@@ -116,7 +116,7 @@ router.post('/login', (req, res, next) => {
 
   User.findOne({email: req.body.email } , function(err, user) {
     if (!user) {
-      req.flash('error_msg', 'There is no email exists !');
+      req.flash('error_msg', 'No email exists !');
       return res.redirect('/login');
     }
     //console.log(req.body.email)
