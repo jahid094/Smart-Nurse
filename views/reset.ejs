@@ -1,0 +1,37 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  Reset Password</h1>
+        <%- include ('./partials/messages')%>
+        <form action="/users/reset/<%= token %>" method="POST">
+          <div class="form-group">
+            <label for="email">Password: </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="new password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Conform Password: </label>
+            <input
+              type="password"
+              id="confirm"
+              name="confirm"
+              class="form-control"
+              placeholder="confirm password"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">update password</button>
+        </form>
+        <p class="lead mt-4">
+          Go back to login? <a href="/login">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  

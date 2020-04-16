@@ -1,0 +1,36 @@
+{
+  "name": "node_passport_login",
+  "version": "2.0.0",
+  "description": "Node.js authentication with Passport",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^7.0.0",
+    "async": "^3.2.0",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "crypto": "^1.0.1",
+    "ejs": "^3.0.2",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.0",
+    "express-validator": "^6.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.9.7",
+    "nodemailer": "^6.4.6",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "validate": "^5.1.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^1.19.4"
+  }
+}
