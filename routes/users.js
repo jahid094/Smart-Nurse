@@ -9,12 +9,16 @@ var nodemailer = require('nodemailer');
 const SMTPConnection = require("nodemailer/lib/smtp-connection");
 // Load User model
 const User = require('../models/User');
+// const { checkUserSession } = require('../app.js')
 const { forwardAuthenticated } = require('../config/auth');
 
 const pass = require('../config/keys').GMAILPW;
 
 // Login Page
-router.get('/login', forwardAuthenticated, (req, res) => res.render('login'));
+router.get('/login', forwardAuthenticated , (req, res) => {
+  console.log(req.user)
+  res.render('login')
+});
 
 // Register Page
 router.get('/register', forwardAuthenticated, (req, res) => res.render('register'));

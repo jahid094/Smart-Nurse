@@ -5,6 +5,10 @@ GMAILPW='CodeBreakers8094'
 module.exports = {
     // mongoURI: dbPassword ,
     // //SENDGRID_API_KEY: sendGrid ,
-    GMAILPW 
+    GMAILPW ,
+
+    session: {
+        cookieKey: 'thesmartnurseisjustaawesomewebapplication'
+    }
 };
 

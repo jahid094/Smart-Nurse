@@ -3,7 +3,9 @@ const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
+const cookieSession = require('cookie-session')
 const session = require('express-session');
+const keys = require('./config/keys');
 
 const app = express();
 
@@ -29,10 +31,15 @@ mongoose
 // EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+app.use(cookieSession({
+  maxAge: 24*60*60*1000,
+  keys: [keys.session.cookieKey]
+}))
 
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
 
+app.set('trust proxy', 1)
 // Express session
 app.use(
   session({
@@ -56,6 +63,7 @@ app.use(function(req, res, next) {
   res.locals.error = req.flash('error');
   next();
 });
+
 
 // Routes
 app.use('/', require('./routes/index.js'));
