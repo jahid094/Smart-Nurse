@@ -21,10 +21,10 @@ router.get('/register', forwardAuthenticated, (req, res) => res.render('register
 
 // Register
 router.post('/register', (req, res) => {
-  const {name, email, password, password2} = req.body
+  const {firstname,lastname,gender , age , email, password, password2 , phone , height , weight ,userType} = req.body
   let errors = []
   let newUser
-  if (!name || !email || !password || !password2) {
+  if (!firstname || !lastname || !gender || !age || !email || !password || !password2 || !phone || !height || !weight || !userType ) {
     errors.push({ msg: 'Please enter all fields' });
   }
 
@@ -32,17 +32,39 @@ router.post('/register', (req, res) => {
     errors.push({ msg: 'Passwords do not match' });
   }
 
+  if(age<0){
+    errors.push({ msg: 'age should not be negetive'})
+  }
+
+  if(height < 0 || weight <0 ){
+    errors.push({ msg: 'height or weight should not be negetive'})
+  }
+
   if (password.length < 6) {
     errors.push({ msg: 'Password must be at least 6 characters' });
   }
 
+  // if (userType != checked ) {
+  //   errors.push({ msg: 'Check one' });
+  // }
+
+  
+
+
   if (errors.length > 0) {
     res.render('register', {
       errors,
-      name,
+      firstname,
+      lastname,
+      gender,
+      age,
       email,
       password,
-      password2
+      password2,
+      phone ,
+      height,
+      weight,
+      userType
     });
   } else {
     User.findOne({ email: email }).then(user => {
@@ -50,19 +72,33 @@ router.post('/register', (req, res) => {
         errors.push({ msg: 'Email already exists' });
         res.render('register', {
           errors,
-          name,
+          firstname,
+          lastname,
+          gender,
+          age,
           email,
           password,
-          password2
+          password2,
+          phone ,
+          height,
+          weight,
+          userType
         });
       } else {
         newUser = new User({
-          name,
+          firstname,
+          lastname,
+          gender,
+          age,
           email,
-          password
+          password,
+          phone ,
+          height,
+          weight,
+          userType
         });
 
-        const Token = jwt.sign({ name , email } , process.env.JWT_SECRET)
+        const Token = jwt.sign({ firstname , lastname , email } , process.env.JWT_SECRET)
         newUser.conformationToken = Token
         newUser.conformationExpires = Date.now() + 3600000
         // newUser.resetPasswordToken = null
