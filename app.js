@@ -1,6 +1,7 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
 const passport = require('passport');
 const flash = require('connect-flash');
 const cookieSession = require('cookie-session')
@@ -28,9 +29,13 @@ mongoose
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+
+app.use(bodyParser.json())
+
+
 // EJS
 app.use(expressLayouts);
-app.set('view engine', 'ejs');
+// app.set('view engine', 'ejs');
 app.use(cookieSession({
   maxAge: 24*60*60*1000,
   keys: [keys.session.cookieKey]
@@ -54,15 +59,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Connect flash
-app.use(flash());
+// app.use(flash());
 
 // Global variables
-app.use(function(req, res, next) {
+/* app.use(function(req, res, next) {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
   next();
-});
+}); */
 
 
 // Routes
