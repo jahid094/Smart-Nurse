@@ -54,6 +54,9 @@ const UserSchema = new mongoose.Schema({
   conformationExpires: {
     type: Date
   },
+  cookieToken: {
+    type: String
+  },
   date: {
     type: Date,
     default: Date.now

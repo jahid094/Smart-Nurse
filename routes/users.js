@@ -180,9 +180,15 @@ router.post('/login', (req, res, next) => {
         if (err) { 
           return res.status(400).json({
             message: err
+
           }) 
         }
+        const Token = jwt.sign({ firstname: user.firstname , lastname:user.lastname , email:user.email } , process.env.JWT_SECRET)
+        console.log(Token)
+        user.cookieToken = Token
+        user.save()
         return res.status(200).json({
+          Token,
           message: 'Logged in'
         })
       })
@@ -236,6 +242,16 @@ router.post('/login', (req, res, next) => {
 
 // Logout
 router.get('/logout', (req, res) => {
+  User.findOne({_id: req.user._id }).then((user) =>{
+    user.cookieToken = undefined
+    user.save().then(() => {
+      console.log("cookie deleted")
+    }).catch((error) => {
+      console.log(error)
+    })
+  }).catch((error) => {
+    console.log(error)
+  })
   req.logout();
   return res.status(200).json({
     message: 'You are logged out.'
