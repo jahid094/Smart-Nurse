@@ -103,9 +103,14 @@ router.post('/register', (req, res) => {
 })
 
 // Login
-router.post('/login', passport.authenticate('local'), (req, res, next) => {
+/* router.post('/login', passport.authenticate('local'), (req, res, next) => {
   const {email, password} = req.body
   User.findOne({email} , (err, user) => {
+    if (err) {
+      return res.status(400).json({
+        message: err
+      })
+    }
     if (!user) {
       return res.status(400).json({
         message: 'No account is associated with this email'
@@ -122,6 +127,7 @@ router.post('/login', passport.authenticate('local'), (req, res, next) => {
           })
         })
         if(isValidPassword){
+          console.log(req.authInfo);
           return res.status(200).json({
             message: 'Login Successful.'
           })
@@ -133,13 +139,99 @@ router.post('/login', passport.authenticate('local'), (req, res, next) => {
         }
     }
     else{
-      /* req.flash('error_msg', 'Please authenticate first !');
-      res.redirect('/login'); */
       return res.status(400).json({
         message: 'Please verify your email to login.'
       })
     }
   })
+}) */
+
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local' ,(err, user, info) => {
+    const {email, password} = req.body
+    if (err) { 
+      // return next(err);
+      return res.status(400).json({
+        message: err
+      })
+    }
+    if(!user){
+      return res.status(400).json({
+        message: 'Invalid credentials, could not log you in'
+      })
+    }
+    if(user.varify !== true){
+      return res.status(400).json({
+        message: 'Please verify your email to login.'
+      })
+    }
+    let isValidPassword = false
+    if(user.varify === true){
+      isValidPassword =  bcrypt.compare(password, user.password).then(() => {
+        isValidPassword = true
+      }).catch((error) => {
+        return res.status(400).json({
+          message: 'Could not log you in, please check your credentials and try again.'
+        })
+      })
+    }
+    if(isValidPassword){
+      req.logIn(user, function(err) {
+        if (err) { 
+          return res.status(400).json({
+            message: err
+          }) 
+        }
+        return res.status(200).json({
+          message: 'Logged in'
+        })
+      })
+    } else{
+      return res.status(400).json({
+        message: 'Invalid credentials, could not log you in.'
+      })
+    }
+  })(req, res, next)
+  /* const {email, password} = req.body
+  User.findOne({email} , (err, user) => {
+    if (err) {
+      return res.status(400).json({
+        message: err
+      })
+    }
+    if (!user) {
+      return res.status(400).json({
+        message: 'No account is associated with this email'
+      })
+    }
+    if(user.varify === true){
+        let isValidPassword = false
+
+        isValidPassword =  bcrypt.compare(password, user.password).then(() => {
+          isValidPassword = true
+        }).catch((error) => {
+          return res.status(400).json({
+            message: 'Could not log you in, please check your credentials and try again.'
+          })
+        })
+        if(isValidPassword){
+          console.log(req.authInfo);
+          return res.status(200).json({
+            message: 'Login Successful.'
+          })
+        }
+        else{
+          return res.status(400).json({
+            message: 'Invalid credentials, could not log you in.'
+          })
+        }
+    }
+    else{
+      return res.status(400).json({
+        message: 'Please verify your email to login.'
+      })
+    }
+  }) */
 })
 
 // Logout
