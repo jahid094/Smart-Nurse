@@ -231,7 +231,9 @@ router.post('/reset/:token', function(req, res) {
                     message: 'Password updated successfully.'
                   })
               }catch(e){
-                  console.log(e)
+                return res.status(400).json({
+                  message: e
+                })
               }
             });
           });

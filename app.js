@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const passport = require('passport');
 const flash = require('connect-flash');
-const cookieSession = require('cookie-session')
+//const cookieSession = require('cookie-session')
 const session = require('express-session');
 const keys = require('./config/keys');
 
@@ -36,15 +36,15 @@ app.use(bodyParser.json())
 // EJS
 app.use(expressLayouts);
 // app.set('view engine', 'ejs');
-app.use(cookieSession({
-  maxAge: 24*60*60*1000,
-  keys: [keys.session.cookieKey]
-}))
+// app.use(cookieSession({
+//   maxAge: 24*60*60*1000,
+//   keys: [keys.session.cookieKey]
+// }))
 
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
 
-app.set('trust proxy', 1)
+//app.set('trust proxy', 1)
 // Express session
 app.use(
   session({
