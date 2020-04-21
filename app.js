@@ -6,7 +6,7 @@ const passport = require('passport');
 // const flash = require('connect-flash');
 //const cookieSession = require('cookie-session')
 const session = require('express-session');
-// const keys = require('./config/keys');
+const keys = require('./config/keys');
 
 const app = express();
 
