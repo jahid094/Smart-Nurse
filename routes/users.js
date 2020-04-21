@@ -17,11 +17,11 @@ const pass = require('../config/keys').GMAILPW;
 router.post('/register', (req, res) => {
   const {firstname, lastname, gender, age, email, password, password2, phone, height, weight, userType} = req.body
   let newUser
-  if (!firstname || !lastname || !gender || !age || !email || !password || !password2 || !phone || !height || !weight || !userType ) {
-    return res.status(400).json({
-      message: 'Please enter all fields'
-    }) 
-  }
+  // if (!firstname || !lastname || !gender || !age || !email || !password || !password2 || !phone || !height || !weight || !userType ) {
+  //   return res.status(400).json({
+  //     message: 'Please enter all fields'
+  //   }) 
+  // }
 
   if (password != password2) {
     return res.status(400).json({
@@ -41,11 +41,11 @@ router.post('/register', (req, res) => {
     })
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({
-      message: 'Password must be at least 6 characters'
-    })
-  }
+  // if (password.length < 6) {
+  //   return res.status(400).json({
+  //     message: 'Password must be at least 6 characters'
+  //   })
+  // }
     
   User.findOne({ email: email }).then(user => {
     if (user) {
@@ -86,7 +86,7 @@ router.post('/register', (req, res) => {
           newUser.password = hash;
             try{
                 await newUser.save()
-                return res.status(200).json({
+                return res.status(201).json({
                   newUser,
                   message: 'An verification-mail has been sent to ' + newUser.email + ' . Please verify !'
                 })
