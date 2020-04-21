@@ -69,12 +69,13 @@ const LoginBox = () => {
 
     const errorHandler = () => {
         setError(null)
+        auth.authMessage = null
+        auth.resetMessage = null
     }
 
     return  <React.Fragment>
             {auth.authMessage && <ErrorModal message={auth.authMessage} onClear={errorHandler.bind(this)}/>}
             {auth.resetMessage && <ErrorModal message={auth.resetMessage} onClear={errorHandler.bind(this)}/>}
-            {auth.authMessage = null}
             {error && <ErrorModal message={error} onClear={errorHandler.bind(this)}/>}
             <div className="login" id="loginBox">
                 {isLoading && <LoadingSpinner asOverlay/>}

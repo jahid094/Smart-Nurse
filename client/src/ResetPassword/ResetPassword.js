@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
 import axios from 'axios'
 import {AuthContext} from '../shared/context/auth-context';
@@ -17,6 +17,18 @@ const ResetPassword = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState()
     const [disable, setDisable] = useState(false)
+    useEffect(() => {
+        const verificationMethod = async () =>{
+            try {
+                await axios.get(process.env.REACT_APP_BACKEND_URL+'reset/'+token);
+            } catch (error) {
+                console.log(error.response.data.message)
+                auth.resetMessage = error.response.data.message
+                history.push('/login')
+            }
+        } 
+        verificationMethod()
+    })
 	const submitHandler = async (event) => {
 		event.preventDefault()
 		/* console.log(password)

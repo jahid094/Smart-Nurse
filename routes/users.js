@@ -40,12 +40,6 @@ router.post('/register', (req, res) => {
       message: 'Height or Weight should not be negetive'
     })
   }
-
-  // if (password.length < 6) {
-  //   return res.status(400).json({
-  //     message: 'Password must be at least 6 characters'
-  //   })
-  // }
     
   User.findOne({ email: email }).then(user => {
     if (user) {
@@ -66,17 +60,6 @@ router.post('/register', (req, res) => {
           pass: pass
         }
       });
-      var mailOptions = {
-        to: req.body.email,
-        from: 'codebreakers8094@gmail.com',
-        subject: 'Confirm Your mail',
-        text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
-          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://localhost:3000/confirmation/' + Token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-      };
-      smtpTransport.sendMail(mailOptions, function(err) {
-      });
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, async (err, hash) => {
@@ -86,13 +69,24 @@ router.post('/register', (req, res) => {
           newUser.password = hash;
             try{
                 await newUser.save()
+                var mailOptions = {
+                  to: req.body.email,
+                  from: 'codebreakers8094@gmail.com',
+                  subject: 'Confirm Your mail',
+                  text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
+                    'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+                    'http://localhost:3000/confirmation/' + Token + '\n\n' +
+                    'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+                };
+                smtpTransport.sendMail(mailOptions, function(err) {
+                });
                 return res.status(201).json({
                   newUser,
                   message: 'An verification-mail has been sent to ' + newUser.email + ' . Please verify !'
                 })
-            }catch(e){
+            }catch(error){
                 return res.status(400).json({
-                  message: e
+                  message: error
                 })
             }
           })
@@ -257,8 +251,6 @@ router.post('/reset/:token', function(req, res) {
           return res.status(400).json({
             message: 'Password reset token is invalid or has expired.'
           })
-          /* req.flash('error_msg', 'Password reset token is invalid or has expired. inside post');
-          return res.redirect('back'); */
         }
         if(password === confirm) {
           bcrypt.genSalt(10, (err, salt) => {
@@ -281,8 +273,6 @@ router.post('/reset/:token', function(req, res) {
           return res.status(400).json({
             message: 'Passwords do not match.'
           })
-          /* req.flash("error_msg", "Passwords do not match.");
-            return res.redirect('back'); */
         }
       });
     },
@@ -307,10 +297,25 @@ router.post('/reset/:token', function(req, res) {
       });
     }
   ], function(err) {
-    res.redirect('/login');
   });
 });
 
+
+router.get('/reset/:token', function(req, res) {
+  User.findOne({ 
+    resetPasswordToken: req.params.token, 
+    resetPasswordExpires: { $gt: Date.now() } 
+  }, (err, user) => {
+    if (!user) {
+      return res.status(400).json({
+        message: 'This link has been expired'
+      })
+    }
+    return res.status(200).json({
+      message: 'You can update password with this link!'
+    })  
+  });
+})
 
 User.find({varify: false }).then((user) =>{
   user.forEach((element) => {

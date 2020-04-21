@@ -53,11 +53,23 @@ const RegisterBox = props => {
             setIsLoading(false)
             setDisable(false)
             setSuccess(response.data.message)
+            setFirstName('')
+            setLastName('')
+            setGender('')
+            setAge('')
+            setEmail('')
+            setPassword('')
+            setConfirmPassword('')
+            setPhone('')
+            setHeight('')
+            setWeight('')
+            setUserType('Patient')
         } catch (error) {
-            // console.log(error.response.data.message);
+            const map = error.response.data.message.errors
+            const result = Object.values(map)
             setIsLoading(false)
             setDisable(false)
-            setError(error.response.data.message || 'Something went wrong, please try again.')
+            setError(result[0].message || 'Something went wrong, please try again.')
         }
     }
 
