@@ -175,6 +175,11 @@ router.post('/logout', (req, res) => {
 router.post('/verifyCookie', (req, res) => {
   const {token} = req.body
   User.findOne({cookieToken: token}).then((user) =>{
+    if(!user){
+      return res.status(400).json({
+        message: 'Cookie not Exist'
+      })
+    }
     return res.status(200).json({
       message: 'Cookie Exist'
     })

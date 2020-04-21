@@ -8,16 +8,18 @@ import './App.css';
 
 const App = () => {
   const auth = useContext(AuthContext)
+  const cookies = new Cookies()
   useEffect(() => {
     const token = new Cookies().get('token')
+    console.log(token)
     if(token !== undefined){
       // console.log(token)
       const verifyToken = async () => { 
         try {
-          await axios.post(process.env.REACT_APP_BACKEND_URL+'verifyCookie', {
+          const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'verifyCookie', {
               token
           });
-          // console.log(response.data);
+          console.log(response.data);
           auth.userId = new Cookies().get('userId')
           auth.firstName = new Cookies().get('firstName')
           auth.token = token
@@ -27,6 +29,14 @@ const App = () => {
           console.log('Login Status: '+auth.isLoggedIn) */
         } catch (error) {
             console.log(error.response.data.message);
+            auth.userId = null
+            auth.firstName = null
+            auth.token = null
+            auth.isLoggedIn = false
+            cookies.remove('userId', {path: '/'})
+            cookies.remove('token', {path: '/'})
+            cookies.remove('isLoggedIn', {path: '/'})
+            cookies.remove('firstName', {path: '/'})
         }
       }
       verifyToken()
