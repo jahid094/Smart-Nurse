@@ -1,0 +1,75 @@
+.form {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:100%;
+    height:100%;
+  }
+  
+  input[type=text] {
+      border-radius: 1em;
+      background-color: #E6E6E6; 
+      padding: 18px;
+  }
+  
+  input[type=email] {
+      border-radius: 1em;
+      background-color: #E6E6E6; 
+      padding: 18px;
+  }
+  
+  input[type=password] {
+      border-radius: 1em;
+      background-color: #E6E6E6; 
+      padding: 18px;
+  }
+
+  input[type=tel] {
+    border-radius: 1em;
+    background-color: #E6E6E6; 
+    padding: 18px;
+}
+  
+  .radio_button{
+      padding-left:10px;
+      padding-right:5px;
+      margin-right:10px; 
+      font-size: 22px; 
+      margin-top: -10px;
+  }
+  
+  .form .head {
+    width:100%;
+    height:100%;
+  }
+  
+  .form .head.signup > div:nth-child(2) {
+    background:transparent !important;
+  }
+  
+  .form .body {
+    position:absolute;
+    overflow:hidden;
+    width:100%;
+    height:100%;
+  }
+  
+  .form .body > div {
+    position:absolute;
+    width:100%;
+    height:100%;
+    transition:all 300ms ease-in-out;
+  }
+  .form .body > div.login {
+    left:0%;
+  }
+  .form .body > div.signup {
+    left:100%;
+  }
+  .form .body.active > div.login {
+    left:-100%;
+  }
+  .form .body.active > div.signup {
+    left:0%;
+  }

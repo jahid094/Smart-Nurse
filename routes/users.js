@@ -6,11 +6,10 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken')
 var async = require('async');
 var nodemailer = require('nodemailer');
-const SMTPConnection = require("nodemailer/lib/smtp-connection");
+// const SMTPConnection = require("nodemailer/lib/smtp-connection");
+
 // Load User model
 const User = require('../models/User');
-// const { checkUserSession } = require('../app.js')
-const { forwardAuthenticated } = require('../config/auth');
 
 const pass = require('../config/keys').GMAILPW;
 
@@ -73,7 +72,7 @@ router.post('/register', (req, res) => {
         subject: 'Confirm Your mail',
         text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://' + req.headers.host + '/conformation/' + Token + '\n\n' +
+          'http://localhost:3000/confirmation/' + Token + '\n\n' +
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
       };
       smtpTransport.sendMail(mailOptions, function(err) {
@@ -89,7 +88,7 @@ router.post('/register', (req, res) => {
                 await newUser.save()
                 return res.status(200).json({
                   newUser,
-                  message: 'An varification-mail has been sent to ' + newUser.email + ' . Please verify !'
+                  message: 'An verification-mail has been sent to ' + newUser.email + ' . Please verify !'
                 })
             }catch(e){
                 return res.status(400).json({
@@ -103,49 +102,6 @@ router.post('/register', (req, res) => {
 })
 
 // Login
-/* router.post('/login', passport.authenticate('local'), (req, res, next) => {
-  const {email, password} = req.body
-  User.findOne({email} , (err, user) => {
-    if (err) {
-      return res.status(400).json({
-        message: err
-      })
-    }
-    if (!user) {
-      return res.status(400).json({
-        message: 'No account is associated with this email'
-      })
-    }
-    if(user.varify === true){
-        let isValidPassword = false
-
-        isValidPassword =  bcrypt.compare(password, user.password).then(() => {
-          isValidPassword = true
-        }).catch((error) => {
-          return res.status(400).json({
-            message: 'Could not log you in, please check your credentials and try again.'
-          })
-        })
-        if(isValidPassword){
-          console.log(req.authInfo);
-          return res.status(200).json({
-            message: 'Login Successful.'
-          })
-        }
-        else{
-          return res.status(400).json({
-            message: 'Invalid credentials, could not log you in.'
-          })
-        }
-    }
-    else{
-      return res.status(400).json({
-        message: 'Please verify your email to login.'
-      })
-    }
-  })
-}) */
-
 router.post('/login', (req, res, next) => {
   passport.authenticate('local' ,(err, user, info) => {
     const {email, password} = req.body
@@ -184,10 +140,10 @@ router.post('/login', (req, res, next) => {
           }) 
         }
         const Token = jwt.sign({ firstname: user.firstname , lastname:user.lastname , email:user.email } , process.env.JWT_SECRET)
-        console.log(Token)
         user.cookieToken = Token
         user.save()
         return res.status(200).json({
+          user,
           Token,
           message: 'Logged in'
         })
@@ -198,59 +154,22 @@ router.post('/login', (req, res, next) => {
       })
     }
   })(req, res, next)
-  /* const {email, password} = req.body
-  User.findOne({email} , (err, user) => {
-    if (err) {
-      return res.status(400).json({
-        message: err
-      })
-    }
-    if (!user) {
-      return res.status(400).json({
-        message: 'No account is associated with this email'
-      })
-    }
-    if(user.varify === true){
-        let isValidPassword = false
-
-        isValidPassword =  bcrypt.compare(password, user.password).then(() => {
-          isValidPassword = true
-        }).catch((error) => {
-          return res.status(400).json({
-            message: 'Could not log you in, please check your credentials and try again.'
-          })
-        })
-        if(isValidPassword){
-          console.log(req.authInfo);
-          return res.status(200).json({
-            message: 'Login Successful.'
-          })
-        }
-        else{
-          return res.status(400).json({
-            message: 'Invalid credentials, could not log you in.'
-          })
-        }
-    }
-    else{
-      return res.status(400).json({
-        message: 'Please verify your email to login.'
-      })
-    }
-  }) */
 })
 
 // Logout
-router.get('/logout', (req, res) => {
-  User.findOne({_id: req.user._id }).then((user) =>{
+router.post('/logout', (req, res) => {
+  const {id} = req.body
+  User.findOne({_id: id}).then((user) =>{
     user.cookieToken = undefined
-    user.save().then(() => {
-      console.log("cookie deleted")
-    }).catch((error) => {
-      console.log(error)
+    user.save().then(() => {}).catch((error) => {
+      return res.status(400).json({
+        message: error
+      })
     })
   }).catch((error) => {
-    console.log(error)
+    return res.status(400).json({
+      message: error
+    })
   })
   req.logout();
   return res.status(200).json({
@@ -258,6 +177,19 @@ router.get('/logout', (req, res) => {
   })
 });
 
+//Verify Cookie
+router.post('/verifyCookie', (req, res) => {
+  const {token} = req.body
+  User.findOne({cookieToken: token}).then((user) =>{
+    return res.status(200).json({
+      message: 'Cookie Exist'
+    })
+  }).catch((error) => {
+    return res.status(400).json({
+      message: error
+    })
+  })
+});
 
 router.post('/forgot', function(req, res, next) {
   const {email} = req.body
@@ -293,7 +225,7 @@ router.post('/forgot', function(req, res, next) {
         subject: 'Node.js Password Reset',
         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+          'http://localhost:3000/resetPassword/' + token + '\n\n' +
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
       };
       smtpTransport.sendMail(mailOptions, function(err) {
@@ -383,13 +315,8 @@ router.post('/reset/:token', function(req, res) {
 User.find({varify: false }).then((user) =>{
   user.forEach((element) => {
     var expire = moment(new Date()).isSameOrBefore(element.conformationExpires)
-    console.log(element.name)
-    console.log(moment(new Date()).isSameOrBefore(element.conformationExpires))
     if(!expire){
-      User.deleteOne(element).then((user) =>{
-        console.log(element.name , ' deleted')
-
-      }).catch((e) =>{
+      User.deleteOne(element).then((user) =>{}).catch((e) =>{
         console.log(e)
       })
     }

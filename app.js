@@ -3,10 +3,10 @@ const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const passport = require('passport');
-const flash = require('connect-flash');
+// const flash = require('connect-flash');
 //const cookieSession = require('cookie-session')
 const session = require('express-session');
-const keys = require('./config/keys');
+// const keys = require('./config/keys');
 
 const app = express();
 
@@ -25,9 +25,15 @@ mongoose.connect(process.env.MONGODB_URL,{
 
 app.use(bodyParser.json())
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+  next()
+})
 
 // EJS
-app.use(expressLayouts);
+// app.use(expressLayouts);
 // app.set('view engine', 'ejs');
 // app.use(cookieSession({
 //   maxAge: 24*60*60*1000,
@@ -39,13 +45,13 @@ app.use(express.urlencoded({ extended: true }));
 
 //app.set('trust proxy', 1)
 // Express session
-app.use(
+/* app.use(
   session({
     secret: 'secret',
     resave: true,
     saveUninitialized: true
   })
-);
+); */
 
 // Passport middleware
 app.use(passport.initialize());
