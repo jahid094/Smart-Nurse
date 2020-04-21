@@ -21,7 +21,11 @@ mongoose.connect(process.env.MONGODB_URL,{
     useNewUrlParser: true ,
     useUnifiedTopology: true,
     useCreateIndex: true
-  }).then(() => console.log('MongoDB Connected')).catch(err => console.log(err));
+  }).then(() => console.log('MongoDB Connected')).catch((err) => {
+    console.log("Mongo url")
+    console.log(process.env.MONGODB_URL)
+    console.log(err)
+  });
 
 app.use(bodyParser.json())
 
