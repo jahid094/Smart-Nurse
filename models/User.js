@@ -26,7 +26,12 @@ const UserSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    required: true
+    required: true,
+    validate(value){
+      if(!validator.isAlphanumeric(value)){
+        throw new Error('gender should not be Alphanumeric')
+      }
+    }
   },
   age: {
     type: String,
