@@ -228,6 +228,11 @@ router.post('/forgot', function(req, res, next) {
       };
       smtpTransport.sendMail(mailOptions, function(err) {
         done(err, 'done');
+
+        if (err) {
+          return res.status(400).send(err);
+        }
+
         return res.status(200).json({
           token,
           message: 'An e-mail has been sent to ' + email + ' with further instructions.'
