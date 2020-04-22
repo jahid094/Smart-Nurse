@@ -16,7 +16,7 @@ const Box = () => {
         setIsLoginOpen(false)
     }
 
-    return  <div className="container-fluid w-100 full_div">
+    return  <div className="container-fluid w-100 h-100 full_div">
         {
             isLoginOpen?
             <Helmet>

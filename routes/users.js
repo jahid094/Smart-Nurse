@@ -6,7 +6,6 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken')
 var async = require('async');
 var nodemailer = require('nodemailer');
-// const SMTPConnection = require("nodemailer/lib/smtp-connection");
 
 // Load User model
 const User = require('../models/User');
@@ -297,7 +296,6 @@ router.post('/reset/:token', function(req, res) {
           'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
       };
       smtpTransport.sendMail(mailOptions, function(err) {
-        // req.flash('success_msg', 'Success! Your password has been changed.');
         done(err);
       });
     }
