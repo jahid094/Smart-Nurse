@@ -6,7 +6,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken')
 var async = require('async');
 var nodemailer = require('nodemailer');
-
+const SMTPConnection = require("nodemailer/lib/smtp-connection")
 // Load User model
 const User = require('../models/User');
 
@@ -226,13 +226,26 @@ router.post('/forgot', function(req, res, next) {
           process.env.FRONTEND_URL+'resetPassword/' + token + '\n\n' +
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
       };
-      smtpTransport.sendMail(mailOptions, function(err) {
-        done(err, 'done');
-        return res.status(200).json({
-          token,
-          message: 'An e-mail has been sent to ' + email + ' with further instructions.'
+      // smtpTransport.sendMail(mailOptions, function(err) {
+      //   done(err, 'done');
+      //   return res.status(200).json({
+      //     token,
+      //     message: 'An e-mail has been sent to ' + email + ' with further instructions.'
+      //   })
+      // });
+
+      return smtpTransporter.sendMail(mailOptions)
+        .then(info => {
+            // res.send("email sent");
+            res.status(200).json({
+                  token,
+                  message: 'An e-mail has been sent to ' + email + ' with further instructions.'
+              })
         })
-      });
+        .catch(err => {
+            console.log(err);
+            res.status(500).send("Error sending mail")
+        })
       
     }
   ], function(err) {
