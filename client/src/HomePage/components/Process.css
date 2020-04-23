@@ -1,0 +1,7 @@
+@media only screen and (min-width: 1200px) {
+    .process{
+        background-image: url("../../shared/img/Team Teresa.jpg");
+        background-repeat: no-repeat; 
+        background-size: cover;
+    }
+}

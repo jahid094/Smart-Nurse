@@ -1,4 +1,6 @@
-client/
 node_modules/
 .env
 .env.production
+client/.firebase/
+client/.firebaserc
+client/firebase.json
