@@ -17,7 +17,7 @@ const Slider = () => {
             <Carousel.Caption>
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-lg-5">
                             <p className="text-left font-weight-bold" style={{fontSize: '40px'}}>Get all your medical solutions in all one place.</p>
                             <p className="animated slideInDown text-left" style={{fontSize: '15px'}}>We provide all kind of medical services
     for your healthy life. We can feel your pain. </p>

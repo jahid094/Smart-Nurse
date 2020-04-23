@@ -1,9 +1,9 @@
 const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
+// const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const passport = require('passport');
-const session = require('express-session');
+// const session = require('express-session');
 const keys = require('./config/keys');
 
 const app = express();
@@ -37,7 +37,6 @@ app.use(express.urlencoded({ extended: true }));
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Routes
 app.use('/', require('./routes/users.js'));

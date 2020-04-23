@@ -86,19 +86,19 @@ const Menu = () => {
                     <NavDropdown 
                     className="justify-content-center"
                     title={
-                        <button type="button" className="btn bg-light p-1 dropdown-toggle" style={{borderRadius: '1em'}} data-toggle="dropdown">Welcome {auth.firstName}
+                        <button type="button" className="btn bg-light p-1 dropdown-toggle rounded-pill" data-toggle="dropdown">Welcome {auth.firstName}
                             <i className="fa fa-angle-down"></i>
                         </button>
                     } id="basic-nav-dropdown">
                         <li>
                         <NavDropdown.Item className="d-flex justify-content-lg-center">
-                            <button className="btn-lg-block p-1" style={{ borderRadius: '1em'}}>Edit Profile</button>
+                            <button className="btn-lg-block p-1 rounded-pill">Edit Profile</button>
                         </NavDropdown.Item>
                         </li>
                         <hr className="bg-white mx-3 mx-lg-4"/>
                         <NavDropdown.Item className="d-flex justify-content-lg-center">
                             <li>
-                                <button className="btn-lg-block" style={{ borderRadius: '1em'}} onClick={logoutHandler}>Logout</button>
+                                <button className="btn-lg-block rounded-pill" onClick={logoutHandler}>Logout</button>
                             </li>
                         </NavDropdown.Item>
                     </NavDropdown>

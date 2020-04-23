@@ -2,14 +2,14 @@ import React from 'react';
 import './AboutTeresa.css'
 
 const AboutTeresa = () => {
-    return  <div className="container-fluid"  style={{paddingTop: '200px', backgroundColor: '#F1F5F8'}}>
-        <div className="row w-100 about-teresa">
-            <div className="col-md-5 card5">
+    return  <div className="container-fluid py-5 mb-5" style={{backgroundColor: '#F1F5F8'}}>
+        <div className="row w-100 mt-5 mb-n5 about-teresa">
+            <div className="col-lg-5 bg-white mt-n5 pb-5 ml-5 card5">
                 <div>
-                    <p className="font-weight-bold text-center" style={{marginTop: '25px', paddingLeft: '25px', paddingRight: '25px', fontSize: '50px'}}>What is Teresa</p>
+                    <p className="font-weight-bold text-center px-5 mt-5 h1">What is Teresa</p>
                 </div>
-                <hr style={{border: '1px solid red', marginLeft: '210px', marginRight: '230px'}}/>
-                <div className="text-justify" style={{fontSize: '23px', marginLeft: '10px', marginRight: '10px', color: '#D8C8DA'}}>
+                <hr className="mx-auto" style={{border: '1px solid red'}}/>
+                <div className="text-justify mx-2 h4 font-weight-normal" style={{color: '#D8C8DA'}}>
                     Teresa is an online platform where you can
                     get all kind of medical services whenever
                     you need. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown
@@ -18,7 +18,7 @@ const AboutTeresa = () => {
                     unchanged. 
                 </div>
             </div>	
-            <div className="col-md-7">	
+            <div className="col-lg-7 d-none d-lg-block">	
             </div>
         </div>
     </div>;

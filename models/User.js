@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken')
 const validator = require('validator')
-
 
 const UserSchema = new mongoose.Schema({
   firstname: {
@@ -29,7 +27,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     validate(value){
       if(!validator.isAlphanumeric(value)){
-        throw new Error('gender should not be Alphanumeric')
+        throw new Error('Gender should not be Alphanumeric')
       }
     }
   },
@@ -40,7 +38,9 @@ const UserSchema = new mongoose.Schema({
     validate(value){
       if(!validator.isInt(value)){
         throw new Error('Age should not be fractional')
-
+      }
+      if(value < 0){
+        throw new Error('Age should not be negetive')
       }
     }
   },
@@ -82,7 +82,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     validate(value){
       if(!validator.isFloat(value)){
-        throw new Error('weight should not be Alphanumeric')
+        throw new Error('Height should not be Alphanumeric')
+      }
+      if(value < 0){
+        throw new Error('Height should not be negetive')
       }
     }
   },
@@ -91,17 +94,20 @@ const UserSchema = new mongoose.Schema({
     required: true,
     validate(value){
       if(!validator.isNumeric(value)){
-        throw new Error('weight should not be Alphanumeric')
+        throw new Error('Weight should not be Alphanumeric')
+      }
+      if(value < 0){
+        throw new Error('Weight should not be negetive')
       }
     }
   },
   userType: {
-    type: String ,
+    type: String,
     required: true
   },
 
   varify: {
-    type: Boolean ,
+    type: Boolean,
     default: false 
   },
   conformationToken: {
@@ -121,9 +127,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   resetPasswordExpires: {
-      type: Date,
+    type: Date,
   }
-
 })
 
 const User = mongoose.model('User', UserSchema);

@@ -16,30 +16,13 @@ const pass = require('../config/keys').GMAILPW;
 router.post('/register', (req, res) => {
   const {firstname, lastname, gender, age, email, password, password2, phone, height, weight, userType} = req.body
   let newUser
-  // if (!firstname || !lastname || !gender || !age || !email || !password || !password2 || !phone || !height || !weight || !userType ) {
-  //   return res.status(400).json({
-  //     message: 'Please enter all fields'
-  //   }) 
-  // }
-
+  
   if (password != password2) {
     return res.status(400).json({
       message: 'Passwords do not match'
     }) 
   }
 
-  if(age<0){
-    return res.status(400).json({
-      message: 'Age should not be negetive'
-    })
-  }
-
-  if(height < 0 || weight <0 ){
-    return res.status(400).json({
-      message: 'Height or Weight should not be negetive'
-    })
-  }
-    
   User.findOne({ email: email }).then(user => {
     if (user) {
       return res.status(400).json({
@@ -91,7 +74,7 @@ router.post('/register', (req, res) => {
           })
         })
       }
-    })
+  })
 })
 
 // Login
@@ -238,7 +221,6 @@ router.post('/forgot', function(req, res, next) {
           message: 'An e-mail has been sent to ' + email + ' with further instructions.'
         })
       });
-      
     }
   ], function(err) {
     if (err) return next(err);
