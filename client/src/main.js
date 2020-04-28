@@ -5,6 +5,7 @@ import Login from './Login/Login'
 import ForgetPassword from './ForgetPassword/ForgetPassword'
 import ResetPassword from './ResetPassword/ResetPassword'
 import VerifyUser from './VerifyUser/VerifyUser'
+import PatientRoutine from './PatientRoutine/PatientRoutine'
 import {AuthContext} from './shared/context/auth-context'
 
 const Main = () => {
@@ -19,7 +20,7 @@ const Main = () => {
             auth.isLoggedIn?
             <Switch>
                 <Route path="/" component={HomePage} exact/>
-            <Redirect to="/"></Redirect>
+                <Redirect to="/"></Redirect>
             </Switch>
             :          
             <Switch>
@@ -28,6 +29,7 @@ const Main = () => {
                 <Route path="/forgetPassword" component={ForgetPassword} exact/>
                 <Route path="/resetPassword/:token" component={ResetPassword} exact/>
                 <Route path="/confirmation/:token" component={VerifyUser} exact/>
+                <Route path="/patientRoutine" component={PatientRoutine} exact/>
                 <Redirect to="/"></Redirect>
             </Switch>
         }
