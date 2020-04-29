@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 const passport = require('passport');
-// const session = require('express-session');
+const session = require('express-session');
 const keys = require('./config/keys');
 
 const app = express();
@@ -31,6 +31,15 @@ app.use((req, res, next) => {
   next()
 })
 
+// Express session
+app.use(
+  session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  })
+);
+
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
 
@@ -40,6 +49,7 @@ app.use(passport.session());
 
 // Routes
 app.use('/', require('./routes/users.js'));
+app.use('/', require('./routes/routines.js'));
 
 const PORT = process.env.PORT;
 

@@ -10,6 +10,8 @@ const SMTPConnection = require("nodemailer/lib/smtp-connection")
 // Load User model
 const User = require('../models/User');
 
+var userId
+
 const pass = require('../config/keys').GMAILPW;
 
 // Registration 
@@ -115,8 +117,13 @@ router.post('/login', (req, res, next) => {
 
           }) 
         }
+        console.log(user._id)
+        userId  = user._id
         const Token = jwt.sign({ firstname: user.firstname , lastname:user.lastname , email:user.email } , process.env.JWT_SECRET)
         user.cookieToken = Token
+        //const user = User.findOne({email: req.body.email})
+        //userId  = user._id
+        //console.log(user._id)
         user.save()
         return res.status(200).json({
           user,
@@ -337,4 +344,5 @@ router.get('/conformation/:token', (req, res) => {
   });
 })
 
+exports.userId = userId
 module.exports = router;
