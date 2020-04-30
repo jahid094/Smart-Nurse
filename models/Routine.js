@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+var moment = require('moment');
 
 const routineSchema =new mongoose.Schema({
     routineItem: {
@@ -22,7 +23,8 @@ const routineSchema =new mongoose.Schema({
     startDate: {
         type: Date,
         required: true,
-        trim: true
+        trim: true ,
+        
     },
 
     endDate: {

@@ -9,6 +9,9 @@ var nodemailer = require('nodemailer');
 const SMTPConnection = require("nodemailer/lib/smtp-connection")
 // Load User model
 const User = require('../models/User');
+const fs = require('fs')
+
+//var pp = require('../images')
 
 var userId
 
@@ -16,7 +19,7 @@ const pass = require('../config/keys').GMAILPW;
 
 // Registration 
 router.post('/register', (req, res) => {
-  const {firstname, lastname, gender, age, email, password, password2, phone, height, weight, userType} = req.body
+  const {firstname, lastname, gender, age, email, password, password2, phone, height, weight, userType , profilePicture} = req.body
   let newUser
   
   if (password != password2) {
@@ -31,11 +34,12 @@ router.post('/register', (req, res) => {
         message: 'Email already exists'
       })
     } else {
-      newUser = new User({firstname, lastname, gender, age, email, password, phone, height, weight, userType})
+      newUser = new User({firstname, lastname, gender, age, email, password, phone, height, weight, userType , profilePicture})
 
       const Token = jwt.sign({ firstname , lastname , email } , process.env.JWT_SECRET)
       newUser.conformationToken = Token
       newUser.conformationExpires = Date.now() + 3600000
+      // newUser.profilePicture = fs.readFileSync(require('../images/9deeb84acbf43a4dc7c26a982820a3ea'));
 
       var smtpTransport = nodemailer.createTransport({
         service: 'Gmail', 
@@ -78,6 +82,39 @@ router.post('/register', (req, res) => {
       }
   })
 })
+
+
+
+const multer = require('multer')
+const upload = multer({
+  limits: {
+    fileSize: 1000000
+  },
+
+  fileFilter(req , file , cb) {
+    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+        return cb(new Error('please upload a picture !'))
+    }
+    cb(undefined , true)
+
+}
+})
+
+router.post('/users/profilePicture' , upload.single('pp') , async(req,res) => {
+  req.user.profilePicture = req.file.buffer
+  await req.user.save()
+  res.send({ message: 'successfully uploaded'})
+} , (error , req , res , next ) => {
+  res.status(400).send({ error: error.message})
+})
+
+router.delete('/users/profilePicture' ,  async(req,res) => {
+  req.user.profilePicture = undefined
+  await req.user.save()
+  res.send({ message: 'successfully deleted'})
+})
+
+
 
 // Login
 router.post('/login', (req, res, next) => {

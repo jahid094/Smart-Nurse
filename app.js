@@ -6,6 +6,7 @@ const passport = require('passport');
 const session = require('express-session');
 const keys = require('./config/keys');
 
+
 const app = express();
 
 // Passport Config
@@ -40,6 +41,8 @@ app.use(
   })
 );
 
+
+
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
 
@@ -50,6 +53,10 @@ app.use(passport.session());
 // Routes
 app.use('/', require('./routes/users.js'));
 app.use('/', require('./routes/routines.js'));
+
+
+
+
 
 const PORT = process.env.PORT;
 

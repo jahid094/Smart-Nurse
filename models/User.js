@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const validator = require('validator')
+const validator = require('validator');
+
 
 const UserSchema = new mongoose.Schema({
   firstname: {
@@ -128,6 +129,9 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordExpires: {
     type: Date,
+  },
+  profilePicture:{
+    type: Buffer
   }
 })
 

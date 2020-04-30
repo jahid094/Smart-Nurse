@@ -34,7 +34,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'paracitamol',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -45,7 +45,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'azin',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -56,7 +56,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'pantonix',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -67,7 +67,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'coffnix',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -77,7 +77,7 @@ const MyRoutine = () => {
             'notificationState': 'Before 15 Mins'
         },
         {
-            'routineItem': 'Medicine',
+            'routineItem': 'alzin',
             'name': 'Napa',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
@@ -89,7 +89,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'amit',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -100,7 +100,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'xyz',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -111,7 +111,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'zimax',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -122,7 +122,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'netlix',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
@@ -133,7 +133,7 @@ const MyRoutine = () => {
         },
         {
             'routineItem': 'Medicine',
-            'name': 'Napa',
+            'name': 'watol',
             'startDate': '01-01-2020',
             'endDate': '08-01-2020',
             'continuity': '7',
