@@ -162,8 +162,12 @@ router.post('/login', (req, res, next) => {
         //userId  = user._id
         //console.log(user._id)
         user.save()
+        var base64data = Buffer.from(user.profilePicture, 'binary').toString('base64');
+        // var originaldata = Buffer.from(base64data, 'base64');
+
         return res.status(200).json({
-          user,
+          
+          profilePicture: base64data,
           Token,
           message: 'Logged in'
         })
