@@ -7,13 +7,24 @@ const jwt = require('jsonwebtoken')
 var async = require('async');
 var nodemailer = require('nodemailer');
 const SMTPConnection = require("nodemailer/lib/smtp-connection")
-// Load User model
+const sharp = require('sharp')
 const User = require('../models/User');
 const fs = require('fs')
 
-//var pp = require('../images')
+const multer = require('multer')
+const upload = multer({
+  limits: {
+    fileSize: 1000000
+  },
 
-var userId
+  fileFilter(req , file , cb) {
+    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+        return cb(new Error('please upload a picture !'))
+    }
+    cb(undefined , true)
+
+}
+})
 
 const pass = require('../config/keys').GMAILPW;
 
@@ -83,25 +94,41 @@ router.post('/register', (req, res) => {
   })
 })
 
+router.patch('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
+  const buffer = await sharp(req.file.buffer).png().toBuffer()
+  req.user.profilePicture = buffer
+  await req.user.save()
+  res.send({ message: 'successfully uploaded'})
+} , (error , req , res , next ) => {
+  res.status(400).send({ error: error.message})
+})
+
+router.patch('/users/me' ,  async ( req , res) => {
+  //const _id = req.params.id
+  const updates = Object.keys(req.body)
+  const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'address' ,'profilePicture']
+  const isValidOperation = updates.every((update) => allowedupdates.includes(update))
 
 
-const multer = require('multer')
-const upload = multer({
-  limits: {
-    fileSize: 1000000
-  },
+  if(!isValidOperation){
+      return res.status(400).send({ error: 'Invali updates!'})
+  }
 
-  fileFilter(req , file , cb) {
-    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-        return cb(new Error('please upload a picture !'))
-    }
-    cb(undefined , true)
+  try{
+      updates.forEach((update) => req.user[update] = req.body[update])
+      await req.user.save()
+      //const user = await User.findByIdAndUpdate(req.params.id, req.body , { new : true , runValidators: true })
 
-}
+      res.send(req.user)
+  }catch(e){
+      res.status(400).send(e)
+  }
+
 })
 
 router.post('/users/profilePicture' , upload.single('pp') , async(req,res) => {
-  req.user.profilePicture = req.file.buffer
+  const buffer = await sharp(req.file.buffer).png().toBuffer()
+  req.user.profilePicture = buffer
   await req.user.save()
   res.send({ message: 'successfully uploaded'})
 } , (error , req , res , next ) => {
@@ -115,6 +142,20 @@ router.delete('/users/profilePicture' ,  async(req,res) => {
 })
 
 
+router.get('/users/:id/profilePicture' , async(req,res) =>{
+  try{
+
+      const user = await User.findById(req.params.id)
+      if(!user || !user.profilePicture) {
+          throw new Error()
+      }
+
+      user.set('Content-Type' , 'image/png')
+      res.send(user.profilePicture)
+  }catch(e) {
+      res.status(404).send()
+  }
+})
 
 // Login
 router.post('/login', (req, res, next) => {
@@ -166,7 +207,6 @@ router.post('/login', (req, res, next) => {
         // var originaldata = Buffer.from(base64data, 'base64');
 
         return res.status(200).json({
-          
           profilePicture: base64data,
           Token,
           message: 'Logged in'

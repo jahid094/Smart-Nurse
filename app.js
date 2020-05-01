@@ -41,8 +41,6 @@ app.use(
   })
 );
 
-
-
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
 
@@ -53,10 +51,6 @@ app.use(passport.session());
 // Routes
 app.use('/', require('./routes/users.js'));
 app.use('/', require('./routes/routines.js'));
-
-
-
-
 
 const PORT = process.env.PORT;
 
