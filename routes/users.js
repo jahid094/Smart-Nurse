@@ -106,8 +106,52 @@ router.patch('/users/profilePicture' , upload.single('updatepp') , async(req,res
 router.patch('/users/me' ,  async ( req , res) => {
   //const _id = req.params.id
   const updates = Object.keys(req.body)
-  const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'address' ,'profilePicture']
+  const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'address' ,'profilePicture' ]
   const isValidOperation = updates.every((update) => allowedupdates.includes(update))
+  const {password, newPassword, confirmPassword} = req.body
+
+  userPassword =req.user.password;
+
+  if(!password || !newPassword || !confirmPassword)
+  {
+    return res.status(400).json({
+      message: 'please fill neccessary fields ! '
+    }) 
+  }
+
+  password = await bcrypt.hash(password , 10)
+
+  if(userPassword === password)
+  {
+      if(newPassword === confirmPassword) {
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newPassword, salt, async (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            try{
+                await user.save()
+                return res.status(200).json({
+                  message: 'Password updated successfully.'
+                })
+            }catch(e){
+              return res.status(400).json({
+                message: e
+              })
+            }
+          });
+        });
+      } else {
+        return res.status(400).json({
+          message: 'Passwords do not match.'
+        })
+      }
+  }
+
+  // if (newPassword != confirmPassword) {
+  //   return res.status(400).json({
+  //     message: 'Passwords do not match'
+  //   }) 
+  // }
 
 
   if(!isValidOperation){
@@ -425,5 +469,4 @@ router.get('/conformation/:token', (req, res) => {
   });
 })
 
-exports.userId = userId
 module.exports = router;
