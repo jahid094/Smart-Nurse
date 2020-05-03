@@ -56,44 +56,88 @@ const AddRoutine = () => {
         console.log(userType)
         console.log(auth.userId)
         console.log(times) */
-        try {
-            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
-                routineItem,
-                itemName,
-                unit,
-                startDate: moment(startDate).format('YYYY/MM/DD'),
-                endDate: moment(endDate).format('YYYY/MM/DD'),
-                timesPerDay: timesPerDay,
-                beforeAfterMeal: mealState,
-                times,
-                notification: notificationState,
-                notificationFor: userType,
-                owner: auth.userId 
-            });
-            // console.log(response.data);
-            setRoutineItem('Medicine')
-            setItemName('')
-            setUnit('')
-            setStartDate(new Date())
-            setEndDate(new Date())
-            setTimesPerDay(1)
-            setMealState('Before Meal')
-            setTime1('10:00')
-            setTime2('11:00')
-            setTime3('12:00')
-            setTime4('13:00')
-            setTime5('14:00')
-            setNotificationState('Before 5 mins')
-            setUserType('Me')
-            setRoutineFormLoading(false)
-            setDisable(false)
-            setMessage(response.data.message)
-        } catch (error) {
-            // console.log(error.response.data);
-            setRoutineFormLoading(false)
-            setDisable(false)
-            setMessage(error.response.data.message)
+        if(routineItem === 'Activity'){
+            console.log("1")
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
+                    routineItem,
+                    itemName,
+                    startDate: moment(startDate).format('YYYY/MM/DD'),
+                    endDate: moment(endDate).format('YYYY/MM/DD'),
+                    timesPerDay: timesPerDay,
+                    beforeAfterMeal: mealState,
+                    times,
+                    notification: notificationState,
+                    notificationFor: userType,
+                    owner: auth.userId 
+                });
+                // console.log(response.data);
+                setRoutineItem('Medicine')
+                setItemName('')
+                setUnit('')
+                setStartDate(new Date())
+                setEndDate(new Date())
+                setTimesPerDay(1)
+                setMealState('Before Meal')
+                setTime1('10:00')
+                setTime2('11:00')
+                setTime3('12:00')
+                setTime4('13:00')
+                setTime5('14:00')
+                setNotificationState('Before 5 mins')
+                setUserType('Me')
+                setRoutineFormLoading(false)
+                setDisable(false)
+                setMessage(response.data.message)
+            } catch (error) {
+                // console.log(error.response.data);
+                setRoutineFormLoading(false)
+                setDisable(false)
+                setMessage(error.response.data.message)
+            }
+        } else {
+            console.log("2")
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
+                    routineItem,
+                    itemName,
+                    unit,
+                    startDate: moment(startDate).format('YYYY/MM/DD'),
+                    endDate: moment(endDate).format('YYYY/MM/DD'),
+                    timesPerDay: timesPerDay,
+                    beforeAfterMeal: mealState,
+                    times,
+                    notification: notificationState,
+                    notificationFor: userType,
+                    owner: auth.userId 
+                });
+                // console.log(response.data);
+                setRoutineItem('Medicine')
+                setItemName('')
+                setUnit('')
+                setStartDate(new Date())
+                setEndDate(new Date())
+                setTimesPerDay(1)
+                setMealState('Before Meal')
+                setTime1('10:00')
+                setTime2('11:00')
+                setTime3('12:00')
+                setTime4('13:00')
+                setTime5('14:00')
+                setNotificationState('Before 5 mins')
+                setUserType('Me')
+                setRoutineFormLoading(false)
+                setDisable(false)
+                setMessage(response.data.message)
+            } catch (error) {
+                // console.log(error.response.data);
+                setRoutineFormLoading(false)
+                setDisable(false)
+                setMessage(error.response.data.message)
+            }
         }
+
+        
     }
 
     /* const formatAMPM = (date) => {
@@ -162,7 +206,7 @@ const AddRoutine = () => {
                                 <div className={"col-12 col-sm-6 mb-4 "+ unitClassHandler()}>
                                     <div className="lg-form mr-4">
                                         <label>Unit</label>
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
+                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-4">

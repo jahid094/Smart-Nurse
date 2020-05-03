@@ -136,12 +136,14 @@ const UpdateRoutineModal = props => {
                                 <div className="row">
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
+                                        <label>{itemNamePlaceHolder()}</label>
                                         <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder={itemNamePlaceHolder()} name="itemName" value={itemName} onChange={(e) => setItemName(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                                 <div className={"col-12 col-sm-6 mb-4 "+ unitClassHandler()}>
                                     <div className="lg-form mr-4">
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
+                                        <label>Unit</label>
+                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                             {/* </div> */}
@@ -169,11 +171,13 @@ const UpdateRoutineModal = props => {
                             {/* <div className="form-row mb-4"> */}
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
+                                        <label>Times Per Day</label>
                                         <input type="number" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} value={timesPerDay} placeholder="Times Per Day" min="1" max="5" onChange={(e) => setTimesPerDay(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
+                                        <label>Before/After Meal</label>
                                         <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={beforeAfterMeal} onChange={(e) => setBeforeAfterMeal(e.target.value)}>
                                             <option value="Before Meal">Before Meal</option>
                                             <option value="After Meal">After Meal</option>
@@ -187,6 +191,7 @@ const UpdateRoutineModal = props => {
                                 Array.from({ length: timesPerDay }, (v, k) => (
                                     <div className="col-12 col-sm-6 mb-4" key={k}>
                                         <div className="lg-form mr-4 mb-4 mb-sm-0">
+                                            <label>{"Time "+(k+1)}</label>
                                             <TimePicker
                                             className="form-control text-justify rounded-pill"
                                                 onChange={(inputTime) => {
@@ -200,6 +205,7 @@ const UpdateRoutineModal = props => {
                             }
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
+                                        <label>Notification Time</label>
                                         <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={notificationState} onChange={(e) => setNotificationState(e.target.value)}>
                                             <option value="Before 5 mins">Notify Before 5 mins</option>
                                             <option value="Before 15 mins">Notify Before 15 mins</option>
