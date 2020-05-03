@@ -383,10 +383,15 @@ router.post('/users/me', async (req, res) => {
       })
     }
     // console.log(user)
-    const buffer = await sharp(user.profilePicture).toBuffer()
-    let base64data = Buffer.from(buffer, 'binary').toString('base64');
+    if(user.profilePicture){
+      const buffer = await sharp(user.profilePicture).toBuffer()
+      let base64data = Buffer.from(buffer, 'binary').toString('base64');
+      return res.status(200).json({
+        profilePicture: base64data,
+        user
+      })
+    }
     return res.status(200).json({
-      profilePicture: base64data,
       user
     })
   } catch (error) {
@@ -451,6 +456,11 @@ router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res)
     res.status(400).send({ error: error.message})
 })
 
+router.delete('/users/profilePicture' ,  async(req,res) => {
+  req.user.profilePicture = undefined
+  await req.user.save()
+  res.send({ message: 'successfully deleted'})
+})
 
 router.patch('/users/me' ,  async ( req , res) => {
   //const _id = req.params.id

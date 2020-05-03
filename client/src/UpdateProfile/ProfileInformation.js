@@ -38,7 +38,9 @@ const ProfileInformation = () => {
                 setHeight(response.data.user.height)
                 setPhone(response.data.user.phone)
                 setEmail(response.data.user.email)
-                setImageFile("data:image/png;base64,"+response.data.profilePicture)
+                if(response.data.profilePicture){
+                    setImageFile("data:image/png;base64,"+response.data.profilePicture)
+                }
                 setIsLoading(false)
                 setDisable(false)
                 // setMessage(response.data.message)
