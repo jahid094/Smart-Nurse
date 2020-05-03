@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 
-const routineSchema =new mongoose.Schema({
+const routineSchema = new mongoose.Schema({
     routineItem: {
         type: String,
         required: true,
@@ -12,67 +12,54 @@ const routineSchema =new mongoose.Schema({
         required: true,
         trim: true
     },
-
     unit: {
-        type: Number ,
-        required: true,
+        type: Number,
         trim: true
     },
-
     startDate: {
-        type: Date,
+        type: String,
         required: true,
         trim: true
     },
-
     endDate: {
-        type: Date,
+        type: String,
         required: true,
         trim: true
     },
-    
     timesPerDay: {
         type: Number,
         required: true,
         trim: true
     },
     beforeAfterMeal: {
-        type: String ,
-        required: true ,
+        type: String,
         trim: true
     },
-
     times: [{
         time: {
-            type: String ,
+            type: String,
             required: true 
         }
-        
-    }] ,
-
+    }],
     notification: {
         type: String ,
-        required: true ,
+        required: true,
         trim: true
     },
-
     notificationFor: {
         type: String ,
-        required: true ,
+        required: true,
         trim: true
     },
-
     owner: {
         type: mongoose.Schema.Types.ObjectId ,
-        required: true ,
+        required: true,
         ref: 'User'
     }
-} , {
+}, {
     timestamps: true
 })
 
 const Routine = mongoose.model('Routine', routineSchema)
-
-
 
 module.exports = Routine

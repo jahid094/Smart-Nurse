@@ -38,6 +38,7 @@ const Menu = () => {
             const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'logout', {
                 id: auth.userId
             });
+            // const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'logout');
             console.log(response.data);
             auth.userId = null
             auth.firstName = null
@@ -91,8 +92,8 @@ const Menu = () => {
                         </button>
                     } id="basic-nav-dropdown">
                         <li>
-                        <NavDropdown.Item className="d-flex justify-content-lg-center">
-                            <button className="btn-lg-block p-1 rounded-pill">Edit Profile</button>
+                        <NavDropdown.Item className="d-flex justify-content-lg-center" href="/editProfile">
+                            <button className="text-dark bg-white btn-lg-block p-1 rounded-pill text-decoration-none">Edit Profile</button>
                         </NavDropdown.Item>
                         </li>
                         <hr className="bg-white mx-3 mx-lg-4"/>

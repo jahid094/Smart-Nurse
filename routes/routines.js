@@ -1,34 +1,35 @@
 const express = require('express');
 const router = express.Router();;
-const moment = require('moment')
+// const moment = require('moment')
 const Routine = require('../models/Routine');
-const { forwardAuthenticated } = require('../config/auth')
-const User = require('../models/User');
-
-// var userInfo = require('./users')
-// var userId = userInfo.userId
-// console.log(userId)
+// const { forwardAuthenticated } = require('../config/auth')
+// const User = require('../models/User');
 
 router.post('/routine' , async (req, res) =>{
-    // console.log("Routine")
-    // console.log(req.user)
-    console.log("Routine")
+    let owner
+    if(req.user){
+        owner = req.user._id
+    } else {
+        owner = req.body.owner
+    }
     const routine = new Routine({
         ...req.body ,
-        owner: req.user._id 
+        owner
     })
-    
-
+    // console.log(owner)
     try{
         await routine.save()
-        console.log(req.user_id)
+        // console.log(owner)
 
         // console.log(user._id)
-        res.status(201).send(routine)
+        res.status(201).json({
+            message: 'Routine Added Successfully'
+        })
 
-    } catch(e){
-        res.status(400).send(e)
-
+    } catch(error){
+        res.status(400).json({
+            message: error
+        })
     }
 })
 
@@ -48,24 +49,26 @@ router.get('/routine' , async (req, res) => {
 })
 
 
-router.get('/routines/:id' , async (req, res) =>{
-
-
+router.post('/routines' , async (req, res) =>{
+    const {id} = req.body
+    let userId
+    if(req.user){
+        userId = req.user._id
+    } else {
+        userId = id
+    }
     try{
-        const routine = await Routine.find({owner: req.params.id })
-
-        if(!routine){
-            return res.status(404).send()
+        const routine = await Routine.find({owner: userId})
+        if (routine === undefined || routine.length == 0) {
+            return res.status(404).json("Routine not found")
         }
-
-        res.send(routine)
-        
+        return res.status(200).json({
+            routine
+        })
     }catch(e){
-        res.status(500).send(e)
-
+        res.status(500).json(e)
     }
 })
-
 
 router.get('/routine/:id' , async (req, res) =>{
     const _id=req.params.id
@@ -93,21 +96,29 @@ router.patch('/routine/:id' , async ( req , res) => {
     const isValidOperation = updates.every((update) => allowedupdates.includes(update))
 
     if(!isValidOperation){
-        return res.status(400).send({ error: 'Invalid updates!'})
+        return res.status(400).json({ 
+            message: 'Invalid updates!'
+        })
     }
 
     try{
         //const task = await Task.findOne({ _id: req.params.id , owner: req.user._id})
         const routine = await Routine.findOne({ _id: req.params.id })
         if(!routine){
-            return res.status(404).send()
+            return res.status(404).json({ 
+                message: 'Routine not found'
+            })
         }
 
         updates.forEach((update) => routine[update] = req.body[update])
         await routine.save()
-        res.send(routine)
-    }catch(e){
-        res.status(400).send(e)
+        res.json({ 
+            message: 'Routine updated successfully'
+        })
+    }catch(error){
+        res.status(400).json({ 
+            message: error
+        })
     }
 
 })
@@ -118,15 +129,18 @@ router.delete('/routine/:id'  , async(req , res) =>{
         const routine = await Routine.findOneAndDelete({_id: req.params.id})
 
         if(!routine){
-            return res.status(404).send()
+            return res.status(404).json({
+                message: 'Routine not found'
+            })
         }
 
-        res.send(routine)
-
-    }catch(e){
-
-        res.status(500).send(e)
-
+        res.json({
+            message: 'Routine deleted successfully'
+        })
+    }catch(error){
+        res.status(500).json({
+            message: error
+        })
     }
 })
 

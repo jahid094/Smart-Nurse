@@ -1,160 +1,101 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import UpdateRoutineModal from './UpdateRoutineModal'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
-// import Table from 'react-bootstrap/Table'
+import LoadingSpinner from '../shared/component/LoadingSpinner'
+import ErrorModal from '../shared/component/ErrorModal'
+import {AuthContext} from '../shared/context/auth-context'
 
 const MyRoutine = () => {
+    const auth = useContext(AuthContext)
+    const [userRoutine, setUserRoutine] = useState([]);
+    const [time1, setTime1] = useState('')
+    const [time2, setTime2] = useState('')
+    const [time3, setTime3] = useState('')
+    const [time4, setTime4] = useState('')
+    const [time5, setTime5] = useState('')
+    const [rowSelect, setRowSelect] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [message, setMessage] = useState('')
+    useEffect(() => {
+        const getRoutine = async () => { 
+            // setIsLoading(true)
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
+                    id: auth.userId
+                });
+                // console.log(response.data.routine);
+                setUserRoutine(response.data.routine)
+                // setIsLoading(false)
+            } catch (error) {
+                console.log(error.response.data);
+                // setIsLoading(false)
+            }
+          }
+          getRoutine()
+    })
+
     const { SearchBar } = Search;
     const [rowInfo, setRowInfo] = useState({
+        id: null,
         routineItem: null,
-        name: null,
+        itemName: null,
         startDate: null,
         endDate: null,
-        continuity: null,
-        mealState: null,
-        time: null,
+        timesPerDay: null,
+        beforeAfterMeal: null,
+        time1: null,
+        time2: null,
+        time3: null,
+        time4: null,
+        time5: null,
         unit: null,
-        notificationState: null
+        notificationState: null,
+        userType: null
     })
-    const [rowSelect, setRowSelect] = useState(false)
-    const routine = [
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '1',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '2',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '3',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '4',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '5',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '6',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '7',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '8',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '9',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '10',
-            'notificationState': 'Before 15 Mins'
-        },
-        {
-            'routineItem': 'Medicine',
-            'name': 'Napa',
-            'startDate': '01-01-2020',
-            'endDate': '08-01-2020',
-            'continuity': '7',
-            'mealState': 'Before',
-            'time': '9:00 AM',
-            'unit': '11',
-            'notificationState': 'Before 15 Mins'
-        }
-    ]
+
+    const rankFormatter = (cell, row, rowIndex, formatExtraData) => { 
+        return <React.Fragment>
+            <div className="btn-group" role="group" aria-label="Basic example">
+                {/* <button type="button" className="btn-success">
+                    <i className="fas fa-eye"></i>
+                </button>
+                <button type="button" className="btn-primary">
+                    <i className="fas fa-edit"></i>
+                </button> */}
+                <button type="button" className="btn-danger" onClick={() => 
+                    // this.onClickProductSelected(cell, row, rowIndex)} 
+                    // console.log("Clicked" +row._id)
+                    deleteRow(row)
+                    }><i className="fas fa-times-circle"></i>
+                </button>
+            </div>
+        </React.Fragment>;
+    } 
 
     const columns = [
+        {
+            dataField: '_id',
+            text: 'Routine Id',
+            sort: true,
+            hidden: true,
+            headerStyle: {
+                width: '0%'
+            }
+        }, 
         {
             dataField: 'routineItem',
             text: 'Routine Item',
             sort: true,
             headerStyle: {
-                width: '16%'
+                width: '17%'
             }
         }, 
         {
-            dataField: 'name',
+            dataField: 'itemName',
             text: 'Name',
             sort: true,
             headerStyle: {
@@ -166,7 +107,7 @@ const MyRoutine = () => {
             text: 'Start Date',
             sort: true,
             headerStyle: {
-                width: '16%'
+                width: '15%'
             }
         },
         {
@@ -174,31 +115,23 @@ const MyRoutine = () => {
             text: 'End Date',
             sort: true,
             headerStyle: {
-                width: '16%'
+                width: '14%'
             }
         },
         {
-            dataField: 'continuity',
-            text: 'Continuity',
+            dataField: 'timesPerDay',
+            text: 'Times Per Day',
             sort: true,
             headerStyle: {
-                width: '5%'
+                width: '19%'
             }
         },
         {
-            dataField: 'mealState',
+            dataField: 'beforeAfterMeal',
             text: 'Meal',
             sort: true,
             headerStyle: {
-                width: '5%'
-            }
-        },
-        {
-            dataField: 'time',
-            text: 'Time',
-            sort: true,
-            headerStyle: {
-                width: '10%'
+                width: '13%'
             }
         },
         {
@@ -206,21 +139,48 @@ const MyRoutine = () => {
             text: 'Unit',
             sort: true,
             headerStyle: {
-                width: '5%'
+                width: '9%'
             }
         },
         {
-            dataField: 'notificationState',
+            dataField: 'notification',
             text: 'Notification',
             sort: true,
             headerStyle: {
-                width: '16%'
+                width: '20%'
             }
         },
+        { 
+            dataField: "edit", 
+            text: "Actions",
+            sort: false,
+            formatter: rankFormatter,
+            headerStyle: {
+                width: '1%'
+            }
+        }
     ];
 
     const errorHandler = () => {
         setRowSelect(false)
+    }
+
+    const deleteRow = async (row) => {
+        selectRow.clickToSelect = false
+        setIsLoading(true)
+        try {
+            const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'routine/'+row._id);
+            // console.log(response.data)
+            setRowSelect(false)
+            selectRow.clickToSelect = true
+            setMessage(response.data.message)
+            setIsLoading(false)
+        } catch (error) {
+            console.log(error);
+            selectRow.clickToSelect = true
+            setMessage(error.response.data.message)
+            setIsLoading(false)
+        }
     }
 
     const selectRow = {
@@ -231,74 +191,73 @@ const MyRoutine = () => {
             color: 'white'
         },
         onSelect: (row, isSelect, rowIndex, e) => {
-            /* console.log(row);
-            console.log(isSelect);
-            console.log(rowIndex); */
-            setRowSelect(true)
-            setRowInfo({
-                routineItem: row.routineItem,
-                name: row.name,
-                startDate: row.startDate,
-                endDate: row.endDate,
-                continuity: row.continuity,
-                mealState: row.mealState,
-                time: row.time,
-                unit: row.unit,
-                notificationState: row.notificationState
-            })
+            let routineItem = row.routineItem
+            let itemName = row.itemName
+            let startDate = row.startDate
+            let endDate =  row.endDate
+            let timesPerDay = row.timesPerDay
+            let beforeAfterMeal = row.beforeAfterMeal
+            // console.log(row.times.length)
+            let length = row.times.length
+            let i = 0
+            for(i = 0; i < length; i++){
+                eval('setTime'+(i+1))(row.times[i].time)
+            }
+            let unit = row.unit
+            let notificationState = row.notification
+            let userType = row.notificationFor
+            // console.log(row)
+            /* console.log(routineItem);
+            console.log(itemName);
+            console.log(startDate);
+            console.log(endDate);
+            console.log(timesPerDay);
+            console.log(beforeAfterMeal);
+            console.log(time1);
+            console.log(time2);
+            console.log(time3);
+            console.log(time4);
+            console.log(time5);
+            console.log(unit);
+            console.log(notificationState) */
+            if(eval('time'+(timesPerDay))){
+                console.log("if")
+                setRowInfo({
+                    id: row._id,
+                    routineItem,
+                    itemName,
+                    startDate: new Date(startDate),
+                    endDate: new Date(endDate),
+                    timesPerDay,
+                    beforeAfterMeal,
+                    time1,
+                    time2,
+                    time3,
+                    time4,
+                    time5,
+                    unit,
+                    notificationState,
+                    userType
+                })
+                setRowSelect(true)
+            }
         }
     };
 
-
-    /* const renderTableData = () => {
-        return routine.map((routine, index) => {
-           const {routineItem, name, startDate, endDate, continuity, mealState, time, unit, notificationState} = routine //destructuring
-           return (
-                <tr key={unit}>
-                    <td>{routineItem}</td>
-                    <td>{name}</td>
-                    <td>{startDate}</td>
-                    <td>{endDate}</td>
-                    <td>{continuity}</td>
-                    <td>{mealState}</td>
-                    <td>{time}</td>
-                    <td>{unit}</td>
-                    <td>{notificationState}</td>
-                </tr>
-            )
-        })
-    } */ 
+    const messageHandler = () => {
+        setMessage(null)
+    }
 
     return <div className="container-fluid" style={{backgroundColor: '#F5F5F5'}}>
         <div className="container">
+            {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <p className="h2 text-center font-weight-bold mt-5">Your Routine</p>
             {rowInfo && rowSelect && <UpdateRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
-            {/* <div className="row mt-5 mb-5">
-                <Table striped bordered hover>
-                    <thead className="thead-dark"> 
-                        <tr>
-                            <th style={{width: '16%'}}>Routine Item</th>
-                            <th style={{width: '10%'}}>Name</th>
-                            <th style={{width: '16%'}}>Start Date</th>
-                            <th style={{width: '16%'}}>End Date</th>
-                            <th style={{width: '5%'}}>Continuity</th>
-                            <th style={{width: '5%'}}>Meal</th>
-                            <th style={{width: '10%'}}>Time</th>
-                            <th style={{width: '5%'}}>Unit</th>
-                            <th style={{width: '16%'}}>Notification</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {renderTableData()}
-                    </tbody>
-                </Table>
-            </div>*/}
+            {isLoading && <LoadingSpinner asOverlay/>}
             <ToolkitProvider
-                striped  
-                hover
                 // responsive
-                keyField='unit'
-                data={routine}
+                keyField='_id'
+                data={userRoutine}
                 columns={columns} 
                 search
             >
@@ -307,7 +266,7 @@ const MyRoutine = () => {
                 <div>
                     <SearchBar { ...props.searchProps } />
                     <BootstrapTable
-                    classes="table-responsive"
+                    classes="table-responsive table-striped table-hover"
                     headerWrapperClasses="thead-dark"
                     { ...props.baseProps }
                     selectRow={ selectRow }
@@ -317,14 +276,6 @@ const MyRoutine = () => {
                 )
             }
             </ToolkitProvider>
-            {/* <BootstrapTable
-                striped  
-                hover
-                keyField='name'
-                data={routine}
-                columns={columns} 
-                pagination={paginationFactory()}
-            /> */}
         </div>
     </div>;
 };

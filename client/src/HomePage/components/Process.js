@@ -3,16 +3,16 @@ import {Card}from 'react-bootstrap'
 import './Process.css'
 
 const Process = () => {
-    return <div class="container-fluid process">
-        <div class="row">
-            <div class="col-xl-6 ml-5">
+    return <div className="container-fluid process">
+        <div className="row">
+            <div className="col-xl-6 ml-5">
             <p className="h1 font-weight-normal ml-3" style={{color: '#010f54'}}>Process</p>
             <p className="h1 ml-3 mb-3" style={{color: '#010f54'}}>How it work</p>
-            <div class="row">
-                <div class="col-xl-2 text-center justify-content-center mt-4">
-                   <button class="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>01</button>
+            <div className="row">
+                <div className="col-xl-2 text-center justify-content-center mt-4">
+                   <button className="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>01</button>
                 </div>
-                <div class="col-xl-10 mb-5 ml-n3">
+                <div className="col-xl-10 mb-5 ml-n3">
                     <Card className="border-0" style={{backgroundColor: '#F4F8FB'}}>
                         <Card.Body>
                             <Card.Title>
@@ -24,10 +24,10 @@ const Process = () => {
                         </Card.Body>
                     </Card>
                 </div>
-                <div class="col-xl-2 text-center justify-content-center mt-4">
-                   <button class="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>02</button>
+                <div className="col-xl-2 text-center justify-content-center mt-4">
+                   <button className="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>02</button>
                 </div>
-                <div class="col-xl-10 mb-5 ml-n3">
+                <div className="col-xl-10 mb-5 ml-n3">
                     <Card className="border-0" style={{backgroundColor: '#F4F8FB'}}>
                         <Card.Body>
                             <Card.Title>
@@ -39,10 +39,10 @@ const Process = () => {
                         </Card.Body>
                     </Card>
                 </div>
-                <div class="col-xl-2 text-center justify-content-center mt-4">
-                   <button class="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>03</button>
+                <div className="col-xl-2 text-center justify-content-center mt-4">
+                   <button className="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>03</button>
                 </div>
-                <div class="col-xl-10 mb-5 ml-n3">
+                <div className="col-xl-10 mb-5 ml-n3">
                     <Card className="border-0" style={{backgroundColor: '#F4F8FB'}}>
                         <Card.Body>
                             <Card.Title>
@@ -54,10 +54,10 @@ const Process = () => {
                         </Card.Body>
                     </Card>
                 </div>
-                <div class="col-xl-2 text-center justify-content-center mt-4">
-                   <button class="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>04</button>
+                <div className="col-xl-2 text-center justify-content-center mt-4">
+                   <button className="btn btn-lg text-center rounded-circle" style={{backgroundColor: '#E58C8A'}}>04</button>
                 </div>
-                <div class="col-xl-10 mb-5 ml-n3">
+                <div className="col-xl-10 mb-5 ml-n3">
                     <Card className="border-0" style={{backgroundColor: '#F4F8FB'}}>
                         <Card.Body>
                             <Card.Title>

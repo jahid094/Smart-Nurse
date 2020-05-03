@@ -1,37 +1,99 @@
-import React, {useState} from 'react';
-// import TimePicker from 'react-gradient-timepicker';
+import React, {useState,useContext} from 'react';
+import axios from 'axios'
+import moment from 'moment'
 import DatePicker from 'react-date-picker';
-// import TimePicker from 'react-times';
-// import 'react-times/css/material/default.css';
-// import TimeKeeper from 'react-timekeeper';
 import TimePicker from 'react-time-picker';
+import {AuthContext} from '../shared/context/auth-context'
+import LoadingSpinner from '../shared/component/LoadingSpinner'
+import ErrorModal from '../shared/component/ErrorModal'
 import './AddRoutine.css'
 
 const AddRoutine = () => {
+    const auth = useContext(AuthContext)
     const [routineItem, setRoutineItem] = useState('Medicine')
     const [itemName, setItemName] = useState('')
     const [unit, setUnit] = useState('')
     const [startDate, setStartDate] = useState(new Date())
     // const [endDate, setEndDate] = useState(new Date(new Date().getTime()+(3*24*60*60*1000)))
     const [endDate, setEndDate] = useState(new Date())
-    const [continuity, setContinuity] = useState(0)
+    const [timesPerDay, setTimesPerDay] = useState(1)
     const [mealState, setMealState] = useState('Before Meal')
-    const [time, setTime] = useState('10:00')
-    const [notificationState, setNotificationState] = useState('Notify Before 5 mins')
+    const [time1, setTime1] = useState('10:00')
+    const [time2, setTime2] = useState('11:00')
+    const [time3, setTime3] = useState('12:00')
+    const [time4, setTime4] = useState('13:00')
+    const [time5, setTime5] = useState('14:00')
+    const [notificationState, setNotificationState] = useState('Before 5 mins')
     const [userType, setUserType] = useState('Me')
+    const [routineFormLoading, setRoutineFormLoading] = useState(false)
+    const [disable, setDisable] = useState(false)
+    const [message, setMessage] = useState('')
 
     const submitHandler = async (event) => {
         event.preventDefault()
-        console.log(routineItem)
+        setRoutineFormLoading(true)
+        setDisable(true)
+        /* console.log(routineItem)
         console.log(itemName)
         console.log(unit)
-        console.log(startDate)
-        console.log(endDate)
-        console.log(continuity)
-        console.log(mealState)
-        console.log(time)
-        console.log(notificationState)
+        console.log(moment(startDate).format('YYYY/MM/DD'))
+        console.log(timesPerDay)
+        console.log(mealState) */
+        let times = [];
+        let i
+        for (i = 0; i < timesPerDay; i++) {
+            // console.log("Time"+(i+1)+":"+eval('time'+(i+1)))
+            times.push({
+                time: eval('time'+(i+1))
+            })
+        }
+        /* console.log("Time1:"+time1)
+        console.log("Time2:"+time2)
+        console.log("Time3:"+time3)
+        console.log("Time4:"+time4)
+        console.log("Time5:"+time5) */
+        /* console.log(notificationState)
         console.log(userType)
+        console.log(auth.userId)
+        console.log(times) */
+        try {
+            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
+                routineItem,
+                itemName,
+                unit,
+                startDate: moment(startDate).format('YYYY/MM/DD'),
+                endDate: moment(endDate).format('YYYY/MM/DD'),
+                timesPerDay: timesPerDay,
+                beforeAfterMeal: mealState,
+                times,
+                notification: notificationState,
+                notificationFor: userType,
+                owner: auth.userId 
+            });
+            // console.log(response.data);
+            setRoutineItem('Medicine')
+            setItemName('')
+            setUnit('')
+            setStartDate(new Date())
+            setEndDate(new Date())
+            setTimesPerDay(1)
+            setMealState('Before Meal')
+            setTime1('10:00')
+            setTime2('11:00')
+            setTime3('12:00')
+            setTime4('13:00')
+            setTime5('14:00')
+            setNotificationState('Before 5 mins')
+            setUserType('Me')
+            setRoutineFormLoading(false)
+            setDisable(false)
+            setMessage(response.data.message)
+        } catch (error) {
+            // console.log(error.response.data);
+            setRoutineFormLoading(false)
+            setDisable(false)
+            setMessage(error.response.data.message)
+        }
     }
 
     /* const formatAMPM = (date) => {
@@ -46,16 +108,32 @@ const AddRoutine = () => {
         return strTime;
     } */
 
-    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-    let diffDays
-    if(endDate > startDate){
-        diffDays = Math.ceil(Math.abs((endDate - startDate) / oneDay));
-    } else {
-        diffDays = 0
+    const itemNamePlaceHolder = () => {
+        if(routineItem === 'Medicine'){
+            return 'Medicine Name'
+        }
+        if(routineItem === 'Activity'){
+            return 'Activity Name'
+        }
+        if(routineItem === 'Food'){
+            return 'Food Name'
+        }
+    }
+
+    const unitClassHandler = () => {
+        if(routineItem === 'Activity'){
+            return 'd-none'
+        }
+    }
+
+    const messageHandler = () => {
+        setMessage(null)
     }
 
     return <React.Fragment>
         <div className="container-fluid bg-white">
+            {routineFormLoading && <LoadingSpinner asOverlay/>}
+            {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <div className="container">
                 <div className="row py-5">
                     <div className="col-lg-8">
@@ -75,47 +153,46 @@ const AddRoutine = () => {
                                 </div>
                             </div>
                                
-                            <div className="form-row mb-4">
-                                <div className="col">
+                            {/* <div className="form-row mb-4"> */}
+                            <div className="row">
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Item name" name="itemName" value={itemName} onChange={(e) => setItemName(e.target.value)} required/>
+                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder={itemNamePlaceHolder()} name="itemName" value={itemName} onChange={(e) => setItemName(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
-                                <div className="col">
-                                    <div className="lg-form mr-4" >
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required/>
+                                <div className={"col-12 col-sm-6 mb-4 "+ unitClassHandler()}>
+                                    <div className="lg-form mr-4">
+                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
-                            </div>
+                            {/* </div> */}
                
-                            <div className="form-row mb-4">
-                                <div className="col">
+                            {/* <div className="form-row mb-4"> */}
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>Start Date</label>
-                                        {/* <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Start Date"/> */}
-                                        <DatePicker className="form-control text-justify rounded-pill" onChange={(date) => {
+                                        <DatePicker className="form-control text-justify rounded-pill" selected={startDate}  dateFormat={moment(startDate).format('DD/MM/YYYY')} onChange={(date) => {
                                             setStartDate(date)
                                         }} value={startDate}/>
                                     </div>
                                 </div>
-                                <div className="col">
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>End Date</label>
-                                        {/* <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="End Date"/> */}
                                         <DatePicker className="form-control text-justify rounded-pill" onChange={(date) => {
                                             setEndDate(date)
                                         }} value={endDate}/>
                                     </div>
                                 </div>
-                            </div>
+                            {/* </div> */}
                
-                            <div className="form-row mb-4">
-                                <div className="col">
+                            {/* <div className="form-row mb-4"> */}
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} value={diffDays} placeholder="Continuity" onChange={(e) => setContinuity(diffDays)} readOnly/>
+                                        <input type="number" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} value={timesPerDay} placeholder="Times Per Day" min="1" max="5" onChange={(e) => setTimesPerDay(e.target.value)} required disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
-                                <div className="col">
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={mealState} onChange={(e) => setMealState(e.target.value)}>
                                             <option value="Before Meal">Before Meal</option>
@@ -123,47 +200,30 @@ const AddRoutine = () => {
                                         </select>
                                     </div>
                                 </div>
-                            </div>
+                            {/* </div> */}
               
-                            <div className="form-row mb-4">
-                                <div className="col-12 col-sm-6">
-                                    <div className="lg-form mr-4 mb-4 mb-sm-0">
-                                        {/* <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Time"/> */}
-                                        {/* <TimePicker
-                                            // time="01:00"
-                                            time={formatAMPM(new Date())}
-                                            theme="Bourbon"
-                                            className="form-control timepicker text-justify rounded-pill"
-                                            placeholder="Start Time"
-                                            onSet={(val) => {
-                                                alert('val:' + val.format12);
-                                            }}
-                                        /> */}
-
-                                        {/* <TimePicker
-                                            onFocusChange={onFocusChange()}
-                                            onTimeChange={onTimeChange()}
-                                        /> */}
-                                        {/* <TimeKeeper
-                                            time={time}
-                                            onChange={(data) => setTime(data.formatted12)}
-                                        /> */}
-
-                                        <TimePicker
-                                        className="form-control text-justify rounded-pill"
-                                            onChange={(inputTime) => {
-                                                setTime(inputTime)
-                                            }}
-                                            value={time} 
-                                        />
+                            {/* <div className="form-row mb-4"> */}
+                            {
+                                Array.from({ length: timesPerDay }, (v, k) => (
+                                    <div className="col-12 col-sm-6 mb-4" key={k}>
+                                        <div className="lg-form mr-4 mb-4 mb-sm-0">
+                                            <TimePicker
+                                            className="form-control text-justify rounded-pill"
+                                                onChange={(inputTime) => {
+                                                    eval('setTime'+(k+1))(inputTime)
+                                                }}
+                                                value={eval('time'+(k+1))} 
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-12 col-sm-6">
+                                ))
+                            }
+                                <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={notificationState} onChange={(e) => setNotificationState(e.target.value)}>
-                                            <option value="Notify Before 5 mins">Notify Before 5 mins</option>
-                                            <option value="Notify Before 15 mins">Notify Before 15 mins</option>
-                                            <option value="Notify Before 30 mins">Notify Before 30 mins</option>
+                                            <option value="Before 5 mins">Notify Before 5 mins</option>
+                                            <option value="Before 15 mins">Notify Before 15 mins</option>
+                                            <option value="Before 30 mins">Notify Before 30 mins</option>
                                         </select>
                                     </div>
                                 </div>
@@ -173,8 +233,8 @@ const AddRoutine = () => {
                             </div>
                
                             <div className="form-row my-4"> 
-                                <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
-                                <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>
+                                <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
+                                <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>
                             </div>
                             <div className="row mt-5">
 				                <div className="col-lg-4">
