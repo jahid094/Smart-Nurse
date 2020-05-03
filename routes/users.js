@@ -3,14 +3,32 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const moment = require('moment')
 const passport = require('passport');
+const sharp = require('sharp')
 const jwt = require('jsonwebtoken')
-var async = require('async');
-var nodemailer = require('nodemailer');
+const async = require('async');
+const formidable = require('formidable');
+const nodemailer = require('nodemailer');
 const SMTPConnection = require("nodemailer/lib/smtp-connection")
 // Load User model
 const User = require('../models/User');
 
+// var userId
+
 const pass = require('../config/keys').GMAILPW;
+
+const multer = require('multer')
+const upload = multer({
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter(req , file , cb) {
+    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+        return cb(new Error('please upload a picture !'))
+    }
+    cb(undefined , true)
+
+  }
+})
 
 // Registration 
 router.post('/register', (req, res) => {
@@ -115,8 +133,13 @@ router.post('/login', (req, res, next) => {
 
           }) 
         }
+        // console.log(user._id)
+        // userId  = user._id
         const Token = jwt.sign({ firstname: user.firstname , lastname:user.lastname , email:user.email } , process.env.JWT_SECRET)
         user.cookieToken = Token
+        //const user = User.findOne({email: req.body.email})
+        //userId  = user._id
+        //console.log(user._id)
         user.save()
         return res.status(200).json({
           user,
@@ -135,7 +158,13 @@ router.post('/login', (req, res, next) => {
 // Logout
 router.post('/logout', (req, res) => {
   const {id} = req.body
-  User.findOne({_id: id}).then((user) =>{
+  let userId = id || req.user._id
+  if(req.user){
+    userId = req.user._id
+  } else {
+    userId = id
+  }
+  User.findOne({_id: userId}).then((user) =>{
     user.cookieToken = undefined
     user.save().then(() => {}).catch((error) => {
       return res.status(400).json({
@@ -337,4 +366,300 @@ router.get('/conformation/:token', (req, res) => {
   });
 })
 
+router.post('/users/me', async (req, res) => {
+  const {id} = req.body
+  let userId = id || req.user._id
+  if(req.user){
+    userId = req.user._id
+  } else {
+    userId = id
+  }
+
+  try {
+    const user = await  User.findOne({_id: userId}).exec()
+    if(!user){
+      return res.status(400).json({
+        message: "User not found"
+      })
+    }
+    // console.log(user)
+    if(user.profilePicture){
+      const buffer = await sharp(user.profilePicture).toBuffer()
+      let base64data = Buffer.from(buffer, 'binary').toString('base64');
+      return res.status(200).json({
+        profilePicture: base64data,
+        user
+      })
+    }
+    return res.status(200).json({
+      user
+    })
+  } catch (error) {
+    console.log(error)
+  }
+
+  /* User.findOne({_id: userId}).then((user) =>{
+    if(!user){
+      return res.status(400).json({
+        message: "User not found"
+      })
+    }
+    const buffer = await sharp(user.profilePicture).toBuffer()
+      
+    user.profilePicture = buffer
+    let base64data = Buffer.from(buffer, 'binary').toString('base64');
+    return res.status(200).json({
+      profilePicture: base64data,
+      user
+    })
+  }).catch((error) => {
+    return res.status(400).json({
+      message: "error1"
+    })
+  }) */
+})
+
+
+router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
+    console.log(req.file)
+    const buffer = await sharp(req.file.buffer).resize({width: 250, height: 250}).png().toBuffer()
+    const {id} = req.body
+    console.log(req.file)
+    let userId = id || req.user._id
+    if(req.user){
+      userId = req.user._id
+    } else {
+      userId = id
+    }
+    User.findOne({_id: userId}).then((user) =>{
+      user.profilePicture = buffer
+      let base64data = Buffer.from(buffer, 'binary').toString('base64');
+      user.save().then(() => {
+        return res.status(200).json({
+          message: 'Successfully uploaded',
+          profilePicture: base64data
+        })
+      }).catch((error) => {
+        return res.status(400).json({
+          message: error
+        })
+      })
+    }).catch((error) => {
+      return res.status(400).json({
+        message: error
+      })
+    })
+    // req.user.profilePicture = buffer
+    // await req.user.save()
+    // res.send({ message: 'successfully uploaded'})
+  } , (error , req , res , next ) => {
+    res.status(400).send({ error: error.message})
+})
+
+router.delete('/users/profilePicture' ,  async(req,res) => {
+  req.user.profilePicture = undefined
+  await req.user.save()
+  res.send({ message: 'successfully deleted'})
+})
+
+router.patch('/users/me' ,  async ( req , res) => {
+  //const _id = req.params.id
+  const {id} = req.body
+  let userId = id || req.user._id
+  if(req.user){
+    userId = req.user._id
+  } else {
+    userId = id
+  }
+  const updates = Object.keys(req.body)
+  const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'phone']
+  const isValidOperation = updates.every((update) => allowedupdates.includes(update))
+  const {password, newPassword, confirmPassword} = req.body
+
+  // userPassword =req.user.password;
+
+  if(!password && !newPassword && !confirmPassword)
+  {
+    /* return res.status(400).json({
+      message: 'test'
+    }) */
+    console.log("1")
+    User.findOne({_id: userId}).then((user) =>{
+      updates.forEach((update) => user[update] = req.body[update])
+      user.save().then(() => {
+        return res.status(200).json({
+          message: 'Successfully updated'
+        })
+      }).catch((error) => {
+        return res.status(400).json({
+          message: error
+        })
+      })
+    }).catch((error) => {
+      return res.status(400).json({
+        message: error
+      })
+    })
+  }
+
+  else if(password && (!newPassword || !confirmPassword))
+  {
+    console.log("2")
+    return res.status(400).json({
+      message: 'Please enter your new password for update password!'
+    }) 
+  } else {
+    console.log("3")
+    // password = bcrypt.hash(password , 10)
+    // password = bcrypt.hash(password , 10).then().catch()
+
+    User.findOne({_id: userId}).then((user) =>{
+      // password = bcrypt.hash(password , 10).then().catch()
+      /* bcrypt.compare(password, user.password).then((err, res) => {
+        console.log("true")
+        console.log(res)
+      }).catch(() => {
+        console.log("false")
+      }) */
+
+      bcrypt.compare(password, user.password, (err, data) => {
+        //if error than throw error
+        if (err) throw err
+        //if both match than you can do anything
+        if (data) {
+          if(newPassword === confirmPassword) {
+            bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newPassword, salt, async (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            console.log(hash)
+            try{
+                updates.forEach((update) => user[update] = req.body[update])
+                user.password = hash;
+                console.log(hash)
+                await user.save()
+                return res.status(200).json({
+                  message: 'Profile updated successfully.'
+                })
+            }catch(e){
+              return res.status(400).json({
+                message: 'Profile  can not update successfully.'
+              })
+            }
+          });
+          });
+          } else {
+          return res.status(400).json({
+            message: 'Passwords do not match.'
+          })
+        }
+        } else {
+          return res.status(400).json({
+            message: 'Current Password is not correct.'
+          })
+        }
+      })
+
+      /* bcrypt.compare(req.body.password, user.password, function(err, res) {
+        if (err){
+          // handle error
+        }
+        if (res)
+          // Send JWT
+        } else {
+          // response is OutgoingMessage object that server response http request
+          return res.json({success: false, message: 'passwords do not match'});
+          return res.status(200).json({
+            message: 'Password updated successfully.'
+          })
+        }
+      }); */
+
+      /* if(user.password === password){ 
+        if(newPassword === confirmPassword) {
+          bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newPassword, salt, async (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            try{
+                updates.forEach((update) => user[update] = req.body[update])
+                await user.save()
+                return res.status(200).json({
+                  message: 'Password updated successfully.'
+                })
+            }catch(e){
+              return res.status(400).json({
+                message: e
+              })
+            }
+          });
+        });
+    } else {
+        return res.status(400).json({
+          message: 'Passwords do not match.'
+        })
+      }
+  } else {
+    return res.status(400).json({
+      message: 'Current Password is not correct.'
+    })
+  } */}).catch((error) => {
+      return res.status(400).json({
+        message: "error 3"+error
+        
+      })
+    })
+  }
+
+  // password = await bcrypt.hash(password , 10)
+
+  /* if(userPassword === password)
+  {
+      if(newPassword === confirmPassword) {
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newPassword, salt, async (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            try{
+                await user.save()
+                return res.status(200).json({
+                  message: 'Password updated successfully.'
+                })
+            }catch(e){
+              return res.status(400).json({
+                message: e
+              })
+            }
+          });
+        });
+      } else {
+        return res.status(400).json({
+          message: 'Passwords do not match.'
+        })
+      }
+  } */
+
+  // if (newPassword != confirmPassword) {
+  //   return res.status(400).json({
+  //     message: 'Passwords do not match'
+  //   }) 
+  // }
+
+
+  /* if(!isValidOperation){
+      return res.status(400).send({ error: 'Invali updates!'})
+  } */
+
+  /* try{
+      updates.forEach((update) => req.user[update] = req.body[update])
+      await req.user.save()
+      //const user = await User.findByIdAndUpdate(req.params.id, req.body , { new : true , runValidators: true })
+
+      res.send(req.user)
+  }catch(e){
+      res.status(400).send(e)
+  } */
+})
+
+// exports.userId = userId
 module.exports = router;
