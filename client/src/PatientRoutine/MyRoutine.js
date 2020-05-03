@@ -67,10 +67,8 @@ const MyRoutine = () => {
                     <i className="fas fa-edit"></i>
                 </button> */}
                 <button type="button" className="btn-danger" onClick={() => 
-                    // this.onClickProductSelected(cell, row, rowIndex)} 
-                    // console.log("Clicked" +row._id)
                     deleteRow(row)
-                    }><i className="fas fa-times-circle"></i>
+                }><i className="fas fa-times-circle"></i>
                 </button>
             </div>
         </React.Fragment>;
@@ -172,12 +170,12 @@ const MyRoutine = () => {
             const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'routine/'+row._id);
             // console.log(response.data)
             setRowSelect(false)
-            selectRow.clickToSelect = true
+            selectRow.clickToSelect = false
             setMessage(response.data.message)
             setIsLoading(false)
         } catch (error) {
             console.log(error);
-            selectRow.clickToSelect = true
+            selectRow.clickToSelect = false
             setMessage(error.response.data.message)
             setIsLoading(false)
         }

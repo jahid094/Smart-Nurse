@@ -4,10 +4,12 @@ import axios from 'axios'
 import {AuthContext} from '../shared/context/auth-context';
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
+import {Cookies} from 'react-cookie';
 
 const ProfileInformation = () => {
     const auth = useContext(AuthContext)
-    const [imageFile, setImageFile] = useState(ProfilePic);
+    const cookies = new Cookies()
+    const [imageFile, setImageFile] = useState(ProfilePic)
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
@@ -52,7 +54,7 @@ const ProfileInformation = () => {
             }
           }
           getUserData()        
-    }, [])
+    }, [auth.userId])
 
     const submitHandler = async (event) => {
         event.preventDefault()
@@ -86,6 +88,8 @@ const ProfileInformation = () => {
                 setIsLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
+                auth.firstName = firstName
+                cookies.set('firstName', auth.firstName, { path: '/', maxAge: 31536000 });
             } catch (error) {
                 // console.log(error.response.data);
                 setIsLoading(false)

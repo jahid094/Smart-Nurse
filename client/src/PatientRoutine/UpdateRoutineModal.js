@@ -1,16 +1,14 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import axios from 'axios'
 import moment from 'moment'
 import DatePicker from 'react-date-picker';
 import {Modal, Button} from 'react-bootstrap'
 import TimePicker from 'react-time-picker';
-import {AuthContext} from '../shared/context/auth-context'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import './AddRoutine.css'
 
 const UpdateRoutineModal = props => {
-    const auth = useContext(AuthContext)
     const [show, setShow] = useState(true);
     const [routineItem, setRoutineItem] = useState(props.rowInfo.routineItem)
     const [itemName, setItemName] = useState(props.rowInfo.itemName)
