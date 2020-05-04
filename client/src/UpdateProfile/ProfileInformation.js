@@ -60,18 +60,7 @@ const ProfileInformation = () => {
         event.preventDefault()
         setIsLoading(true)
         setDisable(true)
-        /* console.log(firstName)
-        console.log(lastName)
-        console.log(age)
-        console.log(email)
-        console.log(currentPassword)
-        console.log(newPassword)
-        console.log(confirmNewPassword)
-        console.log(phone)
-        console.log(height)
-        console.log(weight) */
         if(!currentPassword){
-            console.log("this")
             try {
                 const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/me', {
                     firstname: firstName,
@@ -84,14 +73,12 @@ const ProfileInformation = () => {
                     confirmPassword: confirmNewPassword,
                     id: auth.userId
                 });
-                // console.log(response.data);
                 setIsLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
                 auth.firstName = firstName
                 cookies.set('firstName', auth.firstName, { path: '/', maxAge: 31536000 });
             } catch (error) {
-                // console.log(error.response.data);
                 setIsLoading(false)
                 setDisable(false)
                 setMessage(error.response.data.message)
@@ -112,7 +99,6 @@ const ProfileInformation = () => {
                     confirmPassword: confirmNewPassword,
                     id: auth.userId
                 });
-                // console.log(response.data);
                 setCurrentPassword('')
                 setNewPassword('')
                 setConfirmNewPassword('')
@@ -120,7 +106,6 @@ const ProfileInformation = () => {
                 setDisable(false)
                 setMessage(response.data.message)
             } catch (error) {
-                // console.log(error.response.data);
                 setIsLoading(false)
                 setDisable(false)
                 setMessage(error.response.data.message)
@@ -147,13 +132,14 @@ const ProfileInformation = () => {
                                 formData.append("updatepp", e.target.files[0]);
                                 formData.append("id", auth.userId);
                                 try {
-                                    await axios.post(process.env.REACT_APP_BACKEND_URL+'users/profilePicture', formData, {
+                                    const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/profilePicture', formData, {
                                         headers: {
                                             'Content-Type': 'multipart/form-data'
                                         }
                                     });
+                                    setMessage(response.data.message)
                                 } catch (error) {
-                                    console.log(error)
+                                    setMessage(error.response.data.message)
                                 }
                             }
                         }/>

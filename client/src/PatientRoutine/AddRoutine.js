@@ -8,6 +8,8 @@ import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import './AddRoutine.css'
 
+/* eslint no-eval: 0 */
+
 const AddRoutine = () => {
     const auth = useContext(AuthContext)
     const [routineItem, setRoutineItem] = useState('Medicine')
@@ -176,7 +178,6 @@ const AddRoutine = () => {
 
     return <React.Fragment>
         <div className="container-fluid bg-white">
-            {routineFormLoading && <LoadingSpinner asOverlay/>}
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <div className="container">
                 <div className="row py-5">
@@ -187,7 +188,7 @@ const AddRoutine = () => {
                                     <span className="font-weight-bold ml-2 h5">Routine Item</span>
                                 </div>
                                 <div className="col-7 col-sm-7">
-                                   <select className="w-100 text-justify rounded-pill p-1" style={{backgroundColor: '#E6E6E6'}} value={routineItem} onChange={(e) => setRoutineItem(e.target.value)}>
+                                   <select className="w-100 text-justify rounded-pill p-1" style={{backgroundColor: '#E6E6E6'}} value={routineItem} onChange={(e) => setRoutineItem(e.target.value)} disabled = {(disable)? "disabled" : ""}>
                                       <option value="Medicine">Medicine</option>
                                       <option value="Activity">Activity</option>
                                       <option value="Food">Food</option>
@@ -206,7 +207,7 @@ const AddRoutine = () => {
                                 <div className={"col-12 col-sm-6 mb-4 "+ unitClassHandler()}>
                                     <div className="lg-form mr-4">
                                         <label>Unit</label>
-                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
+                                        <input type="text" className="form-control text-justify rounded-pill" style={{backgroundColor: '#E6E6E6'}} placeholder="Unit" name="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required = {(routineItem !== 'Activity')? "required" : ""} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-4">
@@ -214,7 +215,7 @@ const AddRoutine = () => {
                                         <label>Start Date</label>
                                         <DatePicker className="form-control text-justify rounded-pill" selected={startDate}  dateFormat={moment(startDate).format('DD/MM/YYYY')} onChange={(date) => {
                                             setStartDate(date)
-                                        }} value={startDate}/>
+                                        }} value={startDate} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-4">
@@ -222,7 +223,7 @@ const AddRoutine = () => {
                                         <label>End Date</label>
                                         <DatePicker className="form-control text-justify rounded-pill" onChange={(date) => {
                                             setEndDate(date)
-                                        }} value={endDate}/>
+                                        }} value={endDate} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
                             {/* </div> */}
@@ -237,7 +238,7 @@ const AddRoutine = () => {
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>Before/After Meal</label>
-                                        <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={mealState} onChange={(e) => setMealState(e.target.value)}>
+                                        <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={mealState} onChange={(e) => setMealState(e.target.value)} disabled = {(disable)? "disabled" : ""}>
                                             <option value="Before Meal">Before Meal</option>
                                             <option value="After Meal">After Meal</option>
                                         </select>
@@ -256,7 +257,8 @@ const AddRoutine = () => {
                                                 onChange={(inputTime) => {
                                                     eval('setTime'+(k+1))(inputTime)
                                                 }}
-                                                value={eval('time'+(k+1))} 
+                                                value={eval('time'+(k+1))}
+                                                disabled = {(disable)? "disabled" : ""} 
                                             />
                                         </div>
                                     </div>
@@ -265,7 +267,7 @@ const AddRoutine = () => {
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>Notification Time</label>
-                                        <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={notificationState} onChange={(e) => setNotificationState(e.target.value)}>
+                                        <select className="w-100 text-secondary text-justify rounded-pill p-2" style={{backgroundColor: '#E6E6E6'}} value={notificationState} onChange={(e) => setNotificationState(e.target.value)} disabled = {(disable)? "disabled" : ""}>
                                             <option value="Before 5 mins">Notify Before 5 mins</option>
                                             <option value="Before 15 mins">Notify Before 15 mins</option>
                                             <option value="Before 30 mins">Notify Before 30 mins</option>
@@ -284,8 +286,9 @@ const AddRoutine = () => {
                             <div className="row mt-5">
 				                <div className="col-lg-4">
                                 </div>
+                                {routineFormLoading && <LoadingSpinner asOverlay/>}
                                 <div className="col-lg-4">
-                                    <button type="submit" className="btn btn-lg btn-block rounded-pill text-light" style={{backgroundColor: '#0C0C52'}}>ADD</button>
+                                    <button type="submit" className="btn btn-lg btn-block rounded-pill text-light" style={{backgroundColor: '#0C0C52'}} disabled = {(disable)? "disabled" : ""}>ADD</button>
                                 </div>
                                 <div className="col-lg-4">
                                 </div>

@@ -4,42 +4,43 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import UpdateRoutineModal from './UpdateRoutineModal'
+import ViewRoutineModal from './ViewRoutineModal'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import {AuthContext} from '../shared/context/auth-context'
 
+/* eslint no-eval: 0 */
+
 const MyRoutine = () => {
     const auth = useContext(AuthContext)
-    const [userRoutine, setUserRoutine] = useState([]);
+    const [userRoutine, setUserRoutine] = useState([])
+    const [rowInfo, setRowInfo] = useState([])
     const [time1, setTime1] = useState('')
     const [time2, setTime2] = useState('')
     const [time3, setTime3] = useState('')
     const [time4, setTime4] = useState('')
     const [time5, setTime5] = useState('')
     const [rowSelect, setRowSelect] = useState(false)
+    const [viewDetails, setViewDetails] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     useEffect(() => {
         const getRoutine = async () => { 
-            // setIsLoading(true)
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
                     id: auth.userId
                 });
-                // console.log(response.data.routine);
                 setUserRoutine(response.data.routine)
-                // setIsLoading(false)
             } catch (error) {
                 console.log(error.response.data);
-                // setIsLoading(false)
             }
           }
           getRoutine()
     })
 
     const { SearchBar } = Search;
-    const [rowInfo, setRowInfo] = useState({
+    /* const [rowInfo, setRowInfo] = useState({
         id: null,
         routineItem: null,
         itemName: null,
@@ -55,17 +56,19 @@ const MyRoutine = () => {
         unit: null,
         notificationState: null,
         userType: null
-    })
+    }) */
 
     const rankFormatter = (cell, row, rowIndex, formatExtraData) => { 
         return <React.Fragment>
             <div className="btn-group" role="group" aria-label="Basic example">
-                {/* <button type="button" className="btn-success">
-                    <i className="fas fa-eye"></i>
+                <button type="button" className="btn-success" onClick={() => 
+                    viewRow()
+                }><i className="fas fa-eye"></i>
                 </button>
-                <button type="button" className="btn-primary">
-                    <i className="fas fa-edit"></i>
-                </button> */}
+                <button type="button" className="btn-primary" onClick={() => 
+                    updateRow()
+                }><i className="fas fa-edit"></i>
+                </button>
                 <button type="button" className="btn-danger" onClick={() => 
                     deleteRow(row)
                 }><i className="fas fa-times-circle"></i>
@@ -161,6 +164,19 @@ const MyRoutine = () => {
 
     const errorHandler = () => {
         setRowSelect(false)
+        setViewDetails(false)
+    }
+
+    const viewRow = () => {
+        if(rowInfo){
+            setViewDetails(true)
+        }
+    }
+
+    const updateRow = () => {
+        if(rowInfo){
+            setRowSelect(true)
+        }
     }
 
     const deleteRow = async (row) => {
@@ -237,7 +253,8 @@ const MyRoutine = () => {
                     notificationState,
                     userType
                 })
-                setRowSelect(true)
+                console.log(rowInfo)
+                // setRowSelect(true)
             }
         }
     };
@@ -251,6 +268,7 @@ const MyRoutine = () => {
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <p className="h2 text-center font-weight-bold mt-5">Your Routine</p>
             {rowInfo && rowSelect && <UpdateRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
+            {rowInfo && viewDetails && <ViewRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
             {isLoading && <LoadingSpinner asOverlay/>}
             <ToolkitProvider
                 // responsive

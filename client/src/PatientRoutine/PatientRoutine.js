@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Helmet} from "react-helmet";
 import Menu from '../shared/component/Menu'
 import AddRoutine from './AddRoutine'
@@ -7,6 +7,7 @@ import Footer from '../shared/component/Footer'
 import './PatientRoutine.css'
 
 const PatientRoutine = () => {
+    const [userLoadingRoutine, setUserRoutine] = useState(false);
     return <React.Fragment>
         <Helmet>
             <meta charSet="utf-8" />
