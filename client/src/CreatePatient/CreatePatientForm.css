@@ -1,0 +1,8 @@
+.form-background{
+    background-image: url('../shared/img/createpatient.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 280px;
+}

@@ -10,6 +10,7 @@ const ProfileInformation = () => {
     const auth = useContext(AuthContext)
     const cookies = new Cookies()
     const [imageFile, setImageFile] = useState(ProfilePic)
+    const [profileimageFile, setProfileImageFile] = useState()
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
@@ -42,6 +43,7 @@ const ProfileInformation = () => {
                 setEmail(response.data.user.email)
                 if(response.data.profilePicture){
                     setImageFile("data:image/png;base64,"+response.data.profilePicture)
+                    setProfileImageFile("data:image/png;base64,"+response.data.profilePicture)
                 }
                 setIsLoading(false)
                 setDisable(false)
@@ -140,6 +142,7 @@ const ProfileInformation = () => {
                                     setMessage(response.data.message)
                                 } catch (error) {
                                     setMessage(error.response.data.message)
+                                    setImageFile(profileimageFile)
                                 }
                             }
                         }/>

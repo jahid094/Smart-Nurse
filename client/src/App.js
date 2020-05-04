@@ -24,9 +24,6 @@ const App = () => {
           auth.firstName = new Cookies().get('firstName')
           auth.token = token
           auth.isLoggedIn = true
-          /* console.log('Login Status: '+auth.userId)
-          console.log('Login Status: '+auth.token)
-          console.log('Login Status: '+auth.isLoggedIn) */
         } catch (error) {
             console.log(error.response.data.message);
             auth.userId = null

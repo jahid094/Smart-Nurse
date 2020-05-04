@@ -1,0 +1,6 @@
+.header-background{
+    background-image: url('../shared/img/Banner.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
