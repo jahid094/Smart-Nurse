@@ -407,7 +407,7 @@ router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res)
       let base64data = Buffer.from(buffer, 'binary').toString('base64');
       user.save().then(() => {
         return res.status(200).json({
-          message: 'Successfully uploaded',
+          message: 'Profile Picture Successfully uploaded',
           profilePicture: base64data
         })
       }).catch((error) => {
