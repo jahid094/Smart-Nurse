@@ -5,11 +5,13 @@ const Routine2 = require('../models/Routine2');
 const { google } = require('googleapis')
 const { OAuth2 } = google.auth
 
-const oAuth2Client = new OAuth2('759600775406-9neojbfh0vbofalflkg1idho3ul9qiap.apps.googleusercontent.com', 'ctyV03lx7NhS-F9qhgX12lhI')
+// const oAuth2Client = new OAuth2('759600775406-9neojbfh0vbofalflkg1idho3ul9qiap.apps.googleusercontent.com', 'ctyV03lx7NhS-F9qhgX12lhI')
+const oAuth2Client = new OAuth2('624964228888-0s7o05kb4s1k6udhfeu3qjq729slrms1.apps.googleusercontent.com',
+'IBsN3UhKZIINJrFbzkjGPmuJ')
 
 oAuth2Client.setCredentials({
     refresh_token:
-    '1//04JaCHg5UqRioCgYIARAAGAQSNwF-L9IrrliBGNJiaUtSLzdH4VyOdSgWSXApQ-qO71bQ0MoRso_Q1SOxZf6GtExF-lakHC45vIY'
+    '1//04RoeUBqGGgdwCgYIARAAGAQSNwF-L9IrSR6BexMgRMGr-Kt9hQSqo7a5Qd1d3mbpf46ufAZat52qy049Fxny73lkjUu0mPxPOG0'
 })
 
 const calendar = google.calendar({
@@ -18,112 +20,137 @@ const calendar = google.calendar({
 })
 
 router.post('/routine2' , async (req, res) =>{
-
-    const eventStartTime = new Date()
-    eventStartTime.setDate(eventStartTime.getDay() + 2)
-
-    const eventEndTime = new Date()
-    eventEndTime.setDate(eventEndTime.getDay() + 4)
-    eventEndTime.setMinutes(eventEndTime.getMinutes() + 45)
-
+    const {startDate, endDate} = req.body
     const routine = new Routine2({
         ...req.body ,
-        startDate: eventStartTime,
-        endDate: eventEndTime,
         owner: '5ea95178ca3a3241d8644a05'
     })
     try{
         await routine.save()
-
         res.status(201).json({
             message: 'Routine Added Successfully'
         })
-
     } catch(error){
         res.status(400).json({
             message: error
         })
     }
-
-    console.log(req.body.itemName)
-    console.log(routine.itemName)
-
-    const length = (routine.times).length
+    const length = routine.times.length
     console.log(length)
 
+    let i
+    for(i = 0; i < routine.times.length; i++){
+        const eventStartTime = new Date(startDate)
+        console.log(req.body.times[i].time)
+        let input = req.body.times[i].time
+        var fields = input.split(':');
+        var hour = fields[0];
+        var minute = fields[1];
+        eventStartTime.setHours(hour)
+        eventStartTime.setMinutes(minute)
+        console.log(eventStartTime)
+        const eventEndTime = new Date(endDate)
+        eventEndTime.setHours(hour)
+        eventEndTime.setMinutes(minute)
 
-    const event = {
-        summary: 'Routine Created',
-        description: `
-        routineItem: ${routine.routineItem} 
-        itemName: ${routine.itemName}
-        timesPerDay: ${routine.timesPerDay}
-        beforeAfterMeal: ${routine.beforeAfterMeal}
-        notificationFor: ${routine.notificationFor}
-        `, 
-        start: {
-            dateTime: eventStartTime,
-            timeZone: 'Asia/Dhaka'
-        },
-        end: {
-            dateTime: eventEndTime,
-            timeZone: 'Asia/Dhaka'
-        },
-        reminders: {
-            useDefault: false,
-            overrides: [{
-                method: "popup",
-                minutes: routine.notification
-              },
-              {
-                method: "email",
-                "minutes": routine.notification
-              }
-            ]
-        },
-        colorId: 9
-    }
-
-    calendar.freebusy.query({
-        resource: {
-            timeMin: eventStartTime,
-            timeMax: eventEndTime,
-            timeZone: 'Asia/Dhaka',
-            items: [{
-                id: 'primary'
-            }]
+        const event = {
+            summary: 'Routine Created',
+            description: `
+            routineItem: ${routine.routineItem} 
+            itemName: ${routine.itemName}
+            timesPerDay: ${routine.timesPerDay}
+            beforeAfterMeal: ${routine.beforeAfterMeal}
+            notificationFor: ${routine.notificationFor}
+            `, 
+            start: {
+                dateTime: eventStartTime,
+                timeZone: 'Asia/Dhaka'
+            },
+            end: {
+                dateTime: eventEndTime,
+                timeZone: 'Asia/Dhaka'
+            },
+            reminders: {
+                useDefault: false,
+                overrides: [{
+                    method: "popup",
+                    minutes: routine.notification
+                  },
+                  {
+                    method: "email",
+                    minutes: routine.notification
+                  }
+                ]
+            },
+            colorId: 9
         }
-    }, (err, res) => {
-        if(err){
-            return console.log('Free Busy Query Error: '+err)
-        }
 
-        return calendar.events.insert({
-            calendarId: 'primary',
-            resource: event
+        calendar.freebusy.query({
+            resource: {
+                timeMin: eventStartTime,
+                timeMax: eventEndTime,
+                timeZone: 'Asia/Dhaka',
+                items: [{
+                    id: 'primary'
+                }]
+            }
         }, (err, res) => {
             if(err){
-                return console.log('Calendar Event Creation Error: '+err)
+                return console.log('Free Busy Query Error: '+err)
             }
-            return console.log('Calendar Event Created')
+    
+            return calendar.events.insert({
+                calendarId: 'primary',
+                resource: event
+            }, (err, res) => {
+                if(err){
+                    return console.log('Calendar Event Creation Error: '+err)
+                }
+                return console.log('Calendar Event Created '+i)
+            })
         })
-    })
+    }
 
+    
 })
 
 router.delete('/routine2/:id'  , async(req , res) =>{
     try{
-        //const task = await Task.findOneAndDelete({_id: req.params.id , owner: req.user._id})
         const routine = await Routine2.findOneAndDelete({_id: req.params.id})
-
-        //13ge1omptj4k7o034udfd3a83o
-
         if(!routine){
             return res.status(404).json({
                 message: 'Routine not found'
             })
         }
-
+        calendar.events.list({
+            calendarId: 'primary',
+            timeMin: new Date(routine.startDate),
+            maxResults: 10,
+            singleEvents: true,
+            orderBy: 'startTime',
+        }, (err, res) => {
+            if (err) return console.log('The API returned an error: ' + err);
+            const events = res.data.items;
+            if (events.length) {
+                console.log('Upcoming 10 events:');
+                events.map((event, i) => {
+                  const start = event.start.dateTime || event.start.date;
+                  console.log(event.id);
+                  console.log(`${start} - ${event.summary}`);
+                  calendar.events.delete({
+                    calendarId: 'primary',
+                    eventId: event.id,
+                }, (err, res) => {
+                    if(err){
+                        return console.log('Calendar Event Delete Creation Error: '+err)
+                    }
+                    return console.log('Calendar Event Deleted')
+                });
+                });
+            } else {
+                console.log('No upcoming events found.');
+            }
+        });
         res.json({
             message: 'Routine deleted successfully'
         })
@@ -132,17 +159,6 @@ router.delete('/routine2/:id'  , async(req , res) =>{
             message: error
         })
     }
-
-
-    calendar.events.delete({
-        calendarId: 'primary',
-        eventId: '13ge1omptj4k7o034udfd3a83o',
-    }, (err, res) => {
-        if(err){
-            return console.log('Calendar Event Delete Creation Error: '+err)
-        }
-        return console.log('Calendar Event Deleted'+ res)
-    });
 })
 
 router.patch('/routine2/:id' , async ( req , res) => {
@@ -156,9 +172,8 @@ router.patch('/routine2/:id' , async ( req , res) => {
             message: 'Invalid updates!'
         })
     }
-    //const task = await Task.findOne({ _id: req.params.id , owner: req.user._id})
     const routine = await Routine2.findOne({ _id: req.params.id })
-
+    const startDateOfRoutine = routine.startDate
     try{
         if(!routine){
             return res.status(404).json({ 
@@ -168,6 +183,139 @@ router.patch('/routine2/:id' , async ( req , res) => {
 
         updates.forEach((update) => routine[update] = req.body[update])
         await routine.save()
+        calendar.events.list({
+            calendarId: 'primary',
+            timeMin: new Date(startDateOfRoutine),
+            maxResults: 10,
+            singleEvents: true,
+            orderBy: 'startTime',
+        }, (err, res) => {
+            if (err) return console.log('The API returned an error: ' + err);
+            const events = res.data.items;
+            if (events.length) {
+                console.log('Upcoming 10 events:');
+                events.map((event, i) => {
+                  const start = event.start.dateTime || event.start.date;
+                  console.log(event.id);
+                  console.log(`${start} - ${event.summary}`);
+                  const eventStartTime = new Date(routine.startDate)
+                    console.log(routine.times[i].time)
+                    let input = routine.times[i].time
+                    var fields = input.split(':');
+                    var hour = fields[0];
+                    var minute = fields[1];
+                    eventStartTime.setHours(hour)
+                    eventStartTime.setMinutes(minute)
+                    console.log(eventStartTime)
+                    const eventEndTime = new Date(routine.endDate)
+                    eventEndTime.setHours(hour)
+                    eventEndTime.setMinutes(minute)
+                  const eventUpdate = {
+                    summary: 'Routine Updated',
+                    description: `
+                    routineItem: ${routine.routineItem} 
+                    itemName: ${routine.itemName}
+                    timesPerDay: ${routine.timesPerDay}
+                    beforeAfterMeal: ${routine.beforeAfterMeal}
+                    notificationFor: ${routine.notificationFor}
+                    `, 
+                    start: {
+                        dateTime: eventStartTime,
+                        timeZone: 'Asia/Dhaka'
+                    },
+                    end: {
+                        dateTime: eventEndTime,
+                        timeZone: 'Asia/Dhaka'
+                    },
+                    reminders: {
+                        useDefault: false,
+                        overrides: [{
+                            method: "popup",
+                            minutes: routine.notification
+                          },
+                          {
+                            method: "email",
+                            "minutes": routine.notification
+                          }
+                        ]
+                    },
+                    colorId: 9
+                }
+                calendar.events.update({
+                    calendarId: 'primary',
+                    eventId: event.id,
+                    resource: eventUpdate
+                }, (err, res) => {
+                    if(err){
+                        return console.log('Calendar Event Update Creation Error: '+err)
+                    }
+                    return console.log('Calendar Event Updated'+ res)
+                });
+                });
+            } else {
+                console.log('No upcoming events found.');
+            }
+        });
+        const length = routine.times.length
+        console.log(length)
+        let i
+        /* for(i = 0; i < routine.times.length; i++){
+            const eventStartTime = new Date(routine.startDate)
+            console.log(routine.times[i].time)
+            let input = routine.times[i].time
+            var fields = input.split(':');
+            var hour = fields[0];
+            var minute = fields[1];
+            eventStartTime.setHours(hour)
+            eventStartTime.setMinutes(minute)
+            console.log(eventStartTime)
+            const eventEndTime = new Date(routine.endDate)
+            eventEndTime.setHours(hour)
+            eventEndTime.setMinutes(minute)
+
+            const eventUpdate = {
+                summary: 'Routine Updated',
+                description: `
+                routineItem: ${routine.routineItem} 
+                itemName: ${routine.itemName}
+                timesPerDay: ${routine.timesPerDay}
+                beforeAfterMeal: ${routine.beforeAfterMeal}
+                notificationFor: ${routine.notificationFor}
+                `, 
+                start: {
+                    dateTime: eventStartTime,
+                    timeZone: 'Asia/Dhaka'
+                },
+                end: {
+                    dateTime: eventEndTime,
+                    timeZone: 'Asia/Dhaka'
+                },
+                reminders: {
+                    useDefault: false,
+                    overrides: [{
+                        method: "popup",
+                        minutes: routine.notification
+                      },
+                      {
+                        method: "email",
+                        "minutes": routine.notification
+                      }
+                    ]
+                },
+                colorId: 9
+            }
+
+            calendar.events.update({
+                calendarId: 'primary',
+                eventId: 'fsphh9dtgmdel433jpd7o7tbdg',
+                resource: eventUpdate
+            }, (err, res) => {
+                if(err){
+                    return console.log('Calendar Event Update Creation Error: '+err)
+                }
+                return console.log('Calendar Event Updated'+ res)
+            });
+        } */
         res.json({ 
             message: 'Routine updated successfully'
         })
@@ -176,60 +324,6 @@ router.patch('/routine2/:id' , async ( req , res) => {
             message: error
         })
     }
-
-    const eventStartTime = new Date()
-    eventStartTime.setDate(eventStartTime.getDay() + 4)
-
-    const eventEndTime = new Date()
-    eventEndTime.setDate(eventEndTime.getDay() + 8)
-    eventEndTime.setMinutes(eventEndTime.getMinutes() + 45)
-
-    const eventUpdate = {
-        summary: 'Routine Updated',
-        description: `
-        routineItem: ${routine.routineItem} 
-        itemName: ${routine.itemName}
-        timesPerDay: ${routine.timesPerDay}
-        beforeAfterMeal: ${routine.beforeAfterMeal}
-        notificationFor: ${routine.notificationFor}
-        `, 
-        start: {
-            dateTime: eventStartTime,
-            timeZone: 'Asia/Dhaka'
-        },
-        end: {
-            dateTime: eventEndTime,
-            timeZone: 'Asia/Dhaka'
-        },
-        reminders: {
-            useDefault: false,
-            overrides: [{
-                method: "popup",
-                minutes: routine.notification
-              },
-              {
-                method: "email",
-                "minutes": routine.notification
-              }
-            ]
-        },
-        colorId: 9
-    }
-
-
-
-
-    calendar.events.update({
-        calendarId: 'primary',
-        eventId: 'fsphh9dtgmdel433jpd7o7tbdg',
-        resource: eventUpdate
-    }, (err, res) => {
-        if(err){
-            return console.log('Calendar Event Update Creation Error: '+err)
-        }
-        return console.log('Calendar Event Updated'+ res)
-    });
-
 })
 
 module.exports = router
