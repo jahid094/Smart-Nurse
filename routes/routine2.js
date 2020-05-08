@@ -14,6 +14,13 @@ oAuth2Client.setCredentials({
     '1//04RoeUBqGGgdwCgYIARAAGAQSNwF-L9IrSR6BexMgRMGr-Kt9hQSqo7a5Qd1d3mbpf46ufAZat52qy049Fxny73lkjUu0mPxPOG0'
 })
 
+/* const oAuth2Client = new OAuth2('759600775406-9neojbfh0vbofalflkg1idho3ul9qiap.apps.googleusercontent.com', 'ctyV03lx7NhS-F9qhgX12lhI')
+
+oAuth2Client.setCredentials({
+    refresh_token:
+    '1//04JaCHg5UqRioCgYIARAAGAQSNwF-L9IrrliBGNJiaUtSLzdH4VyOdSgWSXApQ-qO71bQ0MoRso_Q1SOxZf6GtExF-lakHC45vIY'
+}) */
+
 const calendar = google.calendar({
     version: 'v3',
     auth: oAuth2Client
@@ -164,7 +171,7 @@ router.delete('/routine2/:id'  , async(req , res) =>{
 router.patch('/routine2/:id' , async ( req , res) => {
     //const _id = req.params.id
     const updates = Object.keys(req.body)
-    const allowedupdates = ['routineItem', 'itemName' , 'unit' , 'timesPerDay' , 'beforeAfterMeal' , 'times' ,'notification' ,'notificationFor' ]
+    const allowedupdates = ['routineItem', 'itemName' , 'unit' , 'timesPerDay' ,'startDate', 'endDate','beforeAfterMeal' , 'times' ,'notification' ,'notificationFor' ]
     const isValidOperation = updates.every((update) => allowedupdates.includes(update))
 
     if(!isValidOperation){

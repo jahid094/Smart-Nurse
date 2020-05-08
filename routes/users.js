@@ -10,6 +10,7 @@ const nodemailer = require('nodemailer');
 const SMTPConnection = require("nodemailer/lib/smtp-connection")
 // Load User model
 const User = require('../models/User');
+const { sendWelcomeEmail , sendCancelationEmail , sendResetEmail} =require('../emails/account')
 
 const pass = require('../config/keys').GMAILPW;
 
@@ -49,14 +50,6 @@ router.post('/register', (req, res) => {
       newUser.conformationToken = Token
       newUser.conformationExpires = Date.now() + 3600000
 
-      var smtpTransport = nodemailer.createTransport({
-        service: 'Gmail', 
-        auth: {
-          user: 'codebreakers8094@gmail.com',
-          pass: pass
-        }
-      });
-
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, async (err, hash) => {
           if (err) {
@@ -65,17 +58,8 @@ router.post('/register', (req, res) => {
           newUser.password = hash;
             try{
                 await newUser.save()
-                var mailOptions = {
-                  to: req.body.email,
-                  from: 'codebreakers8094@gmail.com',
-                  subject: 'Confirm Your mail',
-                  text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
-                    'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                    process.env.FRONTEND_URL+'confirmation/' + Token + '\n\n' +
-                    'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-                };
-                smtpTransport.sendMail(mailOptions, function(err) {
-                });
+                sendWelcomeEmail(req.body.email , Token)
+
                 return res.status(201).json({
                   newUser,
                   message: 'An verification-mail has been sent to ' + newUser.email + ' . Please verify !'
@@ -218,34 +202,11 @@ router.post('/forgot', function(req, res, next) {
       });
     },
     function(token, user, done) {
-      var smtpTransport = nodemailer.createTransport({
-        service: 'Gmail', 
-        auth: {
-          user: 'codebreakers8094@gmail.com',
-          pass: pass
-        }
-      });
-      var mailOptions = {
-        to: email,
-        from: 'codebreakers8094@gmail.com',
-        subject: 'Node.js Password Reset',
-        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          process.env.FRONTEND_URL+'resetPassword/' + token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-      };
-      smtpTransport.sendMail(mailOptions, function(err) {
-        done(err, 'done');
-
-        if (err) {
-          return res.status(400).send(err);
-        }
-
-        return res.status(200).json({
-          token,
-          message: 'An e-mail has been sent to ' + email + ' with further instructions.'
-        })
-      });
+      sendResetEmail(email , token)
+      return res.status(200).json({
+        token,
+        message: 'An e-mail has been sent to ' + email + ' with further instructions.'
+      })
     }
   ], function(err) {
     if (err) return next(err);
