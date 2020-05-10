@@ -37,7 +37,7 @@ const ForgetPassword = () => {
     return <React.Fragment>
         {error && <ErrorModal message={error} onClear={errorHandler.bind(this)}/>}
         {success && <ErrorModal message={success} onClear={errorHandler.bind(this)}/>}
-        <div className="containder-fluid w-100 full_div">
+        <div className="containder-fluid w-100 h-100 full_div">
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>Forget Password</title>

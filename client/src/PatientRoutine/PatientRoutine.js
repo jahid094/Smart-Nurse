@@ -7,6 +7,15 @@ import Footer from '../shared/component/Footer'
 import './PatientRoutine.css'
 
 const PatientRoutine = () => {
+    const [renderPage, setRenderPage] = useState(false)
+    const pageRender = () => {
+        setRenderPage(true)
+    }
+
+    const pageNotRender = () => {
+        setRenderPage(false)
+    }
+
     return <React.Fragment>
         <Helmet>
             <meta charSet="utf-8" />
@@ -20,8 +29,8 @@ const PatientRoutine = () => {
                 </div>
             </div>
         </div>
-        <AddRoutine/>
-        <MyRoutine/>
+        <AddRoutine pageRender={pageRender.bind(this)}/>
+        <MyRoutine renderPage={renderPage} pageRender={pageRender.bind(this)} pageNotRender={pageNotRender.bind(this)}/>
         <Footer/>
         </React.Fragment>;
 };

@@ -10,7 +10,7 @@ import './AddRoutine.css'
 
 /* eslint no-eval: 0 */
 
-const AddRoutine = () => {
+const AddRoutine = props => {
     const auth = useContext(AuthContext)
     const [routineItem, setRoutineItem] = useState('Medicine')
     const [itemName, setItemName] = useState('')
@@ -59,7 +59,6 @@ const AddRoutine = () => {
         console.log(auth.userId)
         console.log(times) */
         if(routineItem === 'Activity'){
-            console.log("1")
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
                     routineItem,
@@ -73,7 +72,6 @@ const AddRoutine = () => {
                     notificationFor: userType,
                     owner: auth.userId 
                 });
-                // console.log(response.data);
                 setRoutineItem('Medicine')
                 setItemName('')
                 setUnit('')
@@ -91,14 +89,13 @@ const AddRoutine = () => {
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
+                props.pageRender()
             } catch (error) {
-                // console.log(error.response.data);
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(error.response.data.message)
             }
         } else {
-            console.log("2")
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
                     routineItem,
@@ -113,7 +110,6 @@ const AddRoutine = () => {
                     notificationFor: userType,
                     owner: auth.userId 
                 });
-                // console.log(response.data);
                 setRoutineItem('Medicine')
                 setItemName('')
                 setUnit('')
@@ -131,28 +127,14 @@ const AddRoutine = () => {
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
+                props.pageRender()
             } catch (error) {
-                // console.log(error.response.data);
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(error.response.data.message)
             }
         }
-
-        
     }
-
-    /* const formatAMPM = (date) => {
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        // var ampm = hours >= 12 ? 'pm' : 'am';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-        minutes = minutes < 10 ? '0'+minutes : minutes;
-        // var strTime = hours + ':' + minutes + ' ' + ampm;
-        var strTime = hours + ':' + minutes;
-        return strTime;
-    } */
 
     const itemNamePlaceHolder = () => {
         if(routineItem === 'Medicine'){

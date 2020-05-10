@@ -12,7 +12,7 @@ import {AuthContext} from '../shared/context/auth-context'
 
 /* eslint no-eval: 0 */
 
-const MyRoutine = () => {
+const MyRoutine = props => {
     const auth = useContext(AuthContext)
     const [userRoutine, setUserRoutine] = useState([])
     const [rowInfo, setRowInfo] = useState([])
@@ -25,6 +25,9 @@ const MyRoutine = () => {
     const [viewDetails, setViewDetails] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
+    // const [pageLoading, setPageLoading] = useState(true)
+    const [testBool, setTestBool] = useState(false)
+
     useEffect(() => {
         const getRoutine = async () => { 
             try {
@@ -37,26 +40,39 @@ const MyRoutine = () => {
             }
           }
           getRoutine()
-    })
+    }, [])
+
+    useEffect(() => {
+        const getRoutine = async () => { 
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
+                    id: auth.userId
+                });
+                setUserRoutine(response.data.routine)
+            } catch (error) {
+                console.log(error.response.data);
+            }
+          }
+          getRoutine()
+          setTestBool(false)
+    }, [testBool])
+
+    useEffect(() => {
+        const getRoutine = async () => { 
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
+                    id: auth.userId
+                });
+                setUserRoutine(response.data.routine)
+            } catch (error) {
+                console.log(error.response.data);
+            }
+          }
+          getRoutine()
+          props.pageNotRender()
+    }, [props.renderPage])
 
     const { SearchBar } = Search;
-    /* const [rowInfo, setRowInfo] = useState({
-        id: null,
-        routineItem: null,
-        itemName: null,
-        startDate: null,
-        endDate: null,
-        timesPerDay: null,
-        beforeAfterMeal: null,
-        time1: null,
-        time2: null,
-        time3: null,
-        time4: null,
-        time5: null,
-        unit: null,
-        notificationState: null,
-        userType: null
-    }) */
 
     const rankFormatter = (cell, row, rowIndex, formatExtraData) => { 
         return <React.Fragment>
@@ -165,6 +181,7 @@ const MyRoutine = () => {
     const errorHandler = () => {
         setRowSelect(false)
         setViewDetails(false)
+        props.pageRender()
     }
 
     const viewRow = () => {
@@ -189,11 +206,13 @@ const MyRoutine = () => {
             selectRow.clickToSelect = false
             setMessage(response.data.message)
             setIsLoading(false)
+            setTestBool(true)
         } catch (error) {
             console.log(error);
             selectRow.clickToSelect = false
             setMessage(error.response.data.message)
             setIsLoading(false)
+            setTestBool(true)
         }
     }
 
@@ -271,7 +290,6 @@ const MyRoutine = () => {
             {rowInfo && viewDetails && <ViewRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
             {isLoading && <LoadingSpinner asOverlay/>}
             <ToolkitProvider
-                // responsive
                 keyField='_id'
                 data={userRoutine}
                 columns={columns} 
