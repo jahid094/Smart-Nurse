@@ -139,6 +139,23 @@ class ApiCalendar {
             return false;
         }
     }
+
+    listTodayEvents(maxResults, timeMin) {
+        if (this.gapi) {
+            return this.gapi.client.calendar.events.list({
+                calendarId: this.calendar,
+                timeMin,
+                'showDeleted': false,
+                'singleEvents': true,
+                maxResults,
+                orderBy: 'startTime'
+            });
+        }
+        else {
+            console.log("Error: this.gapi not loaded");
+            return false;
+        }
+    }
     /**
      * Create an event from the current time for a certain period
      * @param {number} time in minutes for the event

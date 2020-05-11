@@ -277,9 +277,16 @@ const MyRoutine = props => {
                 eventMaxTime[i].setMinutes(minute)
                 eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
             }
-            await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
-                events = result.items
-            });
+            if(response.data.timesPerDay > 1){
+                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                    events = result.items
+                });
+            } else {
+                await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                    events = result.items
+                });
+            }
+            
             console.log('Event List Loop Finish');
             console.log('Event List:');
             console.log(events);
