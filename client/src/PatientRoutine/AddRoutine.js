@@ -6,6 +6,7 @@ import TimePicker from 'react-time-picker';
 import {AuthContext} from '../shared/context/auth-context'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
+import ApiCalendar from './ApiCalendar'
 import './AddRoutine.css'
 
 /* eslint no-eval: 0 */
@@ -49,6 +50,10 @@ const AddRoutine = props => {
                 time: eval('time'+(i+1))
             })
         }
+        let notificationTime = notificationState.split(' ');
+        console.log(notificationTime[0])
+        console.log(notificationTime[1])
+        console.log(notificationTime[2])
         /* console.log("Time1:"+time1)
         console.log("Time2:"+time2)
         console.log("Time3:"+time3)
@@ -89,6 +94,54 @@ const AddRoutine = props => {
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
+                for (i = 0; i < timesPerDay; i++) {
+                    console.log('Create Event Loop')
+                    const eventStartTime = new Date(startDate)
+                    let input = times[i].time
+                    var fields = input.split(':');
+                    var hour = fields[0];
+                    var minute = fields[1];
+                    eventStartTime.setHours(hour)
+                    eventStartTime.setMinutes(minute)
+                    eventStartTime.setSeconds(0)
+                    console.log(eventStartTime)
+                    const eventEndTime = new Date(endDate)
+                    eventEndTime.setHours(hour)
+                    eventEndTime.setMinutes(minute)
+                    eventEndTime.setSeconds(0)
+                    const event = {
+                        summary: `${itemName} ${unit}`,
+                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                        `, 
+                        start: {
+                            dateTime: eventStartTime,
+                            timeZone: 'Asia/Dhaka'
+                        },
+                        end: {
+                            dateTime: eventEndTime,
+                            timeZone: 'Asia/Dhaka'
+                        },
+                        reminders: {
+                            useDefault: false,
+                            overrides: [{
+                                method: "popup",
+                                minutes: notificationTime[1]
+                              }
+                            ]
+                        },
+                        colorId: 9
+                    }
+                    // console.log(event)
+                    await ApiCalendar.createEvent(event).then((result) => {
+                        console.log('New Event:');
+                        console.log(result);
+                        setMessage('Your Event is created successfully.')
+                    }).catch((error) => {
+                        console.log('New Event Creation Error:');
+                        console.log(error);
+                        setMessage('Your Event is not created successfully.')
+                    });
+                }
                 props.pageRender()
             } catch (error) {
                 setRoutineFormLoading(false)
@@ -127,7 +180,55 @@ const AddRoutine = props => {
                 setRoutineFormLoading(false)
                 setDisable(false)
                 setMessage(response.data.message)
+                for (i = 0; i < timesPerDay; i++) {
+                    console.log('Create Event Loop')
+                    const eventStartTime = new Date(startDate)
+                    let input = times[i].time
+                    var fields = input.split(':');
+                    var hour = fields[0];
+                    var minute = fields[1];
+                    eventStartTime.setHours(hour)
+                    eventStartTime.setMinutes(minute)
+                    eventStartTime.setSeconds(0)
+                    console.log(eventStartTime)
+                    const eventEndTime = new Date(endDate)
+                    eventEndTime.setHours(hour)
+                    eventEndTime.setMinutes(minute)
+                    eventEndTime.setSeconds(0)
+                    const event = {
+                        summary: `${itemName} ${unit}`,
+                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                        `, 
+                        start: {
+                            dateTime: eventStartTime,
+                            timeZone: 'Asia/Dhaka'
+                        },
+                        end: {
+                            dateTime: eventEndTime,
+                            timeZone: 'Asia/Dhaka'
+                        },
+                        reminders: {
+                            useDefault: false,
+                            overrides: [{
+                                method: "popup",
+                                minutes: notificationTime[1]
+                              }
+                            ]
+                        },
+                        colorId: 9
+                    }
+                    // console.log(event)
+                    await ApiCalendar.createEvent(event).then((result) => {
+                        console.log('New Event:');
+                        console.log(result);
+                        setMessage('Your Event is created successfully.')
+                    }).catch((error) => {
+                        console.log('New Event Creation Error:');
+                        console.log(error);
+                        setMessage('Your Event is not created successfully.')
+                    });
                 props.pageRender()
+            }
             } catch (error) {
                 setRoutineFormLoading(false)
                 setDisable(false)

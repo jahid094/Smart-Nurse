@@ -1,5 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios'
+import moment from 'moment'
+import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -9,6 +11,7 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import {AuthContext} from '../shared/context/auth-context'
+import ApiCalendar from './ApiCalendar'
 
 /* eslint no-eval: 0 */
 
@@ -27,6 +30,7 @@ const MyRoutine = props => {
     const [message, setMessage] = useState('')
     // const [pageLoading, setPageLoading] = useState(true)
     const [testBool, setTestBool] = useState(false)
+    const [signBool, setSignBool] = useState(ApiCalendar.sign)
 
     useEffect(() => {
         const getRoutine = async () => { 
@@ -40,7 +44,7 @@ const MyRoutine = props => {
             }
           }
           getRoutine()
-    }, [])
+    }, [auth.userId])
 
     useEffect(() => {
         const getRoutine = async () => { 
@@ -71,6 +75,16 @@ const MyRoutine = props => {
           getRoutine()
           props.pageNotRender()
     }, [props.renderPage])
+
+    useEffect(()=> {
+        console.log('Effect in sign')
+        ApiCalendar.onLoad(() => {
+            ApiCalendar.listenSign(signUpdate());
+        });
+        setSign(ApiCalendar.sign)
+        setSignBool(ApiCalendar.sign)
+        console.log(sign)
+    }, [signBool])
 
     const { SearchBar } = Search;
 
@@ -178,6 +192,55 @@ const MyRoutine = props => {
         }
     ];
 
+    const getDates = (startDate, stopDate) => {
+        var dateArray = [];
+        var currentDate = moment(startDate);
+        var stopDate = moment(stopDate);
+        while (currentDate <= stopDate) {
+            dateArray.push( moment(currentDate).format('YYYY-MM-DD') )
+            currentDate = moment(currentDate).add(1, 'days');
+        }
+        return dateArray;
+    }
+
+
+    const [sign, setSign] = useState(ApiCalendar.sign)
+
+    const signUpdate = () => {
+        setSign(ApiCalendar.sign)
+    }
+
+    const handleItemClick = async (event, name) => {
+        if (name === 'sign-in') {
+            await ApiCalendar.handleAuthClick();
+            console.log(sign)
+            setSign(ApiCalendar.sign)
+            setSignBool(ApiCalendar.sign)
+            console.log(sign)
+        } else if (name === 'sign-out') {
+            ApiCalendar.handleSignoutClick();
+            console.log(sign)
+            setSign(ApiCalendar.sign)
+            setSignBool(ApiCalendar.sign)
+            console.log(sign)
+        }
+    }
+
+    const getEvent = () => {
+        if (ApiCalendar.sign) {
+                console.log(ApiCalendar.sign)
+                ApiCalendar.listUpcomingEvents(10).then(({result}) => {
+                console.log('Event List:');
+                console.log(result.items);
+                setMessage('Please check your console to view your event list.')
+                console.log(getDates('2020-05-10', '2020-05-15'))
+            });
+        } else{
+            console.log('Not Signed In');
+            setMessage('You are not signed in.')
+        }
+    }
+
     const errorHandler = () => {
         setRowSelect(false)
         setViewDetails(false)
@@ -200,8 +263,53 @@ const MyRoutine = props => {
         selectRow.clickToSelect = false
         setIsLoading(true)
         try {
-            const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'routine/'+row._id);
-            // console.log(response.data)
+            const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routine/'+row._id);
+            console.log(response.data.startDate)
+            console.log(response.data.endDate)
+            let i
+            let eventMinTime = []
+            let eventMaxTime = []
+            let eventMinTimeUTC = []
+            let eventMaxTimeUTC = []
+            let events = []
+            for (i = 0; i < response.data.timesPerDay; i++) {
+                eventMinTime[i] = new Date(response.data.startDate)
+                let input = response.data.times[i].time
+                var fields = input.split(':');
+                var hour = fields[0];
+                var minute = fields[1];
+                eventMinTime[i].setHours(hour)
+                eventMinTime[i].setMinutes(minute)
+                eventMinTimeUTC[i] = moment(eventMinTime[i]).format();                
+                eventMaxTime[i] = new Date(response.data.endDate)
+                eventMaxTime[i].setHours(hour)
+                eventMaxTime[i].setMinutes(minute)
+                eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
+            }
+            await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                events = result.items
+            });
+            console.log('Event List Loop Finish');
+            console.log('Event List:');
+            console.log(events);
+            let deleteId = []
+            for (i = 0; i < events.length; i++) {
+                if(eventMinTimeUTC.indexOf(events[i].start.dateTime) > -1 && eventMaxTimeUTC.indexOf(events[i].end.dateTime) > -1){
+                    deleteId.push(events[i].id)
+                }
+            }
+            const deleteResponse = await axios.delete(process.env.REACT_APP_BACKEND_URL+'routine/'+row._id);
+            setMessage(deleteResponse.data.message)
+            for (i = 0; i < deleteId.length; i++) {
+                console.log(deleteId[i])
+                if (ApiCalendar.sign) {
+                    ApiCalendar.deleteEvent(deleteId[i]).then(({result}) => {
+                        setMessage('Your event is deleted.')
+                    });
+                } else{
+                    setMessage('Your event is not deleted because you are not signed in.')
+                }
+            }
             setRowSelect(false)
             selectRow.clickToSelect = false
             setMessage(response.data.message)
@@ -310,6 +418,19 @@ const MyRoutine = props => {
                 )
             }
             </ToolkitProvider>
+            {
+                ApiCalendar.sign ? 
+                <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
+                    <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-out')} variant="danger">Sign Out</Button>
+                </div>
+                :
+                <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
+                    <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-in')} variant="success">Sign In</Button>
+                </div>
+            }
+            <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
+                <Button className="mx-auto btn-block" onClick={(e) => getEvent()} variant="info">Get Event List</Button>
+            </div>
         </div>
     </div>;
 };
