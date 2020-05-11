@@ -278,10 +278,21 @@ const MyRoutine = props => {
                 eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
             }
             if(response.data.timesPerDay > 1){
-                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
-                    events = result.items
-                });
+                console.log('If')
+                console.log(eventMinTimeUTC[0])
+                console.log(eventMaxTimeUTC[response.data.timesPerDay - 1])
+                console.log(moment(response.data.startDate).isSame(response.data.endDate))
+                if(!moment(response.data.startDate).isSame(response.data.endDate)){
+                    await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                        events = result.items
+                    });
+                } else {
+                    await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                        events = result.items
+                    });
+                }
             } else {
+                console.log('Else')
                 await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
                     events = result.items
                 });
