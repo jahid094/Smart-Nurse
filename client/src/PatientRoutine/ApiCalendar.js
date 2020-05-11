@@ -171,18 +171,18 @@ class ApiCalendar {
      * @param {object} event with start and end dateTime
      * @returns {any}
      */
-    createEvent(event, calendarId = this.calendar) {
+    createEvent(event) {
         return this.gapi.client.calendar.events.insert({
-            'calendarId': calendarId,
-            'resource': event,
+            calendarId: this.calendar,
+            resource: event
         });
     }
 
-    updateEvent(event, calendarId = this.calendar) {
+    updateEvent(event,eventId) {
         return this.gapi.client.calendar.events.update({
-            'calendarId': calendarId,
-            'eventId': "jdb4foo34p2aj8783hblhjfofc",
-            'resource': event,
+            calendarId: this.calendar,
+            eventId,
+            resource: event
         });
     }
 

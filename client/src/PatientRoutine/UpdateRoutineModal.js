@@ -6,6 +6,7 @@ import {Modal, Button} from 'react-bootstrap'
 import TimePicker from 'react-time-picker';
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
+import ApiCalendar from './ApiCalendar'
 import './AddRoutine.css'
 
 /* eslint no-eval: 0 */
@@ -60,26 +61,370 @@ const UpdateRoutineModal = props => {
             endingDate = moment(endDate).format('YYYY/MM/DD')
         }
         try {
-            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
-                routineItem,
-                itemName,
-                unit,
-                startDate: startingDate,
-                endDate: endingDate,
-                timesPerDay: timesPerDay,
-                beforeAfterMeal,
-                times,
-                notification: notificationState,
-                notificationFor: userType 
-            }); 
+            const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id);
+            console.log(response.data)
+            let notificationTime = notificationState.split(' ');
+            console.log(notificationTime[0])
+            console.log(notificationTime[1])
+            console.log(notificationTime[2])
+            if(response.data.timesPerDay == timesPerDay){
+                console.log('if')
+                let i
+                let eventMinTime = []
+                let eventMaxTime = []
+                let eventMinTimeUTC = []
+                let eventMaxTimeUTC = []
+                let events = []
+                for (i = 0; i < response.data.timesPerDay; i++) {
+                    eventMinTime[i] = new Date(response.data.startDate)
+                    let input = response.data.times[i].time
+                    var fields = input.split(':');
+                    var hour = fields[0];
+                    var minute = fields[1];
+                    eventMinTime[i].setHours(hour)
+                    eventMinTime[i].setMinutes(minute)
+                    eventMinTimeUTC[i] = moment(eventMinTime[i]).format();                
+                    eventMaxTime[i] = new Date(response.data.endDate)
+                    eventMaxTime[i].setHours(hour)
+                    eventMaxTime[i].setMinutes(minute)
+                    eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
+                }
+                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                    events = result.items
+                });
+                console.log('Event List Loop Finish');
+                console.log('Event List:');
+                console.log(events);
+                let updateId = []
+                for (i = 0; i < events.length; i++) {
+                    if(eventMinTimeUTC.indexOf(events[i].start.dateTime) > -1 && eventMaxTimeUTC.indexOf(events[i].end.dateTime) > -1){
+                        updateId.push(events[i].id)
+                    }
+                }
+                for (i = 0; i < updateId.length; i++) {
+                    console.log(updateId[i])
+                    /* if (ApiCalendar.sign) {
+                        ApiCalendar.deleteEvent(deleteId[i]).then(({result}) => {
+                            setMessage('Your event is deleted.')
+                        });
+                    } else{
+                        setMessage('Your event is not deleted because you are not signed in.')
+                    } */
+                }
+                if(routineItem === 'Activity'){
+                    console.log('Activity If')
+                    for (i = 0; i < timesPerDay; i++) {
+                        console.log('Create Event Loop')
+                        const eventStartTime = new Date(startingDate)
+                        let input = times[i].time
+                        var fields = input.split(':');
+                        var hour = fields[0];
+                        var minute = fields[1];
+                        eventStartTime.setHours(hour)
+                        eventStartTime.setMinutes(minute)
+                        eventStartTime.setSeconds(0)
+                        console.log(eventStartTime)
+                        const eventEndTime = new Date(endingDate)
+                        eventEndTime.setHours(hour)
+                        eventEndTime.setMinutes(minute)
+                        eventEndTime.setSeconds(0)
+                        const event = {
+                            summary: `${itemName}`,
+                            description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
+                            `, 
+                            start: {
+                                dateTime: eventStartTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            end: {
+                                dateTime: eventEndTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            reminders: {
+                                useDefault: false,
+                                overrides: [{
+                                    method: "popup",
+                                    minutes: notificationTime[1]
+                                  }
+                                ]
+                            },
+                            colorId: 9
+                        }
+                        console.log(event)
+                        await ApiCalendar.updateEvent(event, updateId[i]).then((result) => {
+                            console.log('Updated Event:');
+                            console.log(result);
+                            setMessage('Your Event is updated successfully.')
+                        }).catch((error) => {
+                            console.log('Update Event Creation Error:');
+                            console.log(error);
+                            setMessage('Your Event is not updated successfully.')
+                        });
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType 
+                        }); 
+                        console.log(updateResponse.data)
+                        setMessage(updateResponse.data.message)
+                    }
+                } else {
+                    console.log('Activity Else')
+                    for (i = 0; i < timesPerDay; i++) {
+                        console.log('Create Event Loop')
+                        const eventStartTime = new Date(startingDate)
+                        let input = times[i].time
+                        var fields = input.split(':');
+                        var hour = fields[0];
+                        var minute = fields[1];
+                        eventStartTime.setHours(hour)
+                        eventStartTime.setMinutes(minute)
+                        eventStartTime.setSeconds(0)
+                        console.log(moment(eventStartTime).format())
+                        const eventEndTime = new Date(endingDate)
+                        eventEndTime.setHours(hour)
+                        eventEndTime.setMinutes(minute)
+                        eventEndTime.setSeconds(0)
+                        console.log(moment(eventEndTime).format())
+                        const event = {
+                            summary: `${itemName} ${unit}`,
+                            description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
+                            `, 
+                            start: {
+                                dateTime: moment(eventStartTime).format(),
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            end: {
+                                dateTime: moment(eventEndTime).format(),
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            reminders: {
+                                useDefault: false,
+                                overrides: [{
+                                    method: "popup",
+                                    minutes: notificationTime[1]
+                                  }
+                                ]
+                            },
+                            colorId: 9
+                        }
+                        console.log(event)
+                        await ApiCalendar.updateEvent(event, updateId[i]).then((result) => {
+                            console.log('Updated Event:');
+                            console.log(result);
+                            setMessage('Your Event is updated successfully.')
+                        }).catch((error) => {
+                            console.log('Update Event Creation Error:');
+                            console.log(error);
+                            setMessage('Your Event is not updated successfully.')
+                        });
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType 
+                        }); 
+                        console.log(updateResponse.data)
+                        setMessage(updateResponse.data.message)
+                    }   
+                }
+            } else {
+                console.log('else')
+                let i
+                let eventMinTime = []
+                let eventMaxTime = []
+                let eventMinTimeUTC = []
+                let eventMaxTimeUTC = []
+                let events = []
+                for (i = 0; i < response.data.timesPerDay; i++) {
+                    eventMinTime[i] = new Date(response.data.startDate)
+                    let input = response.data.times[i].time
+                    var fields = input.split(':');
+                    var hour = fields[0];
+                    var minute = fields[1];
+                    eventMinTime[i].setHours(hour)
+                    eventMinTime[i].setMinutes(minute)
+                    eventMinTimeUTC[i] = moment(eventMinTime[i]).format();                
+                    eventMaxTime[i] = new Date(response.data.endDate)
+                    eventMaxTime[i].setHours(hour)
+                    eventMaxTime[i].setMinutes(minute)
+                    eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
+                }
+                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                    events = result.items
+                });
+                console.log('Event List Loop Finish');
+                console.log('Event List:');
+                console.log(events);
+                let deleteId = []
+                for (i = 0; i < events.length; i++) {
+                    if(eventMinTimeUTC.indexOf(events[i].start.dateTime) > -1 && eventMaxTimeUTC.indexOf(events[i].end.dateTime) > -1){
+                        deleteId.push(events[i].id)
+                    }
+                }
+                for (i = 0; i < deleteId.length; i++) {
+                    console.log(deleteId[i])
+                    if (ApiCalendar.sign) {
+                        ApiCalendar.deleteEvent(deleteId[i]).then(({result}) => {
+                            console.log('Your event is deleted.')
+                            // setMessage('Your event is deleted.')
+                        });
+                    } else{
+                        console.log('Your event is not deleted because you are not signed in.')
+                        // setMessage('Your event is not deleted because you are not signed in.')
+                    }
+                }
+                if(routineItem === 'Activity'){
+                    console.log('Activity If')
+                    for (i = 0; i < timesPerDay; i++) {
+                        console.log('Create Event Loop')
+                        const eventStartTime = new Date(startingDate)
+                        let input = times[i].time
+                        var fields = input.split(':');
+                        var hour = fields[0];
+                        var minute = fields[1];
+                        eventStartTime.setHours(hour)
+                        eventStartTime.setMinutes(minute)
+                        eventStartTime.setSeconds(0)
+                        console.log(eventStartTime)
+                        const eventEndTime = new Date(endingDate)
+                        eventEndTime.setHours(hour)
+                        eventEndTime.setMinutes(minute)
+                        eventEndTime.setSeconds(0)
+                        const event = {
+                            summary: `${itemName}`,
+                            description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
+                            `, 
+                            start: {
+                                dateTime: eventStartTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            end: {
+                                dateTime: eventEndTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            reminders: {
+                                useDefault: false,
+                                overrides: [{
+                                    method: "popup",
+                                    minutes: notificationTime[1]
+                                  }
+                                ]
+                            },
+                            colorId: 9
+                        }
+                        console.log(event)
+                        await ApiCalendar.createEvent(event).then((result) => {
+                            console.log('New Event:');
+                            console.log(result);
+                            setMessage('Your Event is created successfully.')
+                        }).catch((error) => {
+                            console.log('New Event Creation Error:');
+                            console.log(error);
+                            setMessage('Your Event is not created successfully.')
+                        });
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType 
+                        }); 
+                        console.log(updateResponse.data)
+                        setMessage(updateResponse.data.message)
+                    }
+                } else {
+                    console.log('Activity Else')
+                    for (i = 0; i < timesPerDay; i++) {
+                        console.log('Create Event Loop')
+                        const eventStartTime = new Date(startingDate)
+                        let input = times[i].time
+                        var fields = input.split(':');
+                        var hour = fields[0];
+                        var minute = fields[1];
+                        eventStartTime.setHours(hour)
+                        eventStartTime.setMinutes(minute)
+                        eventStartTime.setSeconds(0)
+                        console.log(eventStartTime)
+                        const eventEndTime = new Date(endingDate)
+                        eventEndTime.setHours(hour)
+                        eventEndTime.setMinutes(minute)
+                        eventEndTime.setSeconds(0)
+                        const event = {
+                            summary: `${itemName} ${unit}`,
+                            description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
+                            `, 
+                            start: {
+                                dateTime: eventStartTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            end: {
+                                dateTime: eventEndTime,
+                                timeZone: 'Asia/Dhaka'
+                            },
+                            reminders: {
+                                useDefault: false,
+                                overrides: [{
+                                    method: "popup",
+                                    minutes: notificationTime[1]
+                                  }
+                                ]
+                            },
+                            colorId: 9
+                        }
+                        console.log(event)
+                        await ApiCalendar.createEvent(event).then((result) => {
+                            console.log('New Event:');
+                            console.log(result);
+                            setMessage('Your Event is created successfully.')
+                        }).catch((error) => {
+                            console.log('New Event Creation Error:');
+                            console.log(error);
+                            setMessage('Your Event is not created successfully.')
+                        });
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType 
+                        }); 
+                        console.log(updateResponse.data)
+                        setMessage(updateResponse.data.message)
+                    }
+                }
+            }
             setIsLoading(false)
             setDisable(false)
-            setMessage(response.data.message)
+            // setMessage(response.data.message)
         } catch (error) {
             console.log(error.response.data); 
             setIsLoading(false)
             setDisable(false)
-            setMessage(error.response.data.message)
+            // setMessage(error.response.data.message)
         } 
     }
 

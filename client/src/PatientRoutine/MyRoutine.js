@@ -52,7 +52,11 @@ const MyRoutine = props => {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
                     id: auth.userId
                 });
-                setUserRoutine(response.data.routine)
+                if(response.data.routine){
+                    setUserRoutine(response.data.routine)
+                } else {
+                    setUserRoutine([])
+                }
             } catch (error) {
                 console.log(error.response.data);
             }
@@ -192,18 +196,6 @@ const MyRoutine = props => {
         }
     ];
 
-    const getDates = (startDate, stopDate) => {
-        var dateArray = [];
-        var currentDate = moment(startDate);
-        var stopDate = moment(stopDate);
-        while (currentDate <= stopDate) {
-            dateArray.push( moment(currentDate).format('YYYY-MM-DD') )
-            currentDate = moment(currentDate).add(1, 'days');
-        }
-        return dateArray;
-    }
-
-
     const [sign, setSign] = useState(ApiCalendar.sign)
 
     const signUpdate = () => {
@@ -233,7 +225,6 @@ const MyRoutine = props => {
                 console.log('Event List:');
                 console.log(result.items);
                 setMessage('Please check your console to view your event list.')
-                console.log(getDates('2020-05-10', '2020-05-15'))
             });
         } else{
             console.log('Not Signed In');

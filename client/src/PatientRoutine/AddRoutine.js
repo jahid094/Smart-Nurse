@@ -110,7 +110,7 @@ const AddRoutine = props => {
                     eventEndTime.setMinutes(minute)
                     eventEndTime.setSeconds(0)
                     const event = {
-                        summary: `${itemName} ${unit}`,
+                        summary: `${itemName}`,
                         description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
                         `, 
                         start: {
