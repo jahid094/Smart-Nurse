@@ -64,14 +64,10 @@ const MyRoutine = props => {
                 setUserRoutine([])
             }
           }
-          const mustExecuted = async () => {
-              await getRoutine()
-              console.log('Delete Effect')
-              console.log(userRoutine)
-              setTestBool(false)
-          }
-          mustExecuted()
-          
+          getRoutine()
+          console.log('Delete Effect')
+          console.log(userRoutine)
+          setTestBool(false)
     }, [testBool])
 
     useEffect(() => {
@@ -288,7 +284,6 @@ const MyRoutine = props => {
                 eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
             }
             if(response.data.timesPerDay > 1){
-                console.log('If')
                 console.log(eventMinTimeUTC[0])
                 console.log(eventMaxTimeUTC[response.data.timesPerDay - 1])
                 console.log(moment(response.data.startDate).isSame(response.data.endDate))

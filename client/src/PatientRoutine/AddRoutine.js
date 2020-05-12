@@ -8,7 +8,6 @@ import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import ApiCalendar from './ApiCalendar'
 import './AddRoutine.css'
-
 /* eslint no-eval: 0 */
 
 const AddRoutine = props => {
@@ -17,7 +16,6 @@ const AddRoutine = props => {
     const [itemName, setItemName] = useState('')
     const [unit, setUnit] = useState('')
     const [startDate, setStartDate] = useState(new Date())
-    // const [endDate, setEndDate] = useState(new Date(new Date().getTime()+(3*24*60*60*1000)))
     const [endDate, setEndDate] = useState(new Date())
     const [timesPerDay, setTimesPerDay] = useState(1)
     const [mealState, setMealState] = useState('Before Meal')
@@ -36,16 +34,9 @@ const AddRoutine = props => {
         event.preventDefault()
         setRoutineFormLoading(true)
         setDisable(true)
-        /* console.log(routineItem)
-        console.log(itemName)
-        console.log(unit)
-        console.log(moment(startDate).format('YYYY/MM/DD'))
-        console.log(timesPerDay)
-        console.log(mealState) */
         let times = [];
         let i
         for (i = 0; i < timesPerDay; i++) {
-            // console.log("Time"+(i+1)+":"+eval('time'+(i+1)))
             times.push({
                 time: eval('time'+(i+1))
             })
@@ -54,15 +45,6 @@ const AddRoutine = props => {
         console.log(notificationTime[0])
         console.log(notificationTime[1])
         console.log(notificationTime[2])
-        /* console.log("Time1:"+time1)
-        console.log("Time2:"+time2)
-        console.log("Time3:"+time3)
-        console.log("Time4:"+time4)
-        console.log("Time5:"+time5) */
-        /* console.log(notificationState)
-        console.log(userType)
-        console.log(auth.userId)
-        console.log(times) */
         if(routineItem === 'Activity'){
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
@@ -131,7 +113,6 @@ const AddRoutine = props => {
                         },
                         colorId: 9
                     }
-                    // console.log(event)
                     await ApiCalendar.createEvent(event).then((result) => {
                         console.log('New Event:');
                         console.log(result);
@@ -184,9 +165,9 @@ const AddRoutine = props => {
                     console.log('Create Event Loop')
                     const eventStartTime = new Date(startDate)
                     let input = times[i].time
-                    var fields = input.split(':');
-                    var hour = fields[0];
-                    var minute = fields[1];
+                    fields = input.split(':');
+                    hour = fields[0];
+                    minute = fields[1];
                     eventStartTime.setHours(hour)
                     eventStartTime.setMinutes(minute)
                     eventStartTime.setSeconds(0)

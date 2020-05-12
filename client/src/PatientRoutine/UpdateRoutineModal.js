@@ -67,7 +67,7 @@ const UpdateRoutineModal = props => {
             console.log(notificationTime[0])
             console.log(notificationTime[1])
             console.log(notificationTime[2])
-            if(response.data.timesPerDay == timesPerDay){
+            if(response.data.timesPerDay === timesPerDay){
                 console.log('if')
                 let i
                 let eventMinTime = []
@@ -89,9 +89,21 @@ const UpdateRoutineModal = props => {
                     eventMaxTime[i].setMinutes(minute)
                     eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
                 }
-                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
-                    events = result.items
-                });
+                if(response.data.timesPerDay > 1){
+                    if(!moment(response.data.startDate).isSame(response.data.endDate)){
+                        await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                            events = result.items
+                        });
+                    } else {
+                        await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                            events = result.items
+                        });
+                    }
+                } else {
+                    await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                        events = result.items
+                    });
+                }
                 console.log('Event List Loop Finish');
                 console.log('Event List:');
                 console.log(events);
@@ -117,9 +129,9 @@ const UpdateRoutineModal = props => {
                         console.log('Create Event Loop')
                         const eventStartTime = new Date(startingDate)
                         let input = times[i].time
-                        var fields = input.split(':');
-                        var hour = fields[0];
-                        var minute = fields[1];
+                        fields = input.split(':');
+                        hour = fields[0];
+                        minute = fields[1];
                         eventStartTime.setHours(hour)
                         eventStartTime.setMinutes(minute)
                         eventStartTime.setSeconds(0)
@@ -181,9 +193,9 @@ const UpdateRoutineModal = props => {
                         console.log('Create Event Loop')
                         const eventStartTime = new Date(startingDate)
                         let input = times[i].time
-                        var fields = input.split(':');
-                        var hour = fields[0];
-                        var minute = fields[1];
+                        fields = input.split(':');
+                        hour = fields[0];
+                        minute = fields[1];
                         eventStartTime.setHours(hour)
                         eventStartTime.setMinutes(minute)
                         eventStartTime.setSeconds(0)
@@ -252,9 +264,9 @@ const UpdateRoutineModal = props => {
                 for (i = 0; i < response.data.timesPerDay; i++) {
                     eventMinTime[i] = new Date(response.data.startDate)
                     let input = response.data.times[i].time
-                    var fields = input.split(':');
-                    var hour = fields[0];
-                    var minute = fields[1];
+                    fields = input.split(':');
+                    hour = fields[0];
+                    minute = fields[1];
                     eventMinTime[i].setHours(hour)
                     eventMinTime[i].setMinutes(minute)
                     eventMinTimeUTC[i] = moment(eventMinTime[i]).format();                
@@ -263,9 +275,21 @@ const UpdateRoutineModal = props => {
                     eventMaxTime[i].setMinutes(minute)
                     eventMaxTimeUTC[i] = moment(eventMaxTime[i]).format();                
                 }
-                await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
-                    events = result.items
-                });
+                if(response.data.timesPerDay > 1){
+                    if(!moment(response.data.startDate).isSame(response.data.endDate)){
+                        await ApiCalendar.listUpcomingEvents(10, eventMinTimeUTC[0], eventMaxTimeUTC[response.data.timesPerDay - 1]).then(({result}) => {
+                            events = result.items
+                        });
+                    } else {
+                        await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                            events = result.items
+                        });
+                    }
+                } else {
+                    await ApiCalendar.listTodayEvents(10, eventMinTimeUTC[0]).then(({result}) => {
+                        events = result.items
+                    });
+                }
                 console.log('Event List Loop Finish');
                 console.log('Event List:');
                 console.log(events);
@@ -293,9 +317,9 @@ const UpdateRoutineModal = props => {
                         console.log('Create Event Loop')
                         const eventStartTime = new Date(startingDate)
                         let input = times[i].time
-                        var fields = input.split(':');
-                        var hour = fields[0];
-                        var minute = fields[1];
+                        fields = input.split(':');
+                        hour = fields[0];
+                        minute = fields[1];
                         eventStartTime.setHours(hour)
                         eventStartTime.setMinutes(minute)
                         eventStartTime.setSeconds(0)
@@ -357,9 +381,9 @@ const UpdateRoutineModal = props => {
                         console.log('Create Event Loop')
                         const eventStartTime = new Date(startingDate)
                         let input = times[i].time
-                        var fields = input.split(':');
-                        var hour = fields[0];
-                        var minute = fields[1];
+                        fields = input.split(':');
+                        hour = fields[0];
+                        minute = fields[1];
                         eventStartTime.setHours(hour)
                         eventStartTime.setMinutes(minute)
                         eventStartTime.setSeconds(0)
