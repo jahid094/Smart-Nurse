@@ -32,189 +32,182 @@ const AddRoutine = props => {
 
     const submitHandler = async (event) => {
         event.preventDefault()
-        setRoutineFormLoading(true)
-        setDisable(true)
-        let times = [];
-        let i
-        for (i = 0; i < timesPerDay; i++) {
-            times.push({
-                time: eval('time'+(i+1))
-            })
-        }
-        let notificationTime = notificationState.split(' ');
-        console.log(notificationTime[0])
-        console.log(notificationTime[1])
-        console.log(notificationTime[2])
-        if(routineItem === 'Activity'){
-            try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
-                    routineItem,
-                    itemName,
-                    startDate: moment(startDate).format('YYYY/MM/DD'),
-                    endDate: moment(endDate).format('YYYY/MM/DD'),
-                    timesPerDay: timesPerDay,
-                    beforeAfterMeal: mealState,
-                    times,
-                    notification: notificationState,
-                    notificationFor: userType,
-                    owner: auth.userId 
-                });
-                setRoutineItem('Medicine')
-                setItemName('')
-                setUnit('')
-                setStartDate(new Date())
-                setEndDate(new Date())
-                setTimesPerDay(1)
-                setMealState('Before Meal')
-                setTime1('10:00')
-                setTime2('11:00')
-                setTime3('12:00')
-                setTime4('13:00')
-                setTime5('14:00')
-                setNotificationState('Before 5 mins')
-                setUserType('Me')
-                setRoutineFormLoading(false)
-                setDisable(false)
-                setMessage(response.data.message)
+        if(ApiCalendar.sign){
+            if(moment(startDate).isSameOrBefore(endDate)){
+                setRoutineFormLoading(true)
+                setDisable(true)
+                let times = [];
+                let i
                 for (i = 0; i < timesPerDay; i++) {
-                    console.log('Create Event Loop')
-                    const eventStartTime = new Date(startDate)
-                    let input = times[i].time
-                    var fields = input.split(':');
-                    var hour = fields[0];
-                    var minute = fields[1];
-                    eventStartTime.setHours(hour)
-                    eventStartTime.setMinutes(minute)
-                    eventStartTime.setSeconds(0)
-                    console.log(eventStartTime)
-                    const eventEndTime = new Date(endDate)
-                    eventEndTime.setHours(hour)
-                    eventEndTime.setMinutes(minute)
-                    eventEndTime.setSeconds(0)
-                    const event = {
-                        summary: `${itemName}`,
-                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
-                        `, 
-                        start: {
-                            dateTime: eventStartTime,
-                            timeZone: 'Asia/Dhaka'
-                        },
-                        end: {
-                            dateTime: eventEndTime,
-                            timeZone: 'Asia/Dhaka'
-                        },
-                        reminders: {
-                            useDefault: false,
-                            overrides: [{
-                                method: "popup",
-                                minutes: notificationTime[1]
-                              }
-                            ]
-                        },
-                        colorId: 9
-                    }
-                    await ApiCalendar.createEvent(event).then((result) => {
-                        console.log('New Event:');
-                        console.log(result);
-                        setMessage('Your Event is created successfully.')
-                    }).catch((error) => {
-                        console.log('New Event Creation Error:');
-                        console.log(error);
-                        setMessage('Your Event is not created successfully.')
-                    });
+                    times.push({
+                        time: eval('time'+(i+1))
+                    })
                 }
-                props.pageRender()
-            } catch (error) {
-                setRoutineFormLoading(false)
-                setDisable(false)
-                setMessage(error.response.data.message)
+                let notificationTime = notificationState.split(' ');
+                if(routineItem === 'Activity'){
+                    try {
+                        const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
+                            routineItem,
+                            itemName,
+                            startDate: moment(startDate).format('YYYY/MM/DD'),
+                            endDate: moment(endDate).format('YYYY/MM/DD'),
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal: mealState,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType,
+                            owner: auth.userId 
+                        });
+                        setRoutineItem('Medicine')
+                        setItemName('')
+                        setUnit('')
+                        setStartDate(new Date())
+                        setEndDate(new Date())
+                        setTimesPerDay(1)
+                        setMealState('Before Meal')
+                        setTime1('10:00')
+                        setTime2('11:00')
+                        setTime3('12:00')
+                        setTime4('13:00')
+                        setTime5('14:00')
+                        setNotificationState('Before 5 mins')
+                        setUserType('Me')
+                        setRoutineFormLoading(false)
+                        setDisable(false)
+                        setMessage(response.data.message)
+                        for (i = 0; i < timesPerDay; i++) {
+                            const eventStartTime = new Date(startDate)
+                            let input = times[i].time
+                            var fields = input.split(':');
+                            var hour = fields[0];
+                            var minute = fields[1];
+                            eventStartTime.setHours(hour)
+                            eventStartTime.setMinutes(minute)
+                            eventStartTime.setSeconds(0)
+                            const eventEndTime = new Date(endDate)
+                            eventEndTime.setHours(hour)
+                            eventEndTime.setMinutes(minute)
+                            eventEndTime.setSeconds(0)
+                            const event = {
+                                summary: `${itemName}`,
+                                description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                `, 
+                                start: {
+                                    dateTime: eventStartTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                end: {
+                                    dateTime: eventEndTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                reminders: {
+                                    useDefault: false,
+                                    overrides: [{
+                                        method: "popup",
+                                        minutes: notificationTime[1]
+                                    }
+                                    ]
+                                },
+                                colorId: 9
+                            }
+                            await ApiCalendar.createEvent(event).then((result) => {
+                            }).catch((error) => {
+                                axios.get(process.env.REACT_APP_BACKEND_URL+'routine/'+response.data.routine._id);
+                                setMessage('Your Routine is not created successfully.')
+                            });
+                        }
+                        props.pageRender()
+                    } catch (error) {
+                        setRoutineFormLoading(false)
+                        setDisable(false)
+                        setMessage(error.response.data.message)
+                    }
+                } else {
+                    try {
+                        const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
+                            routineItem,
+                            itemName,
+                            unit,
+                            startDate: moment(startDate).format('YYYY/MM/DD'),
+                            endDate: moment(endDate).format('YYYY/MM/DD'),
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal: mealState,
+                            times,
+                            notification: notificationState,
+                            notificationFor: userType,
+                            owner: auth.userId 
+                        });
+                        setRoutineItem('Medicine')
+                        setItemName('')
+                        setUnit('')
+                        setStartDate(new Date())
+                        setEndDate(new Date())
+                        setTimesPerDay(1)
+                        setMealState('Before Meal')
+                        setTime1('10:00')
+                        setTime2('11:00')
+                        setTime3('12:00')
+                        setTime4('13:00')
+                        setTime5('14:00')
+                        setNotificationState('Before 5 mins')
+                        setUserType('Me')
+                        setRoutineFormLoading(false)
+                        setDisable(false)
+                        setMessage(response.data.message)
+                        for (i = 0; i < timesPerDay; i++) {
+                            const eventStartTime = new Date(startDate)
+                            let input = times[i].time
+                            fields = input.split(':');
+                            hour = fields[0];
+                            minute = fields[1];
+                            eventStartTime.setHours(hour)
+                            eventStartTime.setMinutes(minute)
+                            eventStartTime.setSeconds(0)
+                            const eventEndTime = new Date(endDate)
+                            eventEndTime.setHours(hour)
+                            eventEndTime.setMinutes(minute)
+                            eventEndTime.setSeconds(0)
+                            const event = {
+                                summary: `${itemName} ${unit}`,
+                                description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                `, 
+                                start: {
+                                    dateTime: eventStartTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                end: {
+                                    dateTime: eventEndTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                reminders: {
+                                    useDefault: false,
+                                    overrides: [{
+                                        method: "popup",
+                                        minutes: notificationTime[1]
+                                    }
+                                    ]
+                                },
+                                colorId: 9
+                            }
+                            await ApiCalendar.createEvent(event).then((result) => {
+                                setMessage('Your Event is created successfully.')
+                            }).catch((error) => {
+                                axios.get(process.env.REACT_APP_BACKEND_URL+'routine/'+response.data.routine._id);
+                                setMessage('Your Routine is not created successfully.')
+                            });
+                        props.pageRender()
+                    }
+                    } catch (error) {
+                        setRoutineFormLoading(false)
+                        setDisable(false)
+                        setMessage(error.response.data.message)
+                    }
+                }
+            } else {
+                setMessage('Start Date should not be greater than End Date.')
             }
         } else {
-            try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
-                    routineItem,
-                    itemName,
-                    unit,
-                    startDate: moment(startDate).format('YYYY/MM/DD'),
-                    endDate: moment(endDate).format('YYYY/MM/DD'),
-                    timesPerDay: timesPerDay,
-                    beforeAfterMeal: mealState,
-                    times,
-                    notification: notificationState,
-                    notificationFor: userType,
-                    owner: auth.userId 
-                });
-                setRoutineItem('Medicine')
-                setItemName('')
-                setUnit('')
-                setStartDate(new Date())
-                setEndDate(new Date())
-                setTimesPerDay(1)
-                setMealState('Before Meal')
-                setTime1('10:00')
-                setTime2('11:00')
-                setTime3('12:00')
-                setTime4('13:00')
-                setTime5('14:00')
-                setNotificationState('Before 5 mins')
-                setUserType('Me')
-                setRoutineFormLoading(false)
-                setDisable(false)
-                setMessage(response.data.message)
-                for (i = 0; i < timesPerDay; i++) {
-                    console.log('Create Event Loop')
-                    const eventStartTime = new Date(startDate)
-                    let input = times[i].time
-                    fields = input.split(':');
-                    hour = fields[0];
-                    minute = fields[1];
-                    eventStartTime.setHours(hour)
-                    eventStartTime.setMinutes(minute)
-                    eventStartTime.setSeconds(0)
-                    console.log(eventStartTime)
-                    const eventEndTime = new Date(endDate)
-                    eventEndTime.setHours(hour)
-                    eventEndTime.setMinutes(minute)
-                    eventEndTime.setSeconds(0)
-                    const event = {
-                        summary: `${itemName} ${unit}`,
-                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
-                        `, 
-                        start: {
-                            dateTime: eventStartTime,
-                            timeZone: 'Asia/Dhaka'
-                        },
-                        end: {
-                            dateTime: eventEndTime,
-                            timeZone: 'Asia/Dhaka'
-                        },
-                        reminders: {
-                            useDefault: false,
-                            overrides: [{
-                                method: "popup",
-                                minutes: notificationTime[1]
-                              }
-                            ]
-                        },
-                        colorId: 9
-                    }
-                    // console.log(event)
-                    await ApiCalendar.createEvent(event).then((result) => {
-                        console.log('New Event:');
-                        console.log(result);
-                        setMessage('Your Event is created successfully.')
-                    }).catch((error) => {
-                        console.log('New Event Creation Error:');
-                        console.log(error);
-                        setMessage('Your Event is not created successfully.')
-                    });
-                props.pageRender()
-            }
-            } catch (error) {
-                setRoutineFormLoading(false)
-                setDisable(false)
-                setMessage(error.response.data.message)
-            }
+            setMessage('Please sign in with your google account to create event and get notification of that routine in google calendar.')
         }
     }
 
@@ -290,9 +283,6 @@ const AddRoutine = props => {
                                         }} value={endDate} disabled = {(disable)? "disabled" : ""}/>
                                     </div>
                                 </div>
-                            {/* </div> */}
-               
-                            {/* <div className="form-row mb-4"> */}
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>Times Per Day</label>
@@ -308,26 +298,23 @@ const AddRoutine = props => {
                                         </select>
                                     </div>
                                 </div>
-                            {/* </div> */}
-              
-                            {/* <div className="form-row mb-4"> */}
-                            {
-                                Array.from({ length: timesPerDay }, (v, k) => (
-                                    <div className="col-12 col-sm-6 mb-4" key={k}>
-                                        <div className="lg-form mr-4 mb-4 mb-sm-0">
-                                            <label>{"Time "+(k+1)}</label>
-                                            <TimePicker
-                                            className="form-control text-justify rounded-pill"
-                                                onChange={(inputTime) => {
-                                                    eval('setTime'+(k+1))(inputTime)
-                                                }}
-                                                value={eval('time'+(k+1))}
-                                                disabled = {(disable)? "disabled" : ""} 
-                                            />
+                                {
+                                    Array.from({ length: timesPerDay }, (v, k) => (
+                                        <div className="col-12 col-sm-6 mb-4" key={k}>
+                                            <div className="lg-form mr-4 mb-4 mb-sm-0">
+                                                <label>{"Time "+(k+1)}</label>
+                                                <TimePicker
+                                                className="form-control text-justify rounded-pill"
+                                                    onChange={(inputTime) => {
+                                                        eval('setTime'+(k+1))(inputTime)
+                                                    }}
+                                                    value={eval('time'+(k+1))}
+                                                    disabled = {(disable)? "disabled" : ""} 
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
-                            }
+                                    ))
+                                }
                                 <div className="col-12 col-sm-6 mb-4">
                                     <div className="lg-form mr-4">
                                         <label>Notification Time</label>
@@ -342,7 +329,6 @@ const AddRoutine = props => {
                             <div className="form-row my-4">
                                 <p className="font-weight-bold h4 pl-1" style={{color: '#857072'}}>Notification For</p>
                             </div>
-               
                             <div className="form-row my-4"> 
                                 <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
                                 <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>

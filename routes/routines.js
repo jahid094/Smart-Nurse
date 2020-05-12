@@ -16,16 +16,12 @@ router.post('/routine' , async (req, res) =>{
         ...req.body ,
         owner
     })
-    // console.log(owner)
     try{
         await routine.save()
-        // console.log(owner)
-
-        // console.log(user._id)
         res.status(201).json({
-            message: 'Routine Added Successfully'
+            message: 'Routine Added Successfully',
+            routine
         })
-
     } catch(error){
         res.status(400).json({
             message: error
