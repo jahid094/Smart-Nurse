@@ -44,6 +44,7 @@ const MyRoutine = props => {
             }
           }
           getRoutine()
+          console.log('Normal Effect')
     }, [auth.userId])
 
     useEffect(() => {
@@ -52,6 +53,7 @@ const MyRoutine = props => {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
                     id: auth.userId
                 });
+                console.log('In getroutine')
                 if(response.data.routine){
                     setUserRoutine(response.data.routine)
                 } else {
@@ -59,10 +61,17 @@ const MyRoutine = props => {
                 }
             } catch (error) {
                 console.log(error.response.data);
+                setUserRoutine([])
             }
           }
-          getRoutine()
-          setTestBool(false)
+          const mustExecuted = async () => {
+              await getRoutine()
+              console.log('Delete Effect')
+              console.log(userRoutine)
+              setTestBool(false)
+          }
+          mustExecuted()
+          
     }, [testBool])
 
     useEffect(() => {
@@ -78,6 +87,7 @@ const MyRoutine = props => {
           }
           getRoutine()
           props.pageNotRender()
+          console.log('Add Effect')
     }, [props.renderPage])
 
     useEffect(()=> {
@@ -437,9 +447,6 @@ const MyRoutine = props => {
                     <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-in')} variant="success">Sign In</Button>
                 </div>
             }
-            <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
-                <Button className="mx-auto btn-block" onClick={(e) => getEvent()} variant="info">Get Event List</Button>
-            </div>
         </div>
     </div>;
 };
