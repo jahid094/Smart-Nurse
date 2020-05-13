@@ -16,10 +16,12 @@ const PatientRoutineHead = () => {
                     console.log(sign)
                     if(!sign){
                         console.log('if')
+                        console.log('Sign Status in if:'+ApiCalendar.sign)
                         await ApiCalendar.handleAuthClick();
                     }
                 }
                 signStatus()
+                console.log('Sign Status outside if:'+ApiCalendar.sign)
             }
             const interval = setInterval(() => {
             setSeconds(seconds => seconds + 1);
@@ -27,6 +29,10 @@ const PatientRoutineHead = () => {
             return () => clearInterval(interval);
         }
     }, [seconds]);
+
+    useEffect(() => {
+        console.log('Sign Status:'+ApiCalendar.sign)
+    }, [ApiCalendar.sign]);
 
     const signUpdate = () => {
         setSign(ApiCalendar.sign)
