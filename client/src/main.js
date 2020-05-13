@@ -37,7 +37,6 @@ const Main = () => {
                 <Route path="/resetPassword/:token" component={ResetPassword} exact/>
                 <Route path="/confirmation/:token" component={VerifyUser} exact/>
                 <Route path="/createPatient" component={CreatePatient} exact/>
-                <Route path="/addPatient" component={AddPatient} exact/>
                 <Redirect to="/"></Redirect>
             </Switch>
         }
