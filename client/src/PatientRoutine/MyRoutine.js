@@ -14,6 +14,7 @@ import {AuthContext} from '../shared/context/auth-context'
 import ApiCalendar from './ApiCalendar'
 
 /* eslint no-eval: 0 */
+/* global gapi */
 
 const MyRoutine = props => {
     const auth = useContext(AuthContext)
@@ -30,6 +31,7 @@ const MyRoutine = props => {
     const [message, setMessage] = useState('')
     // const [pageLoading, setPageLoading] = useState(true)
     const [testBool, setTestBool] = useState(false)
+    const [signBool, setSignBool] = useState(ApiCalendar.sign)
 
     useEffect(() => {
         /* const googleSign = async () => {
@@ -40,6 +42,9 @@ const MyRoutine = props => {
             }
         }
         googleSign() */
+        ApiCalendar.onLoad(() => {
+            ApiCalendar.listenSign(signUpdate());
+        });
         const getRoutine = async () => { 
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
@@ -54,6 +59,9 @@ const MyRoutine = props => {
     }, [auth.userId])
 
     useEffect(() => {
+        ApiCalendar.onLoad(() => {
+            ApiCalendar.listenSign(signUpdate());
+        });
         const getRoutine = async () => { 
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
@@ -70,6 +78,9 @@ const MyRoutine = props => {
     }, [testBool])
 
     useEffect(() => {
+        ApiCalendar.onLoad(() => {
+            ApiCalendar.listenSign(signUpdate());
+        });
         const getRoutine = async () => { 
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
@@ -84,6 +95,21 @@ const MyRoutine = props => {
           props.pageNotRender()
     }, [props.renderPage])
 
+    useEffect(()=> {
+        console.log('Effect in sign')
+        ApiCalendar.onLoad(() => {
+            ApiCalendar.listenSign(signUpdate());
+        });
+        setSign(ApiCalendar.sign)
+        setSignBool(ApiCalendar.sign)
+        console.log(sign)
+    }, [signBool])
+
+    const signUpdate = () => {
+        setSign(ApiCalendar.sign)
+    }
+
+    const [sign, setSign] = useState(ApiCalendar.sign)
 
     const { SearchBar } = Search;
 
@@ -363,7 +389,7 @@ const MyRoutine = props => {
                 )
             }
             </ToolkitProvider>
-            {
+            {/* {
                 ApiCalendar.sign ? 
                 <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
                     <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-out')} variant="danger">Sign Out</Button>
@@ -372,7 +398,7 @@ const MyRoutine = props => {
                 <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
                     <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-in')} variant="success">Sign In</Button>
                 </div>
-            }
+            } */}
         </div>
     </div>;
 };
