@@ -54,7 +54,6 @@ const AddPatient = () => {
     }, [auth.userId])
 
     useEffect(() => {
-        console.log(search)
         if(search){
             setFilteredUserRoutine(
                 userRoutine.filter(routine =>

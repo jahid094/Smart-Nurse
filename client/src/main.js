@@ -9,6 +9,7 @@ import PatientRoutine from './PatientRoutine/PatientRoutine'
 import UpdateProfile from './UpdateProfile/UpdateProfile'
 import CreatePatient from './CreatePatient/CreatePatient'
 import AddPatient from './AddPatient/AddPatient'
+import Notification from './Notification/Notification'
 import {AuthContext} from './shared/context/auth-context'
 
 const Main = () => {
@@ -27,6 +28,7 @@ const Main = () => {
                 <Route path="/editProfile" component={UpdateProfile} exact/>
                 <Route path="/createPatient" component={CreatePatient} exact/>
                 <Route path="/addPatient" component={AddPatient} exact/>
+                <Route path="/notification" component={Notification} exact/>
                 <Redirect to="/"></Redirect>
             </Switch>
             :          
@@ -36,7 +38,6 @@ const Main = () => {
                 <Route path="/forgetPassword" component={ForgetPassword} exact/>
                 <Route path="/resetPassword/:token" component={ResetPassword} exact/>
                 <Route path="/confirmation/:token" component={VerifyUser} exact/>
-                <Route path="/createPatient" component={CreatePatient} exact/>
                 <Redirect to="/"></Redirect>
             </Switch>
         }

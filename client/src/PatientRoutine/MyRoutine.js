@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios'
 import moment from 'moment'
-import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -14,7 +13,6 @@ import {AuthContext} from '../shared/context/auth-context'
 import ApiCalendar from './ApiCalendar'
 
 /* eslint no-eval: 0 */
-/* global gapi */
 
 const MyRoutine = props => {
     const auth = useContext(AuthContext)
@@ -217,14 +215,6 @@ const MyRoutine = props => {
         }
     ];
 
-    const handleItemClick = async (event, name) => {
-        if (name === 'sign-in') {
-            await ApiCalendar.handleAuthClick();
-        } else if (name === 'sign-out') {
-            ApiCalendar.handleSignoutClick();
-        }
-    }
-
     const errorHandler = () => {
         setRowSelect(false)
         setViewDetails(false)
@@ -389,16 +379,6 @@ const MyRoutine = props => {
                 )
             }
             </ToolkitProvider>
-            {/* {
-                ApiCalendar.sign ? 
-                <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
-                    <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-out')} variant="danger">Sign Out</Button>
-                </div>
-                :
-                <div className="col-6 offset-3 col-md-4 offset-md-4 mt-2">
-                    <Button className="mx-auto btn-block" onClick={(e) => handleItemClick(e, 'sign-in')} variant="success">Sign In</Button>
-                </div>
-            } */}
         </div>
     </div>;
 };
