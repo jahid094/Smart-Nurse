@@ -4,4 +4,13 @@
         background-repeat: no-repeat; 
         background-size: cover;
     }
+    .process-card-background{
+        background-color: #F4F8FB;
+    }
+}
+
+.button-background{
+    background: #E2675A;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #E2675A, #F6B8B0);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #E2675A, #F6B8B0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }

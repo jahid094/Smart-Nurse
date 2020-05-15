@@ -2,8 +2,8 @@ import React from 'react';
 import './AboutTeresa.css'
 
 const AboutTeresa = () => {
-    return  <div className="container-fluid py-5 mb-5" style={{backgroundColor: '#F1F5F8'}}>
-        <div className="container">
+    return  <div className="container-fluid pb-5 pt-2" style={{backgroundColor: '#F1F5F8'}}>
+        <div className="container py-5 mb-5">
             <div className="row w-100 mt-5 mb-n5 about-teresa">
                 <div className="col-lg-5 bg-white mt-n5 pb-5 ml-5 card5">
                     <div>

@@ -5,8 +5,9 @@ import AppPhoto from '../../shared/img/APP.png'
 const AboutApp = () => {
     return <div className="container-fluid mb-5" style={{backgroundColor: '#020624'}}>
         <div className="container">
+            <p className="h1 text-center font-weight-bold text-white mt-5 p-3">Our App Is On The Way</p>
             <div className="row">
-                <div className="col-lg-6 mt-5">
+                <div className="col-lg-6 mt-lg-5">
                     <div className="mt-5">
                         <p className="h1 text-left font-weight-bold text-white mt-5 ml-5">Get All Our Services in Teresa App</p>
                     </div>
