@@ -140,9 +140,6 @@ const UserSchema = new mongoose.Schema({
 // }]
 })
 
-
-
-
 UserSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
