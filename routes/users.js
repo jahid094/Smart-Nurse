@@ -6,13 +6,8 @@ const passport = require('passport');
 const sharp = require('sharp')
 const jwt = require('jsonwebtoken')
 const async = require('async');
-const nodemailer = require('nodemailer');
-const SMTPConnection = require("nodemailer/lib/smtp-connection")
-// Load User model
 const User = require('../models/User');
 const { sendWelcomeEmail , sendCancelationEmail , sendResetEmail} =require('../emails/account')
-
-const pass = require('../config/keys').GMAILPW;
 
 const multer = require('multer')
 const upload = multer({

@@ -56,7 +56,7 @@ const sendCancelationEmail =( email , name) => {
         to: email ,
         from: 'jahid.aust39@gmail.com' ,
         subject: 'Sorry to see you go!' ,
-        text: 'Goodbye , ${name} . I hope to see you back sometime soon.' 
+        text: 'Goodbye . I hope to see you back sometime soon.' 
     }).then(() => {
         console.log('Message sent')
     }).catch((error) => {

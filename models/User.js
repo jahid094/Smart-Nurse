@@ -132,7 +132,16 @@ const UserSchema = new mongoose.Schema({
   profilePicture:{
     type: Buffer
   }
+//   patientsUnderGuardian: [{
+//     patientId: {
+//         type: mongoose.Schema.ObjectId,
+//         ref: 'User'
+//     }
+// }]
 })
+
+
+
 
 UserSchema.methods.toJSON = function () {
   const user = this
@@ -153,4 +162,6 @@ UserSchema.methods.toJSON = function () {
 
 const User = mongoose.model('User', UserSchema);
 
-module.exports = User;
+
+
+module.exports = User
