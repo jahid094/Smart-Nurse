@@ -130,6 +130,35 @@ router.post('/login', (req, res, next) => {
   })(req, res, next)
 })
 
+router.get('/users/userList' , async (req , res) => {
+    const users = await User.find({})
+    const me = await User.findOne({ _id: req.user._id })
+
+    if(!users){
+      return res.send('No users')
+    }
+
+  //   for(var i = users.length - 1; i >= 0; i--) {
+  //     console.log(typeof users[i]._id)
+  //     console.log(typeof req.user._id)
+  //     if(JSON.stringify(users[i]._id) === JSON.stringify(req.user._id)) {
+  //       console.log('inside if condition')
+  //       console.log(users[i]._id)
+  //       // console.log('inside for loop. index '+i)
+  //       // console.log(users[i])
+  //       users.splice(i, 1);
+  //     }
+  // }
+
+    const userMap = users.filter(function(item) {
+      return JSON.stringify(item._id) !== JSON.stringify(req.user._id)
+    })
+
+
+    return res.send(userMap)
+
+})
+
 // Logout
 router.post('/logout', (req, res) => {
   const {id} = req.body
