@@ -1,12 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 const AddPatientTable = props => {
+    const [searchId, setSearchId] = useState("");
     const columns = [
         {
             dataField: '_id',
-            text: 'Routine Id',
+            text: 'User Id',
             sort: true,
             hidden: true,
             headerStyle: {
@@ -14,84 +15,77 @@ const AddPatientTable = props => {
             }
         }, 
         {
-            dataField: 'routineItem',
-            text: 'Routine Item',
+            dataField: 'firstname',
+            text: 'First Name',
             sort: true,
-            headerStyle: {
-                width: '17%'
-            }
+            headerClasses: 'w-25'
         }, 
         {
-            dataField: 'itemName',
-            text: 'Name',
+            dataField: 'lastname',
+            text: 'Last Name',
             sort: true,
-            headerStyle: {
-                width: '10%'
-            }
+            headerClasses: 'w-25'
         }, 
         {
-            dataField: 'startDate',
-            text: 'Start Date',
+            dataField: 'age',
+            text: 'Age',
             sort: true,
-            headerStyle: {
-                width: '15%'
-            }
+            headerClasses: 'w-25'
         },
         {
-            dataField: 'endDate',
-            text: 'End Date',
+            dataField: 'email',
+            text: 'Email',
             sort: true,
-            headerStyle: {
-                width: '14%'
-            }
-        },
-        {
-            dataField: 'timesPerDay',
-            text: 'Times Per Day',
-            sort: true,
-            headerStyle: {
-                width: '19%'
-            }
-        },
-        {
-            dataField: 'beforeAfterMeal',
-            text: 'Meal',
-            sort: true,
-            headerStyle: {
-                width: '13%'
-            }
-        },
-        {
-            dataField: 'unit',
-            text: 'Unit',
-            sort: true,
-            headerStyle: {
-                width: '9%'
-            }
-        },
-        {
-            dataField: 'notification',
-            text: 'Notification',
-            sort: true,
-            headerStyle: {
-                width: '20%'
-            }
+            headerClasses: 'w-25'
         }
     ];
+    const selectRow = {
+        mode: 'radio',
+        clickToSelect: true,
+        style: { 
+            backgroundColor: 'rgba(5, 6, 70, 1)',
+            color: 'white'
+        },
+        onSelect: (row, isSelect, rowIndex, e) => {
+            setSearchId(row._id)
+        }
+    };
+    const patientAdd = () => {
+        console.log(searchId)
+        if(searchId){
+            setSearchId("")
+        } else {
+            console.log('You have to select a row')
+        }
+    }
     return  <React.Fragment>
         <div className="container-fluid w-100 h-100">
             <div className="container">
                 <BootstrapTable
                     keyField='_id'
-                    data={props.userRoutine}
+                    data={props.userList}
                     columns={columns}
-                    classes="table-responsive table-striped table-hover"
+                    classes="table-striped table-hover"
                     headerWrapperClasses="thead-dark"
+                    selectRow={ selectRow }
                     pagination={paginationFactory()}
                 />
+                {
+                    props.userList.length!==0 ?
+                    <div className="row">
+                        <div className="col-4 offset-4">
+                            <button  className="btn btn-lg btn-block text-white" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}} onClick={function(){patientAdd()}}>Add</button>
+                        </div>
+                    </div>
+                    :
+                    <div className="row">
+                        <div className="col-4 offset-4">
+                            <a href="/createPatient" className="btn btn-lg btn-block text-white" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}}>Add Patient Manually</a>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-        
     </React.Fragment>;
 };
 

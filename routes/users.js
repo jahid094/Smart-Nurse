@@ -130,33 +130,25 @@ router.post('/login', (req, res, next) => {
   })(req, res, next)
 })
 
-router.get('/users/userList' , async (req , res) => {
-    const users = await User.find({})
-    const me = await User.findOne({ _id: req.user._id })
-
-    if(!users){
-      return res.send('No users')
+router.post('/users/userList' , async (req , res) => {
+    let owner
+    if(req.user){
+        owner = req.user._id
+    } else {
+        owner = req.body.owner
     }
-
-  //   for(var i = users.length - 1; i >= 0; i--) {
-  //     console.log(typeof users[i]._id)
-  //     console.log(typeof req.user._id)
-  //     if(JSON.stringify(users[i]._id) === JSON.stringify(req.user._id)) {
-  //       console.log('inside if condition')
-  //       console.log(users[i]._id)
-  //       // console.log('inside for loop. index '+i)
-  //       // console.log(users[i])
-  //       users.splice(i, 1);
-  //     }
-  // }
-
+    const users = await User.find({})
+    if(!users){
+      return res.status(404).json({
+        message: 'No users'
+      })
+    }
     const userMap = users.filter(function(item) {
-      return JSON.stringify(item._id) !== JSON.stringify(req.user._id)
+      return JSON.stringify(item._id) !== JSON.stringify(owner)
     })
-
-
-    return res.send(userMap)
-
+    return res.status(200).json({
+      user: userMap
+    })
 })
 
 // Logout
@@ -237,7 +229,6 @@ router.post('/forgot', function(req, res, next) {
   });
 });
 
-
 router.post('/reset/:token', function(req, res) {
   const {password, confirm} = req.body
   async.waterfall([
@@ -299,7 +290,6 @@ router.post('/reset/:token', function(req, res) {
   ], function(err) {
   });
 });
-
 
 router.get('/reset/:token', function(req, res) {
   User.findOne({ 
@@ -378,81 +368,6 @@ router.post('/users/me', async (req, res) => {
   }
 })
 
-/* router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
-    const buffer = await sharp(req.file.buffer).resize({width: 250, height: 250}).png().toBuffer()
-    const {id} = req.body
-    let userId = id || req.user._id
-    if(req.user){
-      userId = req.user._id
-    } else {
-      userId = id
-    }
-    User.findOne({_id: userId}).then((user) =>{
-      user.profilePicture = buffer
-      let base64data = Buffer.from(buffer, 'binary').toString('base64');
-      user.save().then(() => {
-        return res.status(200).json({
-          message: 'Profile Picture Successfully uploaded',
-          profilePicture: base64data
-        })
-      }).catch((error) => {
-      return res.status(400).json({
-          message: error
-        })
-      })
-    }).catch((error) => {
-      return res.status(400).json({
-        message: error
-      })
-    })
-  } , (error , req , res , next ) => {
-    res.status(400).json({ 
-      // message: 'File size should not be more than 1 mb'
-      message: error
-    })
-}) */
-
-/* router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
-  const buffer = await sharp(req.file.buffer).resize({width: 250, height: 250}).png().toBuffer()
-  const {id} = req.body
-  let userId = id || req.user._id
-  if(req.user){
-    userId = req.user._id
-  } else {
-    userId = id
-  }
-  User.findOne({_id: userId}).then((user) =>{
-    user.profilePicture = buffer
-    let base64data = Buffer.from(buffer, 'binary').toString('base64');
-    user.save().then(() => {
-      return res.status(200).json({
-        message: 'Profile Picture Successfully uploaded',
-        profilePicture: base64data
-      })
-    }).catch((error) => {
-    return res.status(400).json({
-        message: error
-      })
-    })
-  }).catch((error) => {
-    return res.status(400).json({
-      message: error
-    })
-  })
-} , (error , req , res , next ) => {
-  res.status(400).json({ 
-    message: 'File size should not be more than 1 mb'
-  })
-}) */
-
-/* router.post('/users/profilePicture' , upload.single('pp') , async(req,res) => {
-  req.user.profilePicture = req.file.buffer
-  await req.user.save()
-  res.send({ message: 'successfully uploaded'})
-} , (error , req , res , next ) => {
-  res.status(400).send({ error: error.message})
-}) */
-
 router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
   const buffer = await sharp(req.file.buffer).png().toBuffer()
   const {id} = req.body
@@ -485,7 +400,7 @@ router.delete('/users/profilePicture' ,  async(req,res) => {
   res.send({ message: 'successfully deleted'})
 })
 
-router.patch('/users/me' ,  async ( req , res) => {
+router.patch('/users/me',  async ( req , res) => {
   const {id} = req.body
   let userId
   if(req.user){
@@ -563,7 +478,6 @@ router.patch('/users/me' ,  async ( req , res) => {
     }).catch((error) => {
       return res.status(400).json({
         message: "error 3"+error
-        
       })
     })
   }

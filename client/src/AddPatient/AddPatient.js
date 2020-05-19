@@ -9,59 +9,33 @@ import './AddPatient.css'
 
 const AddPatient = () => {
     const auth = useContext(AuthContext)
-    /* const patients = [
-        {
-            id: 10032,
-            name: 'Mr. Abu Ubaida',
-            age: 22,
-            email: 'abu.ubaida@gmail.com'
-        },
-        {
-            id: 10033,
-            name: 'Samsul Islam',
-            age: 20,
-            email: 'samsulratul98@gmail.com'
-        },
-        {
-            id: 10034,
-            name: 'Ayon',
-            age: 22,
-            email: 'ayon522@gmail.com'
-        },
-        {
-            id: 10035,
-            name: 'Jahidul Islam',
-            age: 22,
-            email: 'jahid.aust39@gmail.com'
-        }
-    ] */
     const [search, setSearch] = useState("");
-    const [userRoutine, setUserRoutine] = useState([])
-    const [filteredUserRoutine, setFilteredUserRoutine] = useState([]);
+    const [userList, setUserList] = useState([])
+    const [filteredUserList, setFilteredUserList] = useState([]);
 
     useEffect(() => {
-        const getRoutine = async () => { 
+        const getUserList = async () => { 
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
-                    id: auth.userId
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/userList', {
+                    owner: auth.userId
                 });
-                setUserRoutine(response.data.routine)
+                setUserList(response.data.user)
             } catch (error) {
                 console.log(error.response.data);
             }
           }
-          getRoutine()
-    }, [auth.userId])
+          getUserList()
+    })
 
     useEffect(() => {
         if(search){
-            setFilteredUserRoutine(
-                userRoutine.filter(routine =>
-                   routine.itemName.toLowerCase().includes(search.toLowerCase()) || routine.beforeAfterMeal.toLowerCase().includes(search.toLowerCase())
+            setFilteredUserList(
+                userList.filter(user =>
+                   user.firstname.toLowerCase().includes(search.toLowerCase()) || user.lastname.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
                 )
             );
         } else {
-            setFilteredUserRoutine([])
+            setFilteredUserList([])
         }
     }, [search]);
 
@@ -99,7 +73,7 @@ const AddPatient = () => {
                 </div>
             </div>
         </div>
-        <AddPatientTable userRoutine={filteredUserRoutine}/>
+        <AddPatientTable userList={filteredUserList}/>
         <Footer/>
     </React.Fragment>;
 };
