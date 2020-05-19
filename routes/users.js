@@ -22,6 +22,21 @@ const upload = multer({
   }
 })
 
+router.get('/getUser/:id' , async (req , res ) =>{
+
+    try{
+      const user = await User.findById(req.params.id)
+      if(!user){
+          return res.status(404).send()
+      }
+      res.send(user)
+
+    }catch(e){
+        res.status(500).send()
+    }
+  
+})
+
 // Registration 
 router.post('/register', (req, res) => {
   const {firstname, lastname, gender, age, email, password, password2, phone, height, weight, userType} = req.body
