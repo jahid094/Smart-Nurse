@@ -1,20 +1,27 @@
 const express = require("express");
 const router = express.Router();
 const Guardianship = require("../models/Guardianship");
+const User = require('../models/User');
 
 //Send Request
 router.post("/users/sendRequest", async (req, res) => {
   let owner;
+  let ownerName;
   if (req.user) {
-    console.log("If")
     owner = req.user._id;
+    ownerName = req.user.firstname+' '+req.user.lastname;
   } else {
     owner = req.body.owner;
+    const ownerNameFind = await User.findOne({_id: owner});
+    if(ownerNameFind){
+      ownerName = ownerNameFind.firstname+' '+ownerNameFind.lastname;
+    }
   }
 
   const gurdian = new Guardianship({
     ...req.body,
     requester: owner,
+    requesterName: ownerName
   });
   
   const patientExist = await Guardianship.findOne({
@@ -71,8 +78,14 @@ router.post("/users/sendRequest", async (req, res) => {
 
 //Accept Request
 router.patch("/users/acceptRequest", async (req, res) => {
+  let owner;
+  if (req.user) {
+    owner = req.user._id;
+  } else {
+    owner = req.body.owner;
+  }
   const gurdian = await Guardianship.findOne({
-    "recipients.id": req.user._id,
+    "recipients.id": owner,
     "recipients.status": false,
     requester: req.body.requester
   });
@@ -81,19 +94,25 @@ router.patch("/users/acceptRequest", async (req, res) => {
     await gurdian.save();
     return res.status(200).json({
       gurdian,
-      mesaage: 'You are now patient of that user.'
+      message: 'You are now patient of that user.'
     });
   }
   return res.status(404).json({
-    mesaage: "No Request Found"
+    message: "No Request Found"
   });
 });
 
 //Delete Request
 router.delete('/requestDelete/:id', async(req , res) =>{
+  /* let owner;
+  if (req.user) {
+    owner = req.user._id;
+  } else {
+    owner = req.body.owner;
+  } */
   try{
       const user = await Guardianship.findOneAndDelete({
-        "recipients.id": req.user._id,
+        // "recipients.id": owner,
         "recipients.status": false,
         _id: req.params.id
       })

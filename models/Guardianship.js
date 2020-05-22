@@ -5,6 +5,10 @@ var GuardianshipSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         required: true
     },
+    requesterName: {
+        type: String,
+        required: true
+    },
     recipients: [{
         id: {
           type: mongoose.Schema.Types.ObjectId,
@@ -15,8 +19,7 @@ var GuardianshipSchema = new mongoose.Schema({
           default: false
         }
     }]
-      
-  });
+});
 
   
   const Guardianship = mongoose.model('Guardianship', GuardianshipSchema);

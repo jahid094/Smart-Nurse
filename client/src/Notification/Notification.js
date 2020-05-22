@@ -12,12 +12,12 @@ const Notification = () => {
     useEffect(() => {
         const getNotificationList = async () => { 
             try {
-                console.log('try')
+                // console.log('try')
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/requestList', {
                     owner: auth.userId
                 });
                 setNotificationList(response.data.requestExist)
-                console.log(response.data)
+                // console.log(response.data)
             } catch (error) {
                 console.log('catch')
                 console.log(error.response.data);
@@ -37,8 +37,13 @@ const Notification = () => {
                     <p className="text-left text-light display-4">Notification</p>
                 </div>
             </div>
-        </div> 
-        <NotificationAlert/>
+        </div>
+        {
+            notificationList ?
+                <NotificationAlert notificationList={notificationList}/>
+            :
+            <NotificationAlert/>
+        }
         <Footer/>
         </React.Fragment>;
 };
