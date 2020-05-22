@@ -1,8 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
+import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import {AuthContext} from '../shared/context/auth-context'
 
 const AddPatientTable = props => {
+    const auth = useContext(AuthContext)
     const [searchId, setSearchId] = useState("");
     const columns = [
         {
@@ -50,9 +53,23 @@ const AddPatientTable = props => {
             setSearchId(row._id)
         }
     };
-    const patientAdd = () => {
+    const patientAdd = async () => {
         console.log(searchId)
         if(searchId){
+            try {
+                console.log(auth.userId)
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/sendRequest', {
+                    recipients: [
+                        {
+                            id : searchId
+                        }
+                    ],
+                    owner: auth.userId 
+                });
+                console.log(response.data);
+            } catch (error) {
+                console.log(error.response.data);
+            }
             setSearchId("")
         } else {
             console.log('You have to select a row')

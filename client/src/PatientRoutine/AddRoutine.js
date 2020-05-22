@@ -8,7 +8,6 @@ import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import ApiCalendar from './ApiCalendar'
 import './AddRoutine.css'
-/* eslint no-eval: 0 */
 
 const AddRoutine = props => {
     const auth = useContext(AuthContext)
@@ -19,11 +18,23 @@ const AddRoutine = props => {
     const [endDate, setEndDate] = useState(new Date())
     const [timesPerDay, setTimesPerDay] = useState(1)
     const [mealState, setMealState] = useState('Before Meal')
-    const [time1, setTime1] = useState('10:00')
-    const [time2, setTime2] = useState('11:00')
-    const [time3, setTime3] = useState('12:00')
-    const [time4, setTime4] = useState('13:00')
-    const [time5, setTime5] = useState('14:00')
+    const [timeList, setTimeList] = useState([
+        {
+          time: '10:00'
+        },
+        {
+          time: '11:00'
+        },
+        {
+          time: '12:00'
+        },
+        {
+          time: '13:00'
+        },
+        {
+          time: '14:00'
+        }
+    ]);
     const [notificationState, setNotificationState] = useState('Before 5 mins')
     const [userType, setUserType] = useState('Me')
     const [routineFormLoading, setRoutineFormLoading] = useState(false)
@@ -36,14 +47,9 @@ const AddRoutine = props => {
             if(moment(startDate).isSameOrBefore(endDate)){
                 setRoutineFormLoading(true)
                 setDisable(true)
-                let times = [];
-                let i
-                for (i = 0; i < timesPerDay; i++) {
-                    times.push({
-                        time: eval('time'+(i+1))
-                    })
-                }
+                let times = timeList.slice(0, timesPerDay);
                 let notificationTime = notificationState.split(' ');
+                let i
                 if(routineItem === 'Activity'){
                     try {
                         const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routine', {
@@ -65,11 +71,23 @@ const AddRoutine = props => {
                         setEndDate(new Date())
                         setTimesPerDay(1)
                         setMealState('Before Meal')
-                        setTime1('10:00')
-                        setTime2('11:00')
-                        setTime3('12:00')
-                        setTime4('13:00')
-                        setTime5('14:00')
+                        setTimeList([
+                            {
+                              time: '10:00'
+                            },
+                            {
+                              time: '11:00'
+                            },
+                            {
+                              time: '12:00'
+                            },
+                            {
+                              time: '13:00'
+                            },
+                            {
+                              time: '14:00'
+                            }
+                        ]);
                         setNotificationState('Before 5 mins')
                         setUserType('Me')
                         setRoutineFormLoading(false)
@@ -144,11 +162,23 @@ const AddRoutine = props => {
                         setEndDate(new Date())
                         setTimesPerDay(1)
                         setMealState('Before Meal')
-                        setTime1('10:00')
-                        setTime2('11:00')
-                        setTime3('12:00')
-                        setTime4('13:00')
-                        setTime5('14:00')
+                        setTimeList([
+                            {
+                              time: '10:00'
+                            },
+                            {
+                              time: '11:00'
+                            },
+                            {
+                              time: '12:00'
+                            },
+                            {
+                              time: '13:00'
+                            },
+                            {
+                              time: '14:00'
+                            }
+                        ]);
                         setNotificationState('Before 5 mins')
                         setUserType('Me')
                         setRoutineFormLoading(false)
@@ -233,6 +263,12 @@ const AddRoutine = props => {
         setMessage(null)
     }
 
+    const handleTimeChange = (inputTime, index) => {
+        let newArr = [...timeList]; 
+        newArr[index].time = inputTime;
+        setTimeList(newArr); 
+    };
+
     return <React.Fragment>
         <div className="container-fluid bg-white">
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
@@ -304,11 +340,11 @@ const AddRoutine = props => {
                                             <div className="lg-form mr-4 mb-4 mb-sm-0">
                                                 <label>{"Time "+(k+1)}</label>
                                                 <TimePicker
-                                                className="form-control text-justify rounded-pill"
-                                                    onChange={(inputTime) => {
-                                                        eval('setTime'+(k+1))(inputTime)
-                                                    }}
-                                                    value={eval('time'+(k+1))}
+                                                    className="form-control text-justify rounded-pill"
+                                                    onChange={(inputTime) => 
+                                                        handleTimeChange(inputTime, k)
+                                                    }
+                                                    value={timeList[k].time}
                                                     disabled = {(disable)? "disabled" : ""} 
                                                 />
                                             </div>

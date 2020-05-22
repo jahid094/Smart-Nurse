@@ -4,8 +4,6 @@ import {Modal, Button} from 'react-bootstrap'
 import TimePicker from 'react-time-picker'
 import './AddRoutine.css'
 
-/* eslint no-eval: 0 */
-
 const ViewRoutineModal = props => {
     const [show, setShow] = useState(true)
     const [routineItem, setRoutineItem] = useState(props.rowInfo.routineItem)
@@ -15,12 +13,6 @@ const ViewRoutineModal = props => {
     const [endDate, setEndDate] = useState(props.rowInfo.endDate)
     const [timesPerDay, setTimesPerDay] = useState(props.rowInfo.timesPerDay)
     const [beforeAfterMeal, setBeforeAfterMeal] = useState(props.rowInfo.beforeAfterMeal)
-    // const [time, setTime] = useState(props.rowInfo.time)
-    const [time1, setTime1] = useState(props.rowInfo.time1 || '10:00')
-    const [time2, setTime2] = useState(props.rowInfo.time2 || '11:00')
-    const [time3, setTime3] = useState(props.rowInfo.time3 || '12:00')
-    const [time4, setTime4] = useState(props.rowInfo.time4 || '13:00')
-    const [time5, setTime5] = useState(props.rowInfo.time5 || '14:00')
     const [notificationState, setNotificationState] = useState(props.rowInfo.notificationState)
     const [userType, setUserType] = useState(props.rowInfo.userType)
 
@@ -122,10 +114,7 @@ const ViewRoutineModal = props => {
                                                 <label>{"Time "+(k+1)}</label>
                                                 <TimePicker
                                                 className="form-control text-justify rounded-pill"
-                                                    onChange={(inputTime) => {
-                                                        eval('setTime'+(k+1))(inputTime)
-                                                    }}
-                                                    value={eval('time'+(k+1))}
+                                                    value={props.rowInfo.times[k].time}
                                                     disabled
                                                 />
                                             </div>

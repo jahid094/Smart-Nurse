@@ -20,11 +20,30 @@ const UpdateRoutineModal = props => {
     const [endDate, setEndDate] = useState(props.rowInfo.endDate)
     const [timesPerDay, setTimesPerDay] = useState(props.rowInfo.timesPerDay)
     const [beforeAfterMeal, setBeforeAfterMeal] = useState(props.rowInfo.beforeAfterMeal)
-    const [time1, setTime1] = useState(props.rowInfo.time1 || '10:00')
+    // const time3 = (props.rowInfo.times[3].time) ? props.rowInfo.times[3].time : '13:00'
+    // const time4 = (!props.rowInfo.times[4].time) ? props.rowInfo.times[4].time : '14:00'
+    const [timeList, setTimeList] = useState([
+        {
+          time: props.rowInfo.times[0].time || '10:00'
+        },
+        {
+          time: props.rowInfo.times[1].time || '11:00'
+        },
+        {
+          time: props.rowInfo.times[2].time || '12:00'
+        },
+        {
+          time: props.rowInfo.times[3].time || '13:00'
+        },
+        {
+          time: props.rowInfo.times[4].time || '14:00' 
+        } 
+    ]);
+    /* const [time1, setTime1] = useState(props.rowInfo.time1 || '10:00')
     const [time2, setTime2] = useState(props.rowInfo.time2 || '11:00')
     const [time3, setTime3] = useState(props.rowInfo.time3 || '12:00')
     const [time4, setTime4] = useState(props.rowInfo.time4 || '13:00')
-    const [time5, setTime5] = useState(props.rowInfo.time5 || '14:00')
+    const [time5, setTime5] = useState(props.rowInfo.time5 || '14:00') */
     const [notificationState, setNotificationState] = useState(props.rowInfo.notificationState)
     const [userType, setUserType] = useState(props.rowInfo.userType)
     const [isLoading, setIsLoading] = useState(false)
@@ -42,13 +61,14 @@ const UpdateRoutineModal = props => {
             if(moment(startDate).isSameOrBefore(endDate)){
                 setIsLoading(true)
                 setDisable(true)
-                let times = [];
+                let times = timeList.slice(0, timesPerDay);
+                /* let times = [];
                 let i
                 for (i = 0; i < timesPerDay; i++) {
                     times.push({
                         time: eval('time'+(i+1))
                     })
-                }
+                } */
                 let startingDate
                 let endingDate
                 if(startDate === (props.rowInfo.startDate)){
@@ -409,10 +429,18 @@ const UpdateRoutineModal = props => {
         setMessage(null)
     }
 
+    const handleTimeChange = (inputTime, index) => {
+        let newArr = [...timeList]; 
+        newArr[index].time = inputTime;
+        setTimeList(newArr); 
+    };
+
     return <Modal show={show} onHide={handleClose}>
         <Modal.Header style={{backgroundColor: '#0C0C52'}}>
             <Modal.Title style={{color: 'white'}}>Update Routine</Modal.Title>
         </Modal.Header>
+        {/* {time3 && console.log(time3)} */}
+        {/* {!time3 && console.log('time3')} */}
         <Modal.Body>
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <div className="container-fluid bg-white">
@@ -486,10 +514,16 @@ const UpdateRoutineModal = props => {
                                                 <label>{"Time "+(k+1)}</label>
                                                 <TimePicker
                                                 className="form-control text-justify rounded-pill"
-                                                    onChange={(inputTime) => {
+                                                    onChange={(inputTime) => 
+                                                        handleTimeChange(inputTime, k)
+                                                    }    
+                                                    /* onChange={(inputTime) => {
                                                         eval('setTime'+(k+1))(inputTime)
-                                                    }}
-                                                    value={eval('time'+(k+1))} 
+                                                    }} */
+                                                    // value={eval('time'+(k+1))} 
+                                                    // value={props.rowInfo.times[k].time || timeList[k].time}
+                                                    // value={timeValueHandler(k)}
+                                                    value={timeList[k].time}
                                                 />
                                             </div>
                                         </div>

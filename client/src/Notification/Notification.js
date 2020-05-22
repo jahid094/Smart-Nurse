@@ -1,10 +1,30 @@
-import React from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import axios from 'axios'
 import Menu from '../shared/component/Menu'
 import {Helmet} from "react-helmet";
 import NotificationAlert from './NotificationAlert'
 import Footer from '../shared/component/Footer'
+import {AuthContext} from '../shared/context/auth-context'
 
 const Notification = () => {
+    const auth = useContext(AuthContext)
+    const [notificationList, setNotificationList] = useState([])
+    useEffect(() => {
+        const getNotificationList = async () => { 
+            try {
+                console.log('try')
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/requestList', {
+                    owner: auth.userId
+                });
+                setNotificationList(response.data.requestExist)
+                console.log(response.data)
+            } catch (error) {
+                console.log('catch')
+                console.log(error.response.data);
+            }
+          }
+          getNotificationList()
+    })
     return <React.Fragment>
         <Helmet>
             <meta charSet="utf-8" />

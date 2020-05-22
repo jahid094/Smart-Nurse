@@ -68,22 +68,17 @@ router.post('/routines' , async (req, res) =>{
 
 router.get('/routine/:id' , async (req, res) =>{
     const _id=req.params.id
-
     try{
         const routine = await Routine.findOne({_id })
-
         if(!routine){
             return res.status(404).send()
         }
-
         res.send(routine)
         
     }catch(e){
         res.status(500).send(e)
-
     }
 })
-
 
 router.patch('/routine/:id' , async ( req , res) => {
     //const _id = req.params.id

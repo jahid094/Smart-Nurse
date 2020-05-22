@@ -18,11 +18,11 @@ const MyRoutine = props => {
     const auth = useContext(AuthContext)
     const [userRoutine, setUserRoutine] = useState([])
     const [rowInfo, setRowInfo] = useState([])
-    const [time1, setTime1] = useState('')
+    /* const [time1, setTime1] = useState('')
     const [time2, setTime2] = useState('')
     const [time3, setTime3] = useState('')
     const [time4, setTime4] = useState('')
-    const [time5, setTime5] = useState('')
+    const [time5, setTime5] = useState('') */
     const [rowSelect, setRowSelect] = useState(false)
     const [viewDetails, setViewDetails] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -32,14 +32,6 @@ const MyRoutine = props => {
     const [signBool, setSignBool] = useState(ApiCalendar.sign)
 
     useEffect(() => {
-        /* const googleSign = async () => {
-            console.log('Google')
-            console.log(ApiCalendar.sign)
-            if(!ApiCalendar.sign){
-                await ApiCalendar.handleAuthClick();
-            }
-        }
-        googleSign() */
         ApiCalendar.onLoad(() => {
             ApiCalendar.listenSign(signUpdate());
         });
@@ -312,15 +304,65 @@ const MyRoutine = props => {
             let endDate =  row.endDate
             let timesPerDay = row.timesPerDay
             let beforeAfterMeal = row.beforeAfterMeal
-            let length = row.times.length
+            let timeList = [
+                {
+                    time: '10:00'
+                },
+                {
+                    time: '11:00'
+                },
+                {
+                    time: '12:00'
+                },
+                {
+                    time: '13:00'
+                },
+                {
+                    time: '14:00'
+                }
+            ]
+            console.log(row.times)
+            if(timesPerDay === 1){
+                timeList[0].time = row.times[0].time;
+                timeList[1].time = '11:00';
+                timeList[2].time = '12:00';
+                timeList[3].time = '13:00';
+                timeList[4].time = '14:00';
+            } else if(timesPerDay === 2){
+                timeList[0].time = row.times[0].time;
+                timeList[1].time = row.times[1].time;
+                timeList[2].time = '12:00';
+                timeList[3].time = '13:00';
+                timeList[4].time = '14:00';
+            } else if(timesPerDay === 3){
+                timeList[0].time = row.times[0].time;
+                timeList[1].time = row.times[1].time;
+                timeList[2].time = row.times[2].time;
+                timeList[3].time = '13:00';
+                timeList[4].time = '14:00';
+            } else if(timesPerDay === 4){
+                timeList[0].time = row.times[0].time;
+                timeList[1].time = row.times[1].time;
+                timeList[2].time = row.times[2].time;
+                timeList[3].time = row.times[3].time;
+                timeList[4].time = '14:00';
+            } else if(timesPerDay === 5){
+                timeList[0].time = row.times[0].time;
+                timeList[1].time = row.times[1].time;
+                timeList[2].time = row.times[2].time;
+                timeList[3].time = row.times[3].time;
+                timeList[4].time = row.times[4].time;
+            }
+            /* let length = row.times.length
             let i = 0
             for(i = 0; i < length; i++){
                 eval('setTime'+(i+1))(row.times[i].time)
-            }
+            } */
+            console.log(timeList)
             let unit = row.unit
             let notificationState = row.notification
             let userType = row.notificationFor
-            if(eval('time'+(timesPerDay))){
+            if(row.times[timesPerDay-1]){
                 console.log("if")
                 const setRowInfoFunction = async () => {
                     await setRowInfo({
@@ -331,11 +373,12 @@ const MyRoutine = props => {
                         endDate: new Date(endDate),
                         timesPerDay,
                         beforeAfterMeal,
-                        time1,
+                        times: timeList,
+                        /* time1,
                         time2,
                         time3,
                         time4,
-                        time5,
+                        time5, */
                         unit,
                         notificationState,
                         userType

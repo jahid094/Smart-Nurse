@@ -23,18 +23,15 @@ const upload = multer({
 })
 
 router.get('/getUser/:id' , async (req , res ) =>{
-
     try{
       const user = await User.findById(req.params.id)
       if(!user){
           return res.status(404).send()
       }
       res.send(user)
-
     }catch(e){
         res.status(500).send()
     }
-  
 })
 
 // Registration 
