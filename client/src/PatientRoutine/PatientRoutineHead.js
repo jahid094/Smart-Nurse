@@ -28,10 +28,12 @@ const PatientRoutineHead = () => {
             }, 1000);
             return () => clearInterval(interval);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [seconds]);
 
     useEffect(() => {
         console.log('Sign Status:'+ApiCalendar.sign)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ApiCalendar.sign]);
 
     const signUpdate = () => {

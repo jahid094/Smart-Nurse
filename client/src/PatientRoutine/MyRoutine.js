@@ -65,6 +65,7 @@ const MyRoutine = props => {
           }
           getRoutine()
           setTestBool(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [testBool])
 
     useEffect(() => {
@@ -83,6 +84,7 @@ const MyRoutine = props => {
           }
           getRoutine()
           props.pageNotRender()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.renderPage])
 
     useEffect(()=> {
@@ -93,6 +95,7 @@ const MyRoutine = props => {
         setSign(ApiCalendar.sign)
         setSignBool(ApiCalendar.sign)
         console.log(sign)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [signBool])
 
     const signUpdate = () => {
