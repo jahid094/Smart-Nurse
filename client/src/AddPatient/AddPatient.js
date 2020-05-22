@@ -5,6 +5,7 @@ import Menu from '../shared/component/Menu'
 import Footer from '../shared/component/Footer'
 import AddPatientTable from './AddPatientTable'
 import {AuthContext} from '../shared/context/auth-context'
+import LoadingSpinner from '../shared/component/LoadingSpinner'
 import './AddPatient.css'
 
 const AddPatient = () => {
@@ -12,20 +13,30 @@ const AddPatient = () => {
     const [search, setSearch] = useState("");
     const [userList, setUserList] = useState([])
     const [filteredUserList, setFilteredUserList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false)
+    const [disable, setDisable] = useState(false)
 
     useEffect(() => {
         const getUserList = async () => { 
+            setIsLoading(true)
+            setDisable(true)
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/userList', {
                     owner: auth.userId
                 });
+                setIsLoading(false)
+                setDisable(false)
                 setUserList(response.data.user)
+                console.log(response.data)
             } catch (error) {
+                setIsLoading(false)
+                setDisable(false)
                 console.log(error.response.data);
             }
           }
           getUserList()
-    })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         if(search){
@@ -55,6 +66,7 @@ const AddPatient = () => {
         </div>
         <div className="container-fluid w-100 h-100">
             <div className="container">
+                {isLoading && <LoadingSpinner asOverlay/>}
                 <div className="row">
                     <p className="h1 font-weight-normal">Search with the UserId and add your patient</p>
                 </div>
@@ -63,9 +75,9 @@ const AddPatient = () => {
                     </div>
                     <div className="col-md-3 mb-4">
                         <div className="input-group">
-                            <input className="form-control py-2 rounded-pill mr-1 pr-5" type="search" placeholder="Patient ID" onChange={e => setSearch(e.target.value)}/>
+                            <input className="form-control py-2 rounded-pill mr-1 pr-5" type="search" placeholder="Patient ID" onChange={e => setSearch(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                             <span className="input-group-append">
-                                <button className="btn rounded-pill border-0 ml-n5" type="button">
+                                <button className="btn rounded-pill border-0 ml-n5" type="button" disabled = {(disable)? "disabled" : ""}>
                                     <i className="fa fa-search"></i>
                                 </button>
                             </span>

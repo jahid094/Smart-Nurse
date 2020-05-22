@@ -3,6 +3,7 @@ import axios from 'axios'
 import Checkmark from '../shared/img/checkmark.png'
 import Cross from '../shared/img/Cross.png'
 import Alert from 'react-bootstrap/Alert'
+import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import {AuthContext} from '../shared/context/auth-context'
 
@@ -10,18 +11,22 @@ const NotificationAlert = props => {
     const auth = useContext(AuthContext)
     const [message, setMessage] = useState('')
     const [disable, setDisable] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const acceptRequest = async (requesterId) => {
         console.log('Accept'+requesterId)
+        setIsLoading(true)
         setDisable(true)
         try {
             const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/acceptRequest', {
                 requester: requesterId,
                 owner: auth.userId
             });
+            setIsLoading(false)
             setDisable(false)
             setMessage(response.data.message)
             console.log(response.data.message)
         } catch (error) {
+            setIsLoading(false)
             setDisable(false)
             setMessage(error.response.data.message)
             console.log(error.response.data);
@@ -29,15 +34,18 @@ const NotificationAlert = props => {
     }
     const cancelRequest = async (deleteId) => {
         console.log('Cancel'+deleteId)
+        setIsLoading(true)
         setDisable(true)
         try {
             const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'requestDelete/'+deleteId/*, {
                 owner: auth.userId
             }*/);
+            setIsLoading(false)
             setDisable(false)
             setMessage(response.data.message)
             console.log(response.data)
         } catch (error) {
+            setIsLoading(false)
             setDisable(false)
             setMessage(error.response.data.message)
             console.log(error.response.data);
@@ -52,6 +60,7 @@ const NotificationAlert = props => {
         <div class="container-fluid">
             <div class="container">
                 {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
+                {isLoading && <LoadingSpinner asOverlay/>}
                 {
                     props.notificationList ? 
                         <ul className="p-0">
