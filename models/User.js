@@ -129,13 +129,11 @@ const UserSchema = new mongoose.Schema({
   },
   profilePicture:{
     type: Buffer
-  }
-//   patientsUnderGuardian: [{
-//     patientId: {
-//         type: mongoose.Schema.ObjectId,
-//         ref: 'User'
-//     }
-// }]
+  },
+  patientUnderGuardian: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User'
+}
 })
 
 UserSchema.methods.toJSON = function () {
