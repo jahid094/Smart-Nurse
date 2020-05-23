@@ -31,6 +31,26 @@ const sendWelcomeEmail = ( email , Token) => {
     console.log(process.env.FRONTEND_URL)
 }
 
+const sendRequestEmail = ( email , Token) => {
+    sgMail.send({
+        to: email ,
+        from: 'jahid.aust39@gmail.com' ,
+        subject: 'Confirm Your mail !' ,
+        text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
+        'Please click on the following link and give passwords to create your account \n\n' +
+        process.env.FRONTEND_URL+'confirmation/request/' + Token + '\n\n' +
+        'If you did not request this, please ignore this email and your password will remain unchanged.\n'  
+    }).then(() => {
+        console.log('request message sent')
+    }).catch((error) => {
+        console.log(error.response.body)
+        // console.log(error.response.body.errors[0].message)
+    })
+    console.log(Token)
+    console.log(email)
+    console.log(process.env.FRONTEND_URL)
+}
+
 const sendResetEmail = ( email , token) => {
     sgMail.send({
         to: email ,
@@ -56,7 +76,7 @@ const sendCancelationEmail =( email , name) => {
         to: email ,
         from: 'jahid.aust39@gmail.com' ,
         subject: 'Sorry to see you go!' ,
-        text: 'Goodbye . I hope to see you back sometime soon.' 
+        text: 'Goodbye sd. I hope to see you back sometime soon.' 
     }).then(() => {
         console.log('Message sent')
     }).catch((error) => {
@@ -68,6 +88,7 @@ const sendCancelationEmail =( email , name) => {
 module.exports = {
     sendWelcomeEmail ,
     sendCancelationEmail ,
-    sendResetEmail
+    sendResetEmail ,
+    sendRequestEmail
 }
 
