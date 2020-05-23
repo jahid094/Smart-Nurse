@@ -13,10 +13,8 @@ const VerifyUser = () => {
                 const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'conformation/'+token);
                 console.log(response.data.message)
                 auth.authMessage = response.data.message
-                // console.log(auth.authMessage)
                 history.push('/login')
             } catch (error) {
-                // console.log(error)
                 auth.authMessage = error.response.data.message
                 history.push('/login')
             }

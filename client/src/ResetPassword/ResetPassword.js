@@ -31,8 +31,6 @@ const ResetPassword = () => {
     })
 	const submitHandler = async (event) => {
 		event.preventDefault()
-		/* console.log(password)
-        console.log(confirmPassword) */
         setIsLoading(true)
         setDisable(true)
         try {
@@ -46,7 +44,6 @@ const ResetPassword = () => {
             auth.resetMessage = response.data.message
             history.push('/login')
         } catch (error) {
-            // console.log(error.response.data.message);
             setIsLoading(false)
             setDisable(false)
             setError(error.response.data.message || 'Something went wrong, please try again.')
@@ -65,7 +62,7 @@ const ResetPassword = () => {
 			<br/>
 			<br/>
             {error && <ErrorModal message={error} onClear={errorHandler.bind(this)}/>}
-            {isLoading && <LoadingSpinner asOverlay/>}
+            {isLoading && <LoadingSpinner/>}
 			<div className="container box">
 				<div className="row" >
 					<div className="col-lg-6 d-none d-lg-block">

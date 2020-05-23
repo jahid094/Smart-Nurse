@@ -30,10 +30,9 @@ const ProfileInformation = () => {
             setIsLoading(true)
             setDisable(true)
             try {
-              const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
-                id: auth.userId
-              });
-                // console.log(response.data);
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
+                    id: auth.userId
+                });
                 setFirstName(response.data.user.firstname)
                 setLastName(response.data.user.lastname)
                 setAge(response.data.user.age)
@@ -47,11 +46,9 @@ const ProfileInformation = () => {
                 }
                 setIsLoading(false)
                 setDisable(false)
-                // setMessage(response.data.message)
             } catch (error) {
                 setIsLoading(false)
                 setDisable(false)
-                // console.log(error.response.data);
                 setMessage(error.response.data.message)
             }
           }
@@ -120,7 +117,7 @@ const ProfileInformation = () => {
     }
 
     return  <div className="container-fluid">
-        {isLoading && <LoadingSpinner asOverlay/>}
+        {isLoading && <LoadingSpinner/>}
         {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
         <div className="row">
             <div className="col-lg-4">

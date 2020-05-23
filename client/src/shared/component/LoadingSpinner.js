@@ -1,24 +1,11 @@
-/* import React from 'react';
-import Spinner from 'react-bootstrap/Spinner'
+import React from 'react';
+import LoadingOverlay from 'react-loading-overlay'
+import BounceLoader from './BounceLoader'
 
 const LoadingSpinner = () => {
-  return <Spinner animation="grow" role="status">
-        <span className="sr-only">Loading...</span>
-    </Spinner>;
-};
-
-export default LoadingSpinner; */
-
-import React from 'react';
-
-import './LoadingSpinner.css';
-
-const LoadingSpinner = props => {
-  return (
-    <div className={`${props.asOverlay && 'loading-spinner__overlay'}`}>
-      <div className="lds-dual-ring"></div>
-    </div>
-  );
+  return <LoadingOverlay
+    active
+    spinner={<BounceLoader/>}/>;
 };
 
 export default LoadingSpinner;

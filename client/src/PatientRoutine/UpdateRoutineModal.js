@@ -9,8 +9,6 @@ import ErrorModal from '../shared/component/ErrorModal'
 import ApiCalendar from './ApiCalendar'
 import './AddRoutine.css'
 
-/* eslint no-eval: 0 */
-
 const UpdateRoutineModal = props => {
     const [show, setShow] = useState(true);
     const [routineItem, setRoutineItem] = useState(props.rowInfo.routineItem)
@@ -20,8 +18,6 @@ const UpdateRoutineModal = props => {
     const [endDate, setEndDate] = useState(props.rowInfo.endDate)
     const [timesPerDay, setTimesPerDay] = useState(props.rowInfo.timesPerDay)
     const [beforeAfterMeal, setBeforeAfterMeal] = useState(props.rowInfo.beforeAfterMeal)
-    // const time3 = (props.rowInfo.times[3].time) ? props.rowInfo.times[3].time : '13:00'
-    // const time4 = (!props.rowInfo.times[4].time) ? props.rowInfo.times[4].time : '14:00'
     const [timeList, setTimeList] = useState([
         {
           time: props.rowInfo.times[0].time || '10:00'
@@ -39,11 +35,6 @@ const UpdateRoutineModal = props => {
           time: props.rowInfo.times[4].time || '14:00' 
         } 
     ]);
-    /* const [time1, setTime1] = useState(props.rowInfo.time1 || '10:00')
-    const [time2, setTime2] = useState(props.rowInfo.time2 || '11:00')
-    const [time3, setTime3] = useState(props.rowInfo.time3 || '12:00')
-    const [time4, setTime4] = useState(props.rowInfo.time4 || '13:00')
-    const [time5, setTime5] = useState(props.rowInfo.time5 || '14:00') */
     const [notificationState, setNotificationState] = useState(props.rowInfo.notificationState)
     const [userType, setUserType] = useState(props.rowInfo.userType)
     const [isLoading, setIsLoading] = useState(false)
@@ -62,13 +53,6 @@ const UpdateRoutineModal = props => {
                 setIsLoading(true)
                 setDisable(true)
                 let times = timeList.slice(0, timesPerDay);
-                /* let times = [];
-                let i
-                for (i = 0; i < timesPerDay; i++) {
-                    times.push({
-                        time: eval('time'+(i+1))
-                    })
-                } */
                 let startingDate
                 let endingDate
                 if(startDate === (props.rowInfo.startDate)){
@@ -444,7 +428,7 @@ const UpdateRoutineModal = props => {
         <Modal.Body>
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <div className="container-fluid bg-white">
-                {isLoading && <LoadingSpinner asOverlay/>}
+                {isLoading && <LoadingSpinner/>}
                 <div className="container">
                     <div className="row py-5">
                         <div className="col-lg-12">

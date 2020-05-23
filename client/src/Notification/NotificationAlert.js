@@ -37,9 +37,7 @@ const NotificationAlert = props => {
         setIsLoading(true)
         setDisable(true)
         try {
-            const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'requestDelete/'+deleteId/*, {
-                owner: auth.userId
-            }*/);
+            const response = await axios.delete(process.env.REACT_APP_BACKEND_URL+'requestDelete/'+deleteId);
             setIsLoading(false)
             setDisable(false)
             setMessage(response.data.message)
@@ -60,7 +58,7 @@ const NotificationAlert = props => {
         <div class="container-fluid">
             <div class="container">
                 {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
-                {isLoading && <LoadingSpinner asOverlay/>}
+                {isLoading && <LoadingSpinner/>}
                 {
                     props.notificationList ? 
                         <ul className="p-0">

@@ -23,17 +23,6 @@ const RegisterBox = props => {
 
     const submitHandler = async (event) => {
         event.preventDefault()
-        /* console.log(firstName)
-        console.log(lastName)
-        console.log(gender)
-        console.log(age)
-        console.log(email)
-        console.log(password)
-        console.log(confirmPassword)
-        console.log(phone)
-        console.log(height)
-        console.log(weight)
-        console.log(userType) */
         setIsLoading(true)
         setDisable(true)
         try {
@@ -81,7 +70,7 @@ const RegisterBox = props => {
         {error && <ErrorModal message={error} onClear={errorHandler.bind(this)}/>}
         {success && <ErrorModal message={success} onClear={errorHandler.bind(this)}/>}
         <div className="signup">
-            {isLoading && <LoadingSpinner asOverlay/>}
+            {isLoading && <LoadingSpinner/>}
             <p className="text-center font-weight-bold" style={{fontSize: '25px', color: '#07074D'}}>Create Account</p>
             <form className="text-center" style={{color: '#757575'}} onSubmit={submitHandler}>
                 <div className="form-row">

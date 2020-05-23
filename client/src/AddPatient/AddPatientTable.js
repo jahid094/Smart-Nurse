@@ -96,7 +96,7 @@ const AddPatientTable = props => {
     return  <React.Fragment>
         <div className="container-fluid w-100 h-100">
             <div className="container">
-                {isLoading && <LoadingSpinner asOverlay/>}
+                {isLoading && <LoadingSpinner/>}
                 {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
                 <BootstrapTable
                     keyField='_id'

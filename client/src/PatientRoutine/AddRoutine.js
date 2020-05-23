@@ -372,7 +372,7 @@ const AddRoutine = props => {
                             <div className="row mt-5">
 				                <div className="col-lg-4">
                                 </div>
-                                {routineFormLoading && <LoadingSpinner asOverlay/>}
+                                {routineFormLoading && <LoadingSpinner/>}
                                 <div className="col-lg-4">
                                     <button type="submit" className="btn btn-lg btn-block rounded-pill text-light" style={{backgroundColor: '#0C0C52'}} disabled = {(disable)? "disabled" : ""}>ADD</button>
                                 </div>

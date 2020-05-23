@@ -45,7 +45,7 @@ const ForgetPassword = () => {
             <br/>
             <br/>
             <br/>
-            {isLoading && <LoadingSpinner asOverlay/>}
+            {isLoading && <LoadingSpinner/>}
             <div className="container box">  
                 <div className="row">
                     <div className="col-lg-6 d-none d-lg-block">

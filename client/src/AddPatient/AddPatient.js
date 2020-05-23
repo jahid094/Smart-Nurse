@@ -66,7 +66,7 @@ const AddPatient = () => {
         </div>
         <div className="container-fluid w-100 h-100">
             <div className="container">
-                {isLoading && <LoadingSpinner asOverlay/>}
+                {isLoading && <LoadingSpinner/>}
                 <div className="row">
                     <p className="h1 font-weight-normal">Search with the UserId and add your patient</p>
                 </div>

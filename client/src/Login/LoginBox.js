@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import axios from 'axios'
 import {useHistory} from 'react-router-dom';
 import {Cookies} from 'react-cookie';
@@ -17,26 +17,10 @@ const LoginBox = () => {
     const [error, setError] = useState()
     const [disable, setDisable] = useState(false)
 
-    useEffect(() => {
-        /* console.log('Login')
-        console.log(auth.authMessage) */
-    })
-        
     const submitHandler = async (event) => {
         event.preventDefault()
-        /* console.log('Login Status: '+auth.userId)
-        console.log('Login Status: '+auth.token)
-        console.log('Login Status: '+auth.isLoggedIn) */
         console.log(email)
         console.log(password)
-        /* axios.post('https://ratul-place-sharing-app.herokuapp.com/api/users/login', {
-            email,
-            password
-        }).then((responese) => {
-            console.log(responese.data)
-        }).catch((error) => {
-            console.log(error)
-        }) */
         setIsLoading(true)
         setDisable(true)
         try {
@@ -55,12 +39,8 @@ const LoginBox = () => {
             cookies.set('token', auth.token, { path: '/', maxAge: 31536000 });
             cookies.set('isLoggedIn', auth.isLoggedIn, { path: '/', maxAge: 31536000 });
             cookies.set('firstName', auth.firstName, { path: '/', maxAge: 31536000 });
-            /* console.log('Login Status: '+auth.userId)
-            console.log('Login Status: '+auth.token)
-            console.log('Login Status: '+auth.isLoggedIn) */
             history.push('/')
         } catch (error) {
-            // console.log(error.response.data.message);
             setIsLoading(false)
             setDisable(false)
             setError(error.response.data.message || 'Something went wrong, please try again.')
@@ -78,7 +58,7 @@ const LoginBox = () => {
             {auth.resetMessage && <ErrorModal message={auth.resetMessage} onClear={errorHandler.bind(this)}/>}
             {error && <ErrorModal message={error} onClear={errorHandler.bind(this)}/>}
             <div className="login" id="loginBox">
-                {isLoading && <LoadingSpinner asOverlay/>}
+                {isLoading && <LoadingSpinner/>}
                 <img className="mx-auto d-block" src={Logo} alt=""/>
                 <p className="text-center font-weight-bold" style={{fontSize:'25px', marginTop: '50px'}}>Member Login</p>
                 <form onSubmit={submitHandler}>

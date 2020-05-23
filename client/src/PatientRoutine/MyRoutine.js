@@ -12,22 +12,14 @@ import ErrorModal from '../shared/component/ErrorModal'
 import {AuthContext} from '../shared/context/auth-context'
 import ApiCalendar from './ApiCalendar'
 
-/* eslint no-eval: 0 */
-
 const MyRoutine = props => {
     const auth = useContext(AuthContext)
     const [userRoutine, setUserRoutine] = useState([])
     const [rowInfo, setRowInfo] = useState([])
-    /* const [time1, setTime1] = useState('')
-    const [time2, setTime2] = useState('')
-    const [time3, setTime3] = useState('')
-    const [time4, setTime4] = useState('')
-    const [time5, setTime5] = useState('') */
     const [rowSelect, setRowSelect] = useState(false)
     const [viewDetails, setViewDetails] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
-    // const [pageLoading, setPageLoading] = useState(true)
     const [testBool, setTestBool] = useState(false)
     const [signBool, setSignBool] = useState(ApiCalendar.sign)
 
@@ -403,7 +395,7 @@ const MyRoutine = props => {
             <p className="h2 text-center font-weight-bold mt-5">Your Routine</p>
             {rowInfo && rowSelect && <UpdateRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
             {rowInfo && viewDetails && <ViewRoutineModal rowInfo={rowInfo} onClear={errorHandler.bind(this)}/>}
-            {isLoading && <LoadingSpinner asOverlay/>}
+            {isLoading && <LoadingSpinner/>}
             <ToolkitProvider
                 keyField='_id'
                 data={userRoutine}
