@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 [0508/144952.923:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0508/144952.923:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0510/174818.317:ERROR:crash_report_database_win.cc(469)] failed to stat report
@@ -28,3 +29,5 @@
 [0523/105051.749:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0523/214745.381:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0523/214745.446:ERROR:crash_report_database_win.cc(469)] failed to stat report
+=======
+>>>>>>> Stashed changes

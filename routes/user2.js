@@ -2,30 +2,19 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
-const passport = require("passport");
-const sharp = require("sharp");
 const jwt = require("jsonwebtoken");
 const async = require("async");
 const User = require("../models/User");
 const { sendRequestEmail } = require("../emails/account");
 
 router.post("/users/patientRegister", async (req, res) => {
-  const {
-    firstname,
-    lastname,
-    gender,
-    age,
-    email,
-    phone,
-    height,
-    weight,
-  } = req.body;
+  const {firstname, lastname, gender, age,email, phone, height, weight} = req.body;
   let newUser;
 
-  User.findOne({ email: email }).then((user) => {
+  User.findOne({ email }).then((user) => {
     if (user) {
       return res.status(400).json({
-        message: "Email already exists",
+        message: "Email already exists"
       });
     } else {
       newUser = new User({
@@ -36,7 +25,7 @@ router.post("/users/patientRegister", async (req, res) => {
         email,
         phone,
         height,
-        weight,
+        weight
       });
 
       const Token = jwt.sign(
@@ -53,29 +42,13 @@ router.post("/users/patientRegister", async (req, res) => {
 
         return res.status(201).json({
           newUser,
-          message:
-            "An verification-mail has been sent to " +
-            newUser.email +
-            " . Please verify !",
+          message: "An verification-mail has been sent to " +newUser.email +". Please verify!",
         });
       } catch (error) {
         return res.status(400).json({
-          message: error,
+          message: error
         });
       }
-    }
-  });
-});
-
-User.find({ varify: false }).then((user) => {
-  user.forEach((element) => {
-    var expire = moment(new Date()).isSameOrBefore(element.conformationExpires);
-    if (!expire) {
-      User.deleteOne(element)
-        .then((user) => {})
-        .catch((e) => {
-          console.log(e);
-        });
     }
   });
 });
@@ -85,15 +58,14 @@ router.post("/conformation/request/:token", (req, res) => {
   async.waterfall(
     [
       function (done) {
-        User.findOne(
-          {
+        User.findOne({
             conformationToken: req.params.token,
-            conformationExpires: { $gt: Date.now() },
+            conformationExpires: { $gt: Date.now() }
           },
           (err, user) => {
             if (!user) {
               return res.status(400).json({
-                message: "Password reset token is invalid or has expired.",
+                message: "Password set token for your account is invalid or has expired."
               });
             }
             user.varify = true;
@@ -105,18 +77,18 @@ router.post("/conformation/request/:token", (req, res) => {
                   try {
                     await user.save();
                     return res.status(200).json({
-                      message: "Password added successfully.",
+                      message: "Password added successfully to your account. You can now login into your account"
                     });
                   } catch (e) {
                     return res.status(400).json({
-                      message: e,
+                      message: e
                     });
                   }
                 });
               });
             } else {
               return res.status(400).json({
-                message: "Passwords do not match.",
+                message: "Passwords do not match."
               });
             }
           }
@@ -126,5 +98,21 @@ router.post("/conformation/request/:token", (req, res) => {
     function (err) {}
   );
 });
+
+router.get('/conformation/request/:token', function(req, res) {
+  User.findOne({ 
+    conformationToken: req.params.token, 
+    conformationExpires: { $gt: Date.now() } 
+  }, (err, user) => {
+    if (!user) {
+      return res.status(400).json({
+        message: 'This link has been expired'
+      })
+    }
+    return res.status(200).json({
+      message: 'You can set password with this link!'
+    })  
+  });
+})
 
 module.exports = router;
