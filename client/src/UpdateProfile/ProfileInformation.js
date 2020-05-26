@@ -4,6 +4,7 @@ import axios from 'axios'
 import {AuthContext} from '../shared/context/auth-context';
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
+import Delete from '../shared/img/Delete.png'
 import {Cookies} from 'react-cookie';
 
 const ProfileInformation = () => {
@@ -122,8 +123,8 @@ const ProfileInformation = () => {
         <div className="row">
             <div className="col-lg-4">
                 <img className="d-block mx-auto rounded-circle" style={{width: '250px', height: '250px'}} src={imageFile} alt="Profile"/>
-                    <div className="col-6 offset-3 col-lg-8 offset-lg-2">
-                        <form>
+                <div className="col-6 offset-3 col-lg-8 offset-lg-2">
+                    <form>
                         <label htmlFor="files" className="btn btn-block text-white mx-auto mt-3 rounded-pill justify-content-center" style={{backgroundColor: '#0C0C52'}}>Change Profile Picture</label>
                         <input id="files" style={{visibility: 'hidden'}} type="file" onChange={async (e) =>  {
                                 setImageFile(URL.createObjectURL(e.target.files[0]))
@@ -143,8 +144,13 @@ const ProfileInformation = () => {
                                 }
                             }
                         }/>
-                        </form>
-                    </div>
+                    </form>
+                </div>
+                <div className="col-10 offset-1 col-sm-6 offset-sm-3 col-lg-8 offset-lg-2">
+                    <p>Name: Samsul Islam</p>
+                    <p>Role: Guardian</p>
+                    <p>Patient Name: Jahidul Islam<span className="d-inline-block"><img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){console.log('image click')}}/></span></p>
+                </div>
             </div>
             <div className="col-lg-8">
                 <div className="container">

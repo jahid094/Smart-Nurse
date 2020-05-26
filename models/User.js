@@ -133,7 +133,7 @@ const UserSchema = new mongoose.Schema({
   patientUnderGuardian: {
       type: mongoose.Schema.ObjectId,
       ref: 'User'
-}
+  }
 })
 
 UserSchema.methods.toJSON = function () {
@@ -148,12 +148,9 @@ UserSchema.methods.toJSON = function () {
   delete userObject.date
   delete userObject.varify
   delete userObject.password
+  delete userObject.__v
   return userObject
 }
 
-
 const User = mongoose.model('User', UserSchema);
-
-
-
 module.exports = User

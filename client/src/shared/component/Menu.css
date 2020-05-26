@@ -2,7 +2,7 @@
     background-color: #020624!important;
 }
 
-.navbar-nav > li{
+.navbar-nav > .nav-item{
     padding-left:15px;
     padding-right:25px;
     margin-left:10px;
@@ -18,12 +18,10 @@
     border-radius: 1em;
 }
 
-
 .dropdown-menu{
     border-radius: 1em!important;
     background-color: #020624!important;
 }
-
 
 .dropdown-item:hover, .dropdown-item:focus {
     background-color:#020624;
@@ -32,4 +30,8 @@
 .dropdown-toggle::after {
     display: none !important;
 }
-  
+
+.badge-notify{
+    color: #020624;
+    top: -10px; 
+}

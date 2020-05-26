@@ -1,12 +1,14 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Navbar, NavDropdown} from 'react-bootstrap'
+import {Nav, Navbar, NavDropdown} from 'react-bootstrap'
 import {useHistory} from 'react-router-dom';
 import {Cookies} from 'react-cookie';
 import axios from 'axios'
 import Logo from '../img/logo1.png'
+import NotificationIcon from '../img/Notification Icon.png'
 import LoginButton from '../img/Login Button.png'
 import './Menu.css'
 import ApiCalendar from '../../PatientRoutine/ApiCalendar'
+import { Link, animateScroll as scroll } from "react-scroll";
 import {AuthContext} from '../context/auth-context';
 
 const Menu = () => {
@@ -42,17 +44,11 @@ const Menu = () => {
     useEffect(() => {
         const token = new Cookies().get('token')
         if(token !== undefined){
-        //   console.log(token)
-          const verifyUser = () => { 
+            const verifyUser = () => { 
               auth.userId = new Cookies().get('userId')
               auth.token = token
               auth.isLoggedIn = true
               auth.firstName = new Cookies().get('firstName')
-              /* console.log('Menu.js')
-              console.log('Login Status: '+auth.userId)
-              console.log('Login Status: '+auth.token)
-              console.log('Login Status: '+auth.isLoggedIn)
-              console.log('Login Status: '+auth.firstName) */
           }
           verifyUser()
         }
@@ -84,53 +80,80 @@ const Menu = () => {
             console.log(error);
         }
     }
+
+    const scrollToTop = () => {
+        scroll.scrollToTop();
+    };
+
     return  <Navbar bg="primary" className="my-nav" expand="lg" sticky="top">
-        <Navbar.Brand href="/">
-            <img src={Logo} width="100" height="70" className="d-inline-block align-top" alt="Logo"/>
+        <Navbar.Brand>
+            <img src={Logo} width="100" height="70" className="d-inline-block align-top" alt="Logo" onClick={function(){scrollToTop()}}/>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav">
             <i className="fas fa-bars text-light"></i>
         </Navbar.Toggle>
         <Navbar.Collapse id="basic-navbar-nav">
             <ul className="navbar-nav ml-auto">
-                <li className="nav-item active">
-                    <a className="nav-link text-light" href="/">Home</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link text-light" href="/">Service</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link text-light" href="/">About</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link text-light" href="/">Contact</a>
-                </li>
+                <Nav.Item>
+                    <Nav.Link className="text-light" href="/">Home</Nav.Link>
+                </Nav.Item>
+                {
+                    window.location.pathname === '/' ?
+                    <React.Fragment>
+                        <Nav.Item>
+                            <Link className="nav-link text-light" to="service" spy={true} smooth={true} offset={-70} duration={500}>Service</Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Link className="nav-link text-light" to="about" spy={true} smooth={true} offset={-70} duration={500}>About</Link>
+                        </Nav.Item>
+                    </React.Fragment>
+                    :
+                    <React.Fragment>
+                        <Nav.Item>
+                            <Nav.Link className="text-light" href="/#service">Service</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link className="text-light" href="/#about">About</Nav.Link>
+                        </Nav.Item>
+                    </React.Fragment>
+                }
+                <Nav.Item>
+                    <Nav.Link className="text-light" href="/">Contact</Nav.Link>
+                </Nav.Item>
                 {
                     auth.isLoggedIn?
-                    <NavDropdown 
-                    className="justify-content-center"
-                    title={
-                        <button type="button" className="btn bg-light p-1 dropdown-toggle rounded-pill" data-toggle="dropdown">Welcome {auth.firstName}
-                            <i className="fa fa-angle-down"></i>
-                        </button>
-                    } id="basic-nav-dropdown">
-                        <li>
-                        <NavDropdown.Item className="d-flex justify-content-lg-center" href="/editProfile">
-                            <button className="text-dark bg-white btn-lg-block p-1 rounded-pill text-decoration-none">Edit Profile</button>
-                        </NavDropdown.Item>
-                        </li>
-                        <hr className="bg-white mx-3 mx-lg-4"/>
-                        <NavDropdown.Item className="d-flex justify-content-lg-center">
+                    <React.Fragment>
+                        <Nav.Item className="mt-lg-n1">
+                            <Nav.Link className="text-light" href="/notification">
+                                <img className="mr-2" src={NotificationIcon} style={{width: '35px', height: '35px'}} alt="Notification Icon"/>
+                                <span className="badge rounded-circle bg-light position-relative ml-n4 badge-notify">5</span>
+                            </Nav.Link>
+                        </Nav.Item>
+                        <NavDropdown 
+                        className="justify-content-center"
+                        title={
+                            <button type="button" className="btn bg-light p-1 dropdown-toggle rounded-pill" data-toggle="dropdown">Welcome {auth.firstName}
+                                <i className="fa fa-angle-down"></i>
+                            </button>
+                        } id="basic-nav-dropdown">
                             <li>
-                                <button className="btn-lg-block rounded-pill" onClick={logoutHandler}>Logout</button>
+                            <NavDropdown.Item className="d-flex justify-content-lg-center" href="/editProfile">
+                                <button className="text-dark bg-white btn-lg-block p-1 rounded-pill text-decoration-none">Edit Profile</button>
+                            </NavDropdown.Item>
                             </li>
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                    : <li className="nav-item">
+                            <hr className="bg-white mx-3 mx-lg-4"/>
+                            <NavDropdown.Item className="d-flex justify-content-lg-center">
+                                <li>
+                                    <button className="btn-lg-block rounded-pill" onClick={logoutHandler}>Logout</button>
+                                </li>
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </React.Fragment>
+                    : <Nav.Item>
                         <a href="/login" className="mt-5" role="button" aria-pressed="true">
                             <img src={LoginButton} alt="" style={{marginLeft: '-20px', width: '110px', height: '45px'}}/>
                         </a>
-                    </li>
+                    </Nav.Item>
                 }
             </ul>
         </Navbar.Collapse>
