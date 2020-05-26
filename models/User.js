@@ -130,10 +130,18 @@ const UserSchema = new mongoose.Schema({
   profilePicture:{
     type: Buffer
   },
-  patientUnderGuardian: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User'
-  }
+  patientList: [{
+    patientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }
+  }],
+  guardianList: [{
+    guardianId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }
+  }]
 })
 
 UserSchema.methods.toJSON = function () {

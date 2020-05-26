@@ -86,9 +86,16 @@ const Menu = () => {
     };
 
     return  <Navbar bg="primary" className="my-nav" expand="lg" sticky="top">
-        <Navbar.Brand>
-            <img src={Logo} width="100" height="70" className="d-inline-block align-top" alt="Logo" onClick={function(){scrollToTop()}}/>
-        </Navbar.Brand>
+        {
+            window.location.pathname === '/' ?
+            <Navbar.Brand>
+                <img src={Logo} width="100" height="70" className="d-inline-block align-top" alt="Logo" onClick={function(){scrollToTop()}}/>
+            </Navbar.Brand>
+            :
+            <Navbar.Brand href="/">
+                <img src={Logo} width="100" height="70" className="d-inline-block align-top" alt="Logo"/>
+            </Navbar.Brand>
+        }
         <Navbar.Toggle aria-controls="basic-navbar-nav">
             <i className="fas fa-bars text-light"></i>
         </Navbar.Toggle>
@@ -101,10 +108,10 @@ const Menu = () => {
                     window.location.pathname === '/' ?
                     <React.Fragment>
                         <Nav.Item>
-                            <Link className="nav-link text-light" to="service" spy={true} smooth={true} offset={-70} duration={500}>Service</Link>
+                            <Link className="nav-link text-light" to="service" spy={true} smooth={true} offset={-70} duration={500} style={{cursor: 'pointer'}}>Service</Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Link className="nav-link text-light" to="about" spy={true} smooth={true} offset={-70} duration={500}>About</Link>
+                            <Link className="nav-link text-light" to="about" spy={true} smooth={true} offset={-70} duration={500} style={{cursor: 'pointer'}}>About</Link>
                         </Nav.Item>
                     </React.Fragment>
                     :

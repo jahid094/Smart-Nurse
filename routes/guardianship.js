@@ -30,10 +30,20 @@ router.post("/users/sendRequest", async (req, res) => {
     requester: owner
   });
 
+  const previouspatientCheck = await Guardianship.findOne({
+    "recipients.id": req.body.recipients[0].id,
+    "recipients.status": true
+  });
+
   const guardianExist = await Guardianship.findOne({
     "recipients.id": owner,
     "recipients.status": true,
     requester: req.body.recipients[0].id
+  });
+
+  const myStatusCheck = await Guardianship.findOne({
+    "recipients.id": owner,
+    "recipients.status": true
   });
 
   const requestExist = await Guardianship.findOne({
@@ -51,9 +61,17 @@ router.post("/users/sendRequest", async (req, res) => {
       return res.status(200).json({
         message: "You are already guardian of that user."
       });
+    } else if (previouspatientCheck) {
+      return res.status(200).json({
+        message: "This user has a guardian. So You can't send request to become his guardian."
+      });
     } else if (guardianExist) {
       return res.status(200).json({
         message: "You are already patient of that user."
+      });
+    } else if (myStatusCheck) {
+      return res.status(200).json({
+        message: "You are already patient of a user. So You can't send request to anyone to become his guardian."
       });
     } else if (requestExist) {
       return res.status(200).json({
@@ -89,8 +107,9 @@ router.patch("/users/acceptRequest", async (req, res) => {
     _id: req.body.requester
   });
 
-  console.log(user);
-  //console.log(user.patientsUnderGuardian.patientId)
+  const guardianUser = await User.findOne({
+    _id: owner
+  });
 
   const gurdian = await Guardianship.findOne({
     "recipients.id": owner,
@@ -98,9 +117,11 @@ router.patch("/users/acceptRequest", async (req, res) => {
     requester: req.body.requester
   });
   if (gurdian) {
-    user.patientUnderGuardian = owner
+    user.patientList.push(owner)
+    guardianUser.guardianList.push(req.body.requester)
     gurdian.recipients[0].status = true;
     await user.save();
+    await guardianUser.save();
     await gurdian.save();
     return res.status(200).json({
       gurdian,

@@ -146,7 +146,7 @@ const ProfileInformation = () => {
                         }/>
                     </form>
                 </div>
-                <div className="col-10 offset-1 col-sm-6 offset-sm-3 col-lg-8 offset-lg-2">
+                <div className="col-6 offset-3 col-sm-6 offset-sm-3 col-lg-8 offset-lg-2 mx-auto">
                     <p>Name: Samsul Islam</p>
                     <p>Role: Guardian</p>
                     <p>Patient Name: Jahidul Islam<span className="d-inline-block"><img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){console.log('image click')}}/></span></p>
@@ -156,7 +156,9 @@ const ProfileInformation = () => {
                 <div className="container">
                     <br/>
                     <br/>
-                    <h3>General Information:</h3>
+                    <div className="col-8 offset-2 col-lg-6 offset-lg-0">
+                        <h3 className="ml-n3">General Information:</h3>
+                    </div>
                     <br/>
                     <form onSubmit={submitHandler}>
                         <div className="form-row">
@@ -193,7 +195,9 @@ const ProfileInformation = () => {
                         </div>
                         <br/>
                         <br/>
-                        <h3>Account Information:</h3>
+                        <div className="col-8 offset-2 col-lg-6 offset-lg-0">
+                            <h3 className="ml-n3">Account Information:</h3>
+                        </div>
                         <br/>
                         <div className="row">
                             <div className="col-8 offset-2 col-lg-5 offset-lg-0">
@@ -205,23 +209,25 @@ const ProfileInformation = () => {
                         <br/>
                         <br/>
                         <br/>
-                        <h3>Change Password:</h3>
+                        <div className="col-8 offset-2 col-lg-6 offset-lg-0">
+                            <h3 className="ml-n3">Change Password:</h3>
+                        </div>
                         <br/>
                         <div className="row">
                             <div className="col-8 offset-2 col-lg-4 offset-lg-0">
                                 <label htmlFor="currentpassword">Current Password</label>
-                                <input type="password" className="form-control rounded-pill text-justify" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="currentPassword" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
+                                <input type="password" className="form-control rounded-pill text-justify mb-3 mb-lg-0" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="currentPassword" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                             </div>
                             <div className="col-8 offset-2 col-lg-4 offset-lg-0">
                                 <label htmlFor="password">New Password</label>
-                                <input type="password" className="form-control rounded-pill text-justify" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
+                                <input type="password" className="form-control rounded-pill text-justify mb-3 mb-lg-0" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                             </div>
                             <div className="col-8 offset-2 col-lg-4 offset-lg-0">
                                 <label htmlFor="confirmnewpassword">Confirm New Password</label>
-                                <input type="password" className="form-control rounded-pill text-justify" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="confirmNewPassword" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
+                                <input type="password" className="form-control rounded-pill text-justify mb-3 mb-lg-0" style={{backgroundColor: '#E6E6E6'}} placeholder="At Least 6 Characters" name="confirmNewPassword" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                             </div>
                             <div className="col-8 offset-2 col-lg-4 offset-lg-3">
-                                <button type="submit" className="btn btn-block text-white mx-auto mt-5 rounded-pill" style={{backgroundColor: '#0C0C52'}}>Save Changes</button>
+                                <button type="submit" className="btn btn-block text-white mx-auto mt-0 mt-lg-5 rounded-pill" style={{backgroundColor: '#0C0C52'}}>Save Changes</button>
                             </div>
                         </div>
                     </form>
