@@ -117,8 +117,8 @@ router.patch("/users/acceptRequest", async (req, res) => {
     requester: req.body.requester
   });
   if (gurdian) {
-    user.patientList.push(owner)
-    guardianUser.guardianList.push(req.body.requester)
+    user.patientList.push({patientId: owner})
+    guardianUser.guardianList.push({guardianId: req.body.requester})
     gurdian.recipients[0].status = true;
     await user.save();
     await guardianUser.save();
