@@ -1,23 +1,7 @@
-# Node.js & Passport Login
+# Smart Nurse
 
-This is a user login and registration app using Node.js, Express, Passport, Mongoose, EJS and some other packages.
+Smart Nurse is an advanced system where you can get all your medical solutions in one place developed using React, Node, Express and MongoDB.
 
-### Version: 2.0.0
+### Version: 1.0.0
 
-### Usage
-
-```sh
-$ npm install
-```
-
-```sh
-$ npm start
-# Or run with Nodemon
-$ npm run dev
-
-# Visit http://localhost:5000
-```
-
-### MongoDB
-
-Open "config/keys.js" and add your MongoDB URI, local or Atlas
+[Live Demo](https://smart-nurse-ee519.web.app/)
