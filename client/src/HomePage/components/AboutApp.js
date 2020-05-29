@@ -17,7 +17,7 @@ const AboutApp = () => {
                     </a>
                 </div>
                 <div className="col-lg-6 d-none d-lg-block">
-                        <img src={AppPhoto} alt="Phone" className="w-100" style={{height: '950px', backgroundSize: 'cover', backgroundPosition: 'center',backgroundRepeat: 'no-repeat'}}/>
+                        <img src={AppPhoto} alt="Phone" className="w-100" style={{backgroundSize: 'cover', backgroundPosition: 'center',backgroundRepeat: 'no-repeat'}}/>
                 </div>
             </div>
         </div>

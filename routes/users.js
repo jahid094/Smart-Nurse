@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const moment = require('moment')
 const passport = require('passport');
-const sharp = require('sharp')
+// const sharp = require('sharp')
 const jwt = require('jsonwebtoken')
 const async = require('async');
 const User = require('../models/User');
@@ -365,10 +365,10 @@ router.post('/users/me', async (req, res) => {
       })
     }
     if(user.profilePicture){
-      const buffer = await sharp(user.profilePicture).toBuffer()
-      let base64data = Buffer.from(buffer, 'binary').toString('base64');
+      const buffer = Buffer.from(user.profilePicture, 'binary').toString('base64');
+      const base64data = Buffer.from(buffer, 'base64');
       return res.status(200).json({
-        profilePicture: base64data,
+        profilePicture: base64data.toString(),
         user
       })
     }
@@ -381,7 +381,8 @@ router.post('/users/me', async (req, res) => {
 })
 
 router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
-  const buffer = await sharp(req.file.buffer).png().toBuffer()
+  const buffer = Buffer.from(req.file.buffer, 'binary').toString('base64');
+
   const {id} = req.body
   let userId
   if(req.user){
@@ -396,7 +397,7 @@ router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res)
     })
   }
   user.profilePicture = buffer
-  await user.save()
+  await user.save() 
   res.status(200).json({ 
     message: 'Profile Picture Successfully uploaded'
   })

@@ -21,57 +21,75 @@ router.post("/users/sendRequest", async (req, res) => {
   const gurdian = new Guardianship({
     ...req.body,
     requester: owner,
-    requesterName: ownerName,
+    requesterName: ownerName
   });
 
   const patientExist = await Guardianship.findOne({
     "recipients.id": req.body.recipients[0].id,
     "recipients.status": true,
-    requester: owner,
+    requester: owner
+  });
+
+  const previouspatientCheck = await Guardianship.findOne({
+    "recipients.id": req.body.recipients[0].id,
+    "recipients.status": true
   });
 
   const guardianExist = await Guardianship.findOne({
     "recipients.id": owner,
     "recipients.status": true,
-    requester: req.body.recipients[0].id,
+    requester: req.body.recipients[0].id
+  });
+
+  const myStatusCheck = await Guardianship.findOne({
+    "recipients.id": owner,
+    "recipients.status": true
   });
 
   const requestExist = await Guardianship.findOne({
     "recipients.id": req.body.recipients[0].id,
-    requester: owner,
+    requester: owner
   });
 
   const receiveRequestExist = await Guardianship.findOne({
     "recipients.id": owner,
-    requester: req.body.recipients[0].id,
+    requester: req.body.recipients[0].id
   });
 
   try {
     if (patientExist) {
       return res.status(200).json({
-        message: "You are already guardian of that user.",
+        message: "You are already guardian of that user."
+      });
+    } else if (previouspatientCheck) {
+      return res.status(200).json({
+        message: "This user has a guardian. So You can't send request to become his guardian."
       });
     } else if (guardianExist) {
       return res.status(200).json({
-        message: "You are already patient of that user.",
+        message: "You are already patient of that user."
+      });
+    } else if (myStatusCheck) {
+      return res.status(200).json({
+        message: "You are already patient of a user. So You can't send request to anyone to become his guardian."
       });
     } else if (requestExist) {
       return res.status(200).json({
-        message: "You have already sent a request to that user.",
+        message: "You have already sent a request to that user."
       });
     } else if (receiveRequestExist) {
       return res.status(200).json({
-        message: "You have already got a request from that user.",
+        message: "You have already got a request from that user."
       });
     }
     await gurdian.save();
     return res.status(200).json({
       gurdian,
-      message: "You have succesfully sent request to that user",
+      message: "You have succesfully sent request to that user"
     });
   } catch (error) {
     return res.status(404).json({
-      mesaage: error,
+      mesaage: error
     });
   }
 });
@@ -86,30 +104,32 @@ router.patch("/users/acceptRequest", async (req, res) => {
   }
 
   const user = await User.findOne({
-    _id: req.body.requester,
+    _id: req.body.requester
   });
 
-  console.log(user);
-  //console.log(user.patientsUnderGuardian.patientId)
+  const guardianUser = await User.findOne({
+    _id: owner
+  });
 
   const gurdian = await Guardianship.findOne({
     "recipients.id": owner,
     "recipients.status": false,
-    requester: req.body.requester,
+    requester: req.body.requester
   });
   if (gurdian) {
-    user.patientUnderGuardian = req.user._id
-    console.log
+    user.patientList.push({patientId: owner})
+    guardianUser.guardianList.push({guardianId: req.body.requester})
     gurdian.recipients[0].status = true;
     await user.save();
+    await guardianUser.save();
     await gurdian.save();
     return res.status(200).json({
       gurdian,
-      message: "You are now patient of that user.",
+      message: "You are now patient of that user."
     });
   }
   return res.status(404).json({
-    message: "No Request Found",
+    message: "No Request Found"
   });
 });
 
@@ -129,15 +149,15 @@ router.delete("/requestDelete/:id", async (req, res) => {
     });
     if (!user) {
       return res.status(404).json({
-        message: "No request found",
+        message: "No request found"
       });
     }
     res.status(200).json({
-      message: "Request deleted successfully",
+      message: "Request deleted successfully"
     });
   } catch (error) {
     res.status(500).json({
-      message: error,
+      message: error
     });
   }
 });
@@ -153,22 +173,22 @@ router.post("/users/requestList", async (req, res) => {
 
   const requestExist = await Guardianship.find({
     "recipients.id": owner,
-    "recipients.status": false,
+    "recipients.status": false
   });
 
   try {
     if (requestExist.length > 0) {
       return res.status(200).json({
-        requestExist,
+        requestExist
       });
     } else {
       return res.status(200).json({
-        mesaage: "You have no request.",
+        mesaage: "You have no request."
       });
     }
   } catch (error) {
     return res.status(404).json({
-      mesaage: error,
+      mesaage: error
     });
   }
 });

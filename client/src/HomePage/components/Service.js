@@ -6,9 +6,9 @@ import ActivityManagemnetIcon from '../../shared/img/3.png'
 import {AuthContext} from '../../shared/context/auth-context'
 import './Service.css'
 
-const Service = () => {
+const Service = props => {
     const auth = useContext(AuthContext)
-    return <div className="mt-2 pt-5">
+    return <div className="mt-2 pt-5" id={props.id}>
         <div className="container mb-5">
             <p className="h1 text-center font-weight-bold mb-5" style={{color: '#19184E'}}>Our Services</p>
             <div className="row">

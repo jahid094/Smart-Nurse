@@ -17,8 +17,8 @@ const HomePage = () => {
         </Helmet>
         <Menu/>
         <Slider/>
-        <Service/>
-        <AboutTeresa/>
+        <Service id="service"/>
+        <AboutTeresa id="about"/>
         <TopService/>
         <AboutApp/>
         <Process/>
