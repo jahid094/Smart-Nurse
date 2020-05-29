@@ -122,7 +122,7 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   },
   resetPasswordToken: {
-    type: String,
+    type: String
   },
   resetPasswordExpires: {
     type: Date
@@ -134,12 +134,18 @@ const UserSchema = new mongoose.Schema({
     patientId: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    patientName: {
+      type: String
     }
   }],
   guardianList: [{
     guardianId: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    guardianName: {
+      type: String
     }
   }]
 })
