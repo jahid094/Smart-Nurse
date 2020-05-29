@@ -12,6 +12,11 @@ const ProfileInformation = () => {
     const cookies = new Cookies()
     const [imageFile, setImageFile] = useState(ProfilePic)
     const [profileimageFile, setProfileImageFile] = useState()
+    const [userRole, setUserRole] = useState('')
+    const [patientId, setPatientId] = useState('')
+    const [guardianName, setGuardianName] = useState('')
+    const [patientName, setPatientName] = useState('')
+    const [fullName, setFullName] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
@@ -25,17 +30,21 @@ const ProfileInformation = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [disable, setDisable] = useState(false)
     const [message, setMessage] = useState('')
+    const [testBool, setTestBool] = useState(false)
 
     useEffect(() => {
         const getUserData = async () => { 
             setIsLoading(true)
             setDisable(true)
+            console.log('first')
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
                     id: auth.userId
                 });
+                // console.log(response.data)
                 setFirstName(response.data.user.firstname)
                 setLastName(response.data.user.lastname)
+                setFullName(response.data.user.firstname+' '+response.data.user.lastname)
                 setAge(response.data.user.age)
                 setWeight(response.data.user.weight)
                 setHeight(response.data.user.height)
@@ -44,6 +53,15 @@ const ProfileInformation = () => {
                 if(response.data.profilePicture){
                     setImageFile("data:image/png;base64,"+response.data.profilePicture)
                     setProfileImageFile("data:image/png;base64,"+response.data.profilePicture)
+                }
+                if(response.data.user.guardianList.length > 0){
+                    setUserRole('Patient')
+                    setPatientName(response.data.user.guardianList[0].guardianName)
+                }
+                if(response.data.user.patientList.length > 0){
+                    setUserRole('Guardian')
+                    setGuardianName(response.data.user.patientList[0].patientName)
+                    setPatientId(response.data.user.patientList[0].patientId)
                 }
                 setIsLoading(false)
                 setDisable(false)
@@ -55,6 +73,50 @@ const ProfileInformation = () => {
           }
           getUserData()        
     }, [auth.userId])
+
+    useEffect(() => {
+        const getUserData = async () => { 
+            setIsLoading(true)
+            setDisable(true)
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
+                    id: auth.userId
+                });
+                console.log('second')
+                // console.log(response.data)
+                setFirstName(response.data.user.firstname)
+                setLastName(response.data.user.lastname)
+                setFullName(response.data.user.firstname+' '+response.data.user.lastname)
+                setAge(response.data.user.age)
+                setWeight(response.data.user.weight)
+                setHeight(response.data.user.height)
+                setPhone(response.data.user.phone)
+                setEmail(response.data.user.email)
+                if(response.data.profilePicture){
+                    setImageFile("data:image/png;base64,"+response.data.profilePicture)
+                    setProfileImageFile("data:image/png;base64,"+response.data.profilePicture)
+                }
+                if(response.data.user.guardianList.length > 0){
+                    setUserRole('Patient')
+                    setPatientName(response.data.user.guardianList[0].guardianName)
+                }
+                if(response.data.user.patientList.length > 0){
+                    setUserRole('Guardian')
+                    setGuardianName(response.data.user.patientList[0].patientName)
+                    setPatientId(response.data.user.patientList[0].patientId)
+                }
+                setIsLoading(false)
+                setDisable(false)
+            } catch (error) {
+                setIsLoading(false)
+                setDisable(false)
+                setMessage(error.response.data.message)
+            }
+          }
+          getUserData()
+          setTestBool(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [testBool])
 
     const submitHandler = async (event) => {
         event.preventDefault()
@@ -113,6 +175,28 @@ const ProfileInformation = () => {
         }
     }
 
+    const cancelRequest = async (patientId) => {
+        console.log(patientId)
+        setIsLoading(true)
+        setDisable(true)
+        try {
+            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/cancelRequest', {
+                owner: auth.userId,
+                patientId
+            });
+            setIsLoading(false)
+            setDisable(false)
+            setTestBool(true)
+            console.log(response.data)
+            setMessage(response.data.message)
+        } catch (error) {
+            setIsLoading(false)
+            setDisable(false)
+            setTestBool(true)
+            setMessage(error.response.data.message)
+        }
+    }
+
     const messageHandler = () => {
         setMessage(null)
     }
@@ -147,9 +231,25 @@ const ProfileInformation = () => {
                     </form>
                 </div>
                 <div className="col-6 offset-3 col-sm-6 offset-sm-3 col-lg-8 offset-lg-2 mx-auto">
-                    <p>Name: Samsul Islam</p>
-                    <p>Role: Guardian</p>
-                    <p>Patient Name: Jahidul Islam<span className="d-inline-block"><img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){console.log('image click')}}/></span></p>
+                    <p>Name: {fullName}</p>
+                    {
+                        userRole ?
+                        <p>Role: {userRole}</p>
+                        :
+                        <p>You are not guardian of a user and you are not patient of a user.</p>
+                    }
+                    {
+                        userRole && patientName ?
+                        <p>Patient Name: {patientName}</p>
+                        :
+                        null
+                    }
+                    {
+                        userRole && guardianName ?
+                        <p>Guardian Name: {guardianName}<span className="d-inline-block"><img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){cancelRequest(patientId)}}/></span></p>
+                        :
+                        null
+                    }
                 </div>
             </div>
             <div className="col-lg-8">

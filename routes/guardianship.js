@@ -117,8 +117,8 @@ router.patch("/users/acceptRequest", async (req, res) => {
     requester: req.body.requester
   });
   if (gurdian) {
-    user.patientList.push({patientId: owner})
-    guardianUser.guardianList.push({guardianId: req.body.requester})
+    user.patientList.push({patientId: owner, patientName: guardianUser.firstname+' '+guardianUser.lastname})
+    guardianUser.guardianList.push({guardianId: req.body.requester, guardianName: user.firstname+' '+user.lastname})
     gurdian.recipients[0].status = true;
     await user.save();
     await guardianUser.save();
@@ -161,6 +161,53 @@ router.delete("/requestDelete/:id", async (req, res) => {
     });
   }
 });
+
+//Cancel Request
+router.post("/users/cancelRequest", async (req, res) => {
+  let owner;
+  if (req.user) {
+    owner = req.user._id;
+  } else {
+    owner = req.body.owner;
+  }
+  try {
+    const request = await Guardianship.findOneAndDelete({
+      "recipients.id": req.body.patientId,
+      "recipients.status": true,
+      requester: owner
+    });
+    await User.findByIdAndUpdate(
+      owner, { $pull: { "patientList": { patientId: req.body.patientId } } }, { multi: true },
+      function(err) {
+        if (err) { 
+          return res.status(500).json({
+            message: error
+          }); 
+        }
+    });
+    await User.findByIdAndUpdate(
+      req.body.patientId, { $pull: { "guardianList": { guardianId: owner } } },{ "multi": true },
+      function(err) {
+        if (err) { 
+          return res.status(500).json({
+            message: error
+          }); 
+        }
+    });
+    if(!request){
+      return res.status(200).json({
+        message: 'No Request Found.'
+      });
+    }
+    return res.status(200).json({
+      message: 'Request Deleted Successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error
+    });
+  }
+})
 
 //Request List
 router.post("/users/requestList", async (req, res) => {
