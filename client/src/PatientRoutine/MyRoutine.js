@@ -33,6 +33,7 @@ const MyRoutine = props => {
                     id: auth.userId
                 });
                 setUserRoutine(response.data.routine)
+                console.log(response.data.routine)
             } catch (error) {
                 console.log(error.response.data);
             }

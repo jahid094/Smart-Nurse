@@ -139,16 +139,20 @@ router.delete('/routine/:id'  , async(req , res) =>{
 })
 
 router.post('/routineNotification' , async (req, res) =>{
-    const {id} = req.body
-    let userId
-    if(req.user){
-        userId = req.user._id
+    let owner;
+    if (req.user) {
+        owner = req.user._id;
     } else {
-        userId = id
+        owner = req.body.owner;
     }
+    /* if (userId === undefined) {
+        return res.status(404).json({
+            message: "You must login to see your notification"
+        })
+    } */
 
     try {
-        const routine = await Routine.find({owner: userId})
+        const routine = await Routine.find({owner})
 
         var today = new Date();
         today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
@@ -174,7 +178,7 @@ router.post('/routineNotification' , async (req, res) =>{
             // console.log('Subtract Minute:'+subtractTime[1])
             for(let time of entry.times){
                 // console.log("Start Time Loop")
-                var endDateTime = moment(`${today} ${time.time}`, 'YYYY-MM-DD HH:mm').format()
+                var endDateTime = moment(`${entry.endDate} ${time.time}`, 'YYYY-MM-DD HH:mm').format()
                 var startDateTime = moment(endDateTime).subtract(subtractTime[1], 'minutes').format();
                 /* console.log('Compare DateTime: '+compareDateTime);
                 console.log('Start DateTime: '+startDateTime);
@@ -201,12 +205,12 @@ router.post('/routineNotification' , async (req, res) =>{
 
 
         if (notificationArray === undefined || notificationArray.length == 0) {
-            return res.status(404).json({
+            return res.status(200).json({
                 message: "You have no upcoming notification"
             })
         }
 
-        return res.json({
+        return res.status(200).json({
             routine: notificationArray
         })
     } catch (e) {

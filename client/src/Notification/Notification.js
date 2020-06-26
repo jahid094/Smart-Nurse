@@ -9,6 +9,7 @@ import {AuthContext} from '../shared/context/auth-context'
 const Notification = () => {
     const auth = useContext(AuthContext)
     const [notificationList, setNotificationList] = useState([])
+    // const [routineNotificationList, setRoutineNotificationList] = useState([])
     useEffect(() => {
         const getNotificationList = async () => { 
             try {
@@ -17,10 +18,14 @@ const Notification = () => {
                     owner: auth.userId
                 });
                 setNotificationList(response.data.requestExist)
-                // console.log(response.data)
+                /* const routineNotificationResponse = await axios.post(process.env.REACT_APP_BACKEND_URL+'routineNotification', {
+                    owner: auth.userId
+                });
+                console.log(routineNotificationResponse.data.routine)
+                setRoutineNotificationList(routineNotificationResponse.data.routine) */
             } catch (error) {
                 console.log('catch')
-                console.log(error.response.data);
+                // console.log(error.response.data);
             }
           }
           getNotificationList()
@@ -40,7 +45,7 @@ const Notification = () => {
         </div>
         {
             notificationList ?
-                <NotificationAlert notificationList={notificationList}/>
+                <NotificationAlert notificationList={notificationList} /*routineNotificationList={routineNotificationList}*//>
             :
             <NotificationAlert/>
         }
