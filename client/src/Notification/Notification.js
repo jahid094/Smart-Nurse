@@ -27,8 +27,8 @@ const Notification = () => {
                 console.log('catch')
                 // console.log(error.response.data);
             }
-          }
-          getNotificationList()
+        }
+        getNotificationList()
     })
     return <React.Fragment>
         <Helmet>

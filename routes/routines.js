@@ -1,12 +1,7 @@
 const express = require('express');
 const router = express.Router();;
 const moment = require('moment')
-// const Moment = require('moment');
 const Routine = require('../models/Routine');
-/* const MomentRange = require('moment-range');
-const moment = MomentRange.extendMoment(Moment); */
-// const { forwardAuthenticated } = require('../config/auth')
-// const User = require('../models/User');
 
 router.post('/routine' , async (req, res) =>{
     let owner
@@ -15,8 +10,33 @@ router.post('/routine' , async (req, res) =>{
     } else {
         owner = req.body.owner
     }
+    const statusDay = [];
+    const statusTime = [];
+    const startDate  = moment(req.body.startDate, "YYYY-MM-DD")
+    const endDate  = moment(req.body.endDate, "YYYY-MM-DD")
+    const dateDifference = endDate.diff(startDate, 'days') + 1
+    console.log(dateDifference)
+    console.log('TimesPerDay:'+req.body.timesPerDay)
+    Array.from({ length: req.body.timesPerDay }, (v, k) => (
+        statusTime.push({
+            done: false,
+            visible: true
+        })
+    ))
+    console.log(statusTime)
+    Array.from({ length: dateDifference }, (v, k) => (
+        statusDay.push({
+            statusTime
+        })
+    ))
+    console.log(statusDay)
+    console.log(statusDay[0])
+    /* return res.status(201).json({
+        message: 'Successful'
+    }) */
     const routine = new Routine({
-        ...req.body ,
+        ...req.body,
+        statusDay,
         owner
     })
     try{
@@ -46,7 +66,6 @@ router.get('/routine' , async (req, res) => {
         res.status(500).send(e)
     }
 })
-
 
 router.post('/routines' , async (req, res) =>{
     const {id} = req.body
@@ -166,43 +185,94 @@ router.post('/routineNotification' , async (req, res) =>{
         var dateTimeRange;
         var subtractTime;
         var notificationArray = [];
-
-        routine.forEach(function(entry) {
-            /* console.log("Start Loop")
-            console.log(entry.startDate);
-            console.log(entry.endDate); */
+        var newArray = [];
+        
+        routine.forEach(function(entry, i) {
+            /* console.log('Other loop')
+            console.log(entry._id);
+            console.log(entry.startDate)
+            console.log(entry.endDate) */
             compareDate = moment(today, "YYYY/MM/DD");
             startDate   = moment(entry.startDate, "YYYY/MM/DD");
             endDate     = moment(entry.endDate, "YYYY/MM/DD");
             subtractTime = entry.notification.split(' ')
-            // console.log('Subtract Minute:'+subtractTime[1])
-            for(let time of entry.times){
-                // console.log("Start Time Loop")
-                var endDateTime = moment(`${entry.endDate} ${time.time}`, 'YYYY-MM-DD HH:mm').format()
-                var startDateTime = moment(endDateTime).subtract(subtractTime[1], 'minutes').format();
-                /* console.log('Compare DateTime: '+compareDateTime);
-                console.log('Start DateTime: '+startDateTime);
-                console.log('End DateTime: '+endDateTime); */
-                dateTimeBetween = moment(compareDateTime, 'YYYY-MM-DD HH:mm').isBetween(moment(startDateTime, 'YYYY-MM-DD HH:mm'), moment(endDateTime, 'YYYY-MM-DD HH:mm'), null, '[]')
-                if(dateTimeBetween || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(startDateTime, 'YYYY-MM-DD HH:mm') || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(endDateTime, 'YYYY-MM-DD HH:mm')){
-                    // console.log('If')
-                    dateTimeRange = true
-                } else{
-                    // console.log('Else')
-                    dateTimeRange = false
-                }
-                /* console.log('DateTimeRange: '+dateTimeRange)
-                console.log("End Time Loop") */
-                if(dateTimeRange){
-                    // console.log('Date Time Range Block')
-                    notificationArray.push(entry)
-                    break;
-                } else {
-                }
+            /* console.log(moment(compareDate, 'YYYY/MM/DD').isBetween(moment(startDate, 'YYYY/MM/DD'), moment(endDate, 'YYYY/MM/DD')))
+            console.log(moment(compareDate, 'YYYY/MM/DD').isSame(startDate, 'YYYY/MM/DD'))
+            console.log(moment(compareDate, 'YYYY/MM/DD').isSame(endDate, 'YYYY/MM/DD')) */
+
+            if(moment(compareDate, 'YYYY/MM/DD').isBetween(moment(startDate, 'YYYY/MM/DD'), moment(endDate, 'YYYY/MM/DD')) || moment(compareDate, 'YYYY/MM/DD').isSame(startDate, 'YYYY/MM/DD') || moment(compareDate, 'YYYY/MM/DD').isSame(endDate, 'YYYY/MM/DD')){
+                /* console.log('Date Compare')
+                console.log(entry._id)
+                
+                console.log('Date Difference')
+                console.log(compareDate.diff(startDate, 'days'))
+                console.log(entry.statusDay) */
+                entry.times.forEach(function (time, j) {
+                    /* console.log('Routine:'+i+'Time:'+j)
+                    console.log(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j])
+                    console.log(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j].visible) */
+                    if(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j].visible){
+                        newArray.push({
+                            notificationArray: entry,
+                            notificationTime: time
+                        })
+                    }
+                });
+                /* for(let time of entry.times){
+                    newArray.push({
+                        notificationArray: entry,
+                        notificationTime: time
+                    })
+                } */
+                // console.log(entry.status[compareDate.diff(startDate, 'days')].visible)
+                // entry.status[compareDate.diff(startDate, 'days')].visible = true
+                /* try {
+                    routine[i].save()
+                } catch (error) {
+                    return res.status(404).json({
+                        message: error
+                    })
+                } */
             }
-            // console.log("End Loop")
+        })
+        /* newArray.forEach(function(entry) {
+            console.log("New Array Start Loop 1")
+            console.log(entry.notificationTime.time);
+        }) */
+
+        newArray.sort(function (a, b) {
+            return a.notificationTime.time.localeCompare(b.notificationTime.time);
         });
 
+        newArray.forEach(function(entry) {
+            /* console.log("New Array Start Loop 2")
+            console.log(entry.notificationArray.startDate);
+            console.log(entry.notificationArray.endDate); */
+            compareDate = moment(today, "YYYY/MM/DD");
+            startDate   = moment(entry.notificationArray.startDate, "YYYY/MM/DD");
+            endDate     = moment(entry.notificationArray.endDate, "YYYY/MM/DD");
+            subtractTime = entry.notificationArray.notification.split(' ')
+            /* console.log(subtractTime)
+            console.log(entry.notificationTime) */
+            var startDateTime = moment(moment(`${today} ${entry.notificationTime.time}`, 'YYYY-MM-DD HH:mm').format()).subtract(subtractTime[1], 'minutes').format()
+            var endDateTime = moment(today, "YYYY/MM/DD").add(1, 'days').format()
+            /* console.log('Compare DateTime: '+compareDateTime);
+            console.log('Start DateTime: '+startDateTime);
+            console.log('End DateTime: '+endDateTime) */
+            dateTimeBetween = moment(compareDateTime, 'YYYY-MM-DD HH:mm').isBetween(moment(startDateTime, 'YYYY-MM-DD HH:mm'), moment(endDateTime, 'YYYY-MM-DD HH:mm'), null, '[]')
+            if(dateTimeBetween || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(startDateTime, 'YYYY-MM-DD HH:mm') || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(endDateTime, 'YYYY-MM-DD HH:mm')){
+                // console.log('If')
+                dateTimeRange = true
+            } else{
+                // console.log('Else')
+                dateTimeRange = false
+            }
+            // console.log('DateTimeRange: '+dateTimeRange)
+            if(dateTimeRange){
+                // console.log('Date Time Range Block')
+                notificationArray.push(entry)
+            }
+        })
 
         if (notificationArray === undefined || notificationArray.length == 0) {
             return res.status(200).json({
@@ -213,11 +283,134 @@ router.post('/routineNotification' , async (req, res) =>{
         return res.status(200).json({
             routine: notificationArray
         })
+
+        /* return res.status(200).json({
+            newArray
+        }) */
+        // console.log(routine[2])
+
+        // routine.forEach(function(entry) {
+            /* console.log("Start Loop")
+            console.log(entry.startDate);
+            console.log(entry.endDate); */
+           /*  compareDate = moment(today, "YYYY/MM/DD");
+            startDate   = moment(entry.startDate, "YYYY/MM/DD");
+            endDate     = moment(entry.endDate, "YYYY/MM/DD");
+            subtractTime = entry.notification.split(' ')
+            
+            // console.log('Subtract Minute:'+subtractTime[1])
+            for(let time of entry.times){
+                // console.log("Start Time Loop")
+                var endDateTime = moment(`${entry.endDate} ${time.time}`, 'YYYY-MM-DD HH:mm').format()
+                var startDateTime = moment(endDateTime).subtract(subtractTime[1], 'minutes').format(); */
+                /* console.log('Compare DateTime: '+compareDateTime);
+                console.log('Start DateTime: '+startDateTime);
+                console.log('End DateTime: '+endDateTime); */
+                /* dateTimeBetween = moment(compareDateTime, 'YYYY-MM-DD HH:mm').isBetween(moment(startDateTime, 'YYYY-MM-DD HH:mm'), moment(endDateTime, 'YYYY-MM-DD HH:mm'), null, '[]')
+                if(dateTimeBetween || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(startDateTime, 'YYYY-MM-DD HH:mm') || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(endDateTime, 'YYYY-MM-DD HH:mm')){
+                    // console.log('If')
+                    dateTimeRange = true
+                } else{
+                    // console.log('Else')
+                    dateTimeRange = false
+                } */
+                /* console.log('DateTimeRange: '+dateTimeRange)
+                console.log("End Time Loop") */
+                /* if(dateTimeRange){
+                    // console.log('Date Time Range Block')
+                    notificationArray.push(entry)
+                    break;
+                } else {
+                }
+            }
+            // console.log("End Loop")
+        }); */
     } catch (e) {
         res.status(500).json({
            message: e
         })
     }
+})
+
+router.patch('/acceptRoutine' , async ( req , res) => {
+    var timeIndex
+    const routine = await Routine.findOne({ _id: req.body.id })
+
+    var today = new Date();
+    today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+    today = moment(today, "YYYY/MM/DD");
+
+    // console.log('Date Difference:' +today.diff(routine.startDate, 'days'))
+
+    routine.times.forEach(function (time, i) {
+        // console.log(req.body.time.localeCompare(time.time))
+        if(req.body.time.localeCompare(time.time) === 0){
+            timeIndex = i
+        }
+    })
+
+    if(today.diff(routine.startDate, 'days') >= 0){
+        if(timeIndex !== undefined){
+            // console.log('TimeIndex: '+timeIndex)
+            routine.statusDay[today.diff(routine.startDate, 'days')].statusTime[timeIndex].done = true
+            routine.statusDay[today.diff(routine.startDate, 'days')].statusTime[timeIndex].visible = false
+            await routine.save()
+        } else {
+            return res.status(404).json({
+                message: 'This routine is not exist in '+today
+            })
+        }
+    } else {
+        return res.status(404).json({
+            message: 'This routine is not exist in '+today
+        })
+    }
+
+    return res.status(200).json({
+        message: 'Successful',
+        routine
+    })
+})
+
+router.patch('/cancelRoutine' , async ( req , res) => {
+    var timeIndex
+    const routine = await Routine.findOne({ _id: req.body.id })
+
+    var today = new Date();
+    today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+    today = moment(today, "YYYY/MM/DD");
+
+    // console.log('Date Difference:' +today.diff(routine.startDate, 'days'))
+
+    routine.times.forEach(function (time, i) {
+        // console.log(req.body.time.localeCompare(time.time))
+        if(req.body.time.localeCompare(time.time) === 0){
+            timeIndex = i
+        }
+    })
+
+    if(today.diff(routine.startDate, 'days') >= 0){
+        if(timeIndex !== undefined){
+            // console.log('TimeIndex: '+timeIndex)
+            routine.statusDay[today.diff(routine.startDate, 'days')].statusTime[timeIndex].visible = false
+            await routine.save()
+        } else {
+            return res.status(404).json({
+                message: 'This routine is not exist in '+today
+            })
+        }
+    } else {
+        return res.status(404).json({
+            message: 'This routine is not exist in '+today
+        })
+    }
+
+    return res.status(200).json({
+        message: 'Successful',
+        routine
+    })
 })
 
 module.exports = router
