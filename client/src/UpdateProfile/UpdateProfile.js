@@ -5,7 +5,6 @@ import Footer from '../shared/component/Footer'
 import ProfileInformation from './ProfileInformation'
 import './UpdateProfile.css'
 
-
 const UpdateProfile = () => {
     return  <React.Fragment>
         <Helmet>

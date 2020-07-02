@@ -1,5 +1,6 @@
 import React, {useState, useContext} from 'react';
 import axios from 'axios'
+import {useHistory} from 'react-router-dom';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import LoadingSpinner from '../shared/component/LoadingSpinner'
@@ -8,6 +9,7 @@ import {AuthContext} from '../shared/context/auth-context'
 
 const AddPatientTable = props => {
     const auth = useContext(AuthContext)
+    const history = useHistory()
     const [searchId, setSearchId] = useState("");
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
@@ -90,6 +92,25 @@ const AddPatientTable = props => {
         }
     }
 
+    const patientAddManually = async () => {
+        console.log('click')
+        try {
+            console.log(auth.userId)
+            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'checkGuardianAndPatient', {
+                id: auth.userId 
+            });
+            setIsLoading(false)
+            setDisable(false)
+            history.push('/createPatient')
+            console.log(response.data);
+        } catch (error) {
+            setIsLoading(false)
+            setDisable(false)
+            setMessage(error.response.data.message)
+            console.log(error.response.data);
+        }
+    }
+
     const messageHandler = () => {
         setMessage(null)
     }
@@ -117,7 +138,7 @@ const AddPatientTable = props => {
                     :
                     <div className="row">
                         <div className="col-10 col-sm-6 col-lg-4 offset-1 offset-sm-3 offset-lg-4">
-                            <a href="/createPatient" className="btn btn-lg btn-block text-white" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}}>Add Patient Manually</a>
+                            <button className="btn btn-lg btn-block text-white" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}} onClick={function() {patientAddManually()}}>Add Patient Manually</button>
                         </div>
                     </div>
                 }

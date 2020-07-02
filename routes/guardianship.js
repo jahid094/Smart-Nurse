@@ -13,7 +13,15 @@ router.post("/users/sendRequest", async (req, res) => {
   } else {
     owner = req.body.owner;
     const ownerNameFind = await User.findOne({ _id: owner });
-    if (ownerNameFind) {
+    if(ownerNameFind.guardianList.length > 0){
+      return res.status(404).json({
+        message: 'You have already a guardian'
+      })
+    } if(ownerNameFind.patientList.length > 0){
+      return res.status(404).json({
+        message: 'You are already a patient of a user.'
+      }) 
+    } if (ownerNameFind) {
       ownerName = ownerNameFind.firstname + " " + ownerNameFind.lastname;
     }
   }
@@ -194,11 +202,11 @@ router.post("/users/cancelRequest", async (req, res) => {
           }); 
         }
     });
-    if(!request){
+    /* if(!request){
       return res.status(200).json({
         message: 'No Request Found.'
       });
-    }
+    } */
     return res.status(200).json({
       message: 'Request Deleted Successfully'
     });
@@ -283,6 +291,25 @@ router.patch("/removePatientMyself", async (req, res) => {
   } else {
     return res.status(404).json({
       message: 'You are not add yourself as a patient.'
+    })
+  }
+});
+
+router.post("/checkGuardianAndPatient", async (req, res) => {
+  const user = await User.findOne({
+    _id: req.body.id
+  });
+  if(user.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You have already a guardian'
+    })
+  } if(user.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a patient of a user.'
+    })
+  } else {
+    return res.status(200).json({
+      message: 'You are not guardian of any user & You are not patient of any user.'
     })
   }
 });

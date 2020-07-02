@@ -164,18 +164,12 @@ router.post('/routineNotification' , async (req, res) =>{
     } else {
         owner = req.body.owner;
     }
-    /* if (userId === undefined) {
-        return res.status(404).json({
-            message: "You must login to see your notification"
-        })
-    } */
 
     try {
         const routine = await Routine.find({owner})
 
         var today = new Date();
         today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
-        // console.log("Today:"+moment(new Date()).format())
 
         var compareDate;
         var startDate;
@@ -188,29 +182,13 @@ router.post('/routineNotification' , async (req, res) =>{
         var newArray = [];
         
         routine.forEach(function(entry, i) {
-            /* console.log('Other loop')
-            console.log(entry._id);
-            console.log(entry.startDate)
-            console.log(entry.endDate) */
             compareDate = moment(today, "YYYY/MM/DD");
             startDate   = moment(entry.startDate, "YYYY/MM/DD");
             endDate     = moment(entry.endDate, "YYYY/MM/DD");
             subtractTime = entry.notification.split(' ')
-            /* console.log(moment(compareDate, 'YYYY/MM/DD').isBetween(moment(startDate, 'YYYY/MM/DD'), moment(endDate, 'YYYY/MM/DD')))
-            console.log(moment(compareDate, 'YYYY/MM/DD').isSame(startDate, 'YYYY/MM/DD'))
-            console.log(moment(compareDate, 'YYYY/MM/DD').isSame(endDate, 'YYYY/MM/DD')) */
 
             if(moment(compareDate, 'YYYY/MM/DD').isBetween(moment(startDate, 'YYYY/MM/DD'), moment(endDate, 'YYYY/MM/DD')) || moment(compareDate, 'YYYY/MM/DD').isSame(startDate, 'YYYY/MM/DD') || moment(compareDate, 'YYYY/MM/DD').isSame(endDate, 'YYYY/MM/DD')){
-                /* console.log('Date Compare')
-                console.log(entry._id)
-                
-                console.log('Date Difference')
-                console.log(compareDate.diff(startDate, 'days'))
-                console.log(entry.statusDay) */
                 entry.times.forEach(function (time, j) {
-                    /* console.log('Routine:'+i+'Time:'+j)
-                    console.log(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j])
-                    console.log(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j].visible) */
                     if(routine[i].statusDay[compareDate.diff(startDate, 'days')].statusTime[j].visible){
                         newArray.push({
                             notificationArray: entry,
@@ -218,58 +196,27 @@ router.post('/routineNotification' , async (req, res) =>{
                         })
                     }
                 });
-                /* for(let time of entry.times){
-                    newArray.push({
-                        notificationArray: entry,
-                        notificationTime: time
-                    })
-                } */
-                // console.log(entry.status[compareDate.diff(startDate, 'days')].visible)
-                // entry.status[compareDate.diff(startDate, 'days')].visible = true
-                /* try {
-                    routine[i].save()
-                } catch (error) {
-                    return res.status(404).json({
-                        message: error
-                    })
-                } */
             }
         })
-        /* newArray.forEach(function(entry) {
-            console.log("New Array Start Loop 1")
-            console.log(entry.notificationTime.time);
-        }) */
 
         newArray.sort(function (a, b) {
-            return a.notificationTime.time.localeCompare(b.notificationTime.time);
+            return b.notificationTime.time.localeCompare(a.notificationTime.time);
         });
 
         newArray.forEach(function(entry) {
-            /* console.log("New Array Start Loop 2")
-            console.log(entry.notificationArray.startDate);
-            console.log(entry.notificationArray.endDate); */
             compareDate = moment(today, "YYYY/MM/DD");
             startDate   = moment(entry.notificationArray.startDate, "YYYY/MM/DD");
             endDate     = moment(entry.notificationArray.endDate, "YYYY/MM/DD");
             subtractTime = entry.notificationArray.notification.split(' ')
-            /* console.log(subtractTime)
-            console.log(entry.notificationTime) */
             var startDateTime = moment(moment(`${today} ${entry.notificationTime.time}`, 'YYYY-MM-DD HH:mm').format()).subtract(subtractTime[1], 'minutes').format()
             var endDateTime = moment(today, "YYYY/MM/DD").add(1, 'days').format()
-            /* console.log('Compare DateTime: '+compareDateTime);
-            console.log('Start DateTime: '+startDateTime);
-            console.log('End DateTime: '+endDateTime) */
             dateTimeBetween = moment(compareDateTime, 'YYYY-MM-DD HH:mm').isBetween(moment(startDateTime, 'YYYY-MM-DD HH:mm'), moment(endDateTime, 'YYYY-MM-DD HH:mm'), null, '[]')
             if(dateTimeBetween || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(startDateTime, 'YYYY-MM-DD HH:mm') || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(endDateTime, 'YYYY-MM-DD HH:mm')){
-                // console.log('If')
                 dateTimeRange = true
             } else{
-                // console.log('Else')
                 dateTimeRange = false
             }
-            // console.log('DateTimeRange: '+dateTimeRange)
             if(dateTimeRange){
-                // console.log('Date Time Range Block')
                 notificationArray.push(entry)
             }
         })
@@ -283,48 +230,6 @@ router.post('/routineNotification' , async (req, res) =>{
         return res.status(200).json({
             routine: notificationArray
         })
-
-        /* return res.status(200).json({
-            newArray
-        }) */
-        // console.log(routine[2])
-
-        // routine.forEach(function(entry) {
-            /* console.log("Start Loop")
-            console.log(entry.startDate);
-            console.log(entry.endDate); */
-           /*  compareDate = moment(today, "YYYY/MM/DD");
-            startDate   = moment(entry.startDate, "YYYY/MM/DD");
-            endDate     = moment(entry.endDate, "YYYY/MM/DD");
-            subtractTime = entry.notification.split(' ')
-            
-            // console.log('Subtract Minute:'+subtractTime[1])
-            for(let time of entry.times){
-                // console.log("Start Time Loop")
-                var endDateTime = moment(`${entry.endDate} ${time.time}`, 'YYYY-MM-DD HH:mm').format()
-                var startDateTime = moment(endDateTime).subtract(subtractTime[1], 'minutes').format(); */
-                /* console.log('Compare DateTime: '+compareDateTime);
-                console.log('Start DateTime: '+startDateTime);
-                console.log('End DateTime: '+endDateTime); */
-                /* dateTimeBetween = moment(compareDateTime, 'YYYY-MM-DD HH:mm').isBetween(moment(startDateTime, 'YYYY-MM-DD HH:mm'), moment(endDateTime, 'YYYY-MM-DD HH:mm'), null, '[]')
-                if(dateTimeBetween || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(startDateTime, 'YYYY-MM-DD HH:mm') || moment(compareDateTime, 'YYYY-MM-DD HH:mm').isSame(endDateTime, 'YYYY-MM-DD HH:mm')){
-                    // console.log('If')
-                    dateTimeRange = true
-                } else{
-                    // console.log('Else')
-                    dateTimeRange = false
-                } */
-                /* console.log('DateTimeRange: '+dateTimeRange)
-                console.log("End Time Loop") */
-                /* if(dateTimeRange){
-                    // console.log('Date Time Range Block')
-                    notificationArray.push(entry)
-                    break;
-                } else {
-                }
-            }
-            // console.log("End Loop")
-        }); */
     } catch (e) {
         res.status(500).json({
            message: e

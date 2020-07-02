@@ -66,6 +66,7 @@ const Menu = () => {
                         setNotificationNumber(length)
                     } else {
                         // console.log('Routine Length:'+0)
+                        setNotificationNumber(length)
                     }
                 } catch (error) {
                     // console.log('catch')

@@ -139,7 +139,7 @@ const NotificationAlert = props => {
                                         <div className="btn-group float-md-right" role="group" aria-label="Basic example">
                                             <div className="row ml-2 ml-sm-0">
                                                 <div className="col-12" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}}>
-                                                    <button class="btn-block btn text-white" onClick={function() {acceptRequest(item.requester)}} disabled = {(disable)? "disabled" : ""}>
+                                                    <button className="btn-block btn text-white" onClick={function() {acceptRequest(item.requester)}} disabled = {(disable)? "disabled" : ""}>
                                                         Confirm
                                                     </button>
                                                 </div>

@@ -45,11 +45,27 @@ const CreatePatientForm = () => {
             });
             setIsLoading(false)
             setDisable(false)
+            setFirstName('')
+            setLastName('')
+            setGender('')
+            setAge('')
+            setEmail('')
+            setPhone('')
+            setHeight('')
+            setWeight('')
             setMessage(response.data.message)
             console.log(response.data);
         } catch (error) {
             setIsLoading(false)
             setDisable(false)
+            setFirstName('')
+            setLastName('')
+            setGender('')
+            setAge('')
+            setEmail('')
+            setPhone('')
+            setHeight('')
+            setWeight('')
             setMessage(error.response.data.message)
             console.log(error.response.data);
         }
