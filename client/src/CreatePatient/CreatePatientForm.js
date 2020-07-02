@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import axios from 'axios'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import './CreatePatientForm.css'
+import {AuthContext} from '../shared/context/auth-context'
 
 const CreatePatientForm = () => {
+    const auth = useContext(AuthContext)
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [gender, setGender] = useState('')
@@ -38,7 +40,8 @@ const CreatePatientForm = () => {
                 email, 
                 phone, 
                 height, 
-                weight 
+                weight,
+                guardianId: auth.userId
             });
             setIsLoading(false)
             setDisable(false)

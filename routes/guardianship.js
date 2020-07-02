@@ -240,4 +240,51 @@ router.post("/users/requestList", async (req, res) => {
   }
 });
 
+//Add Myself As Patient
+router.patch("/addPatientMyself", async (req, res) => {
+  let id = req.body.id
+  const user = await User.findOne({
+    _id: req.body.id
+  });
+  if(user.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You already have a guradian.'
+    })
+  }
+  if(user.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a patient of a user.'
+    })
+  }
+  user.guardianList.push({guardianId: req.body.id, guardianName: user.firstname+' '+user.lastname})
+  user.patientList.push({patientId: req.body.id, patientName: user.firstname+' '+user.lastname})
+  await user.save();
+  
+  return res.status(200).json({
+    message: 'You have add yourself as a patient',
+    user
+  })
+});
+
+//Remove Myself As Patient
+router.patch("/removePatientMyself", async (req, res) => {
+  let id = req.body.id
+  const user = await User.findOne({
+    _id: req.body.id
+  });
+  if(user.guardianList[0].guardianId.equals(req.body.id) && user.patientList[0].patientId.equals(req.body.id)){
+    user.guardianList = []
+    user.patientList = []
+    await user.save();
+    return res.status(200).json({
+      message: 'You have removed yourself as a patient',
+      user
+    })
+  } else {
+    return res.status(404).json({
+      message: 'You are not add yourself as a patient.'
+    })
+  }
+});
+
 module.exports = router;

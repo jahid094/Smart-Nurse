@@ -116,7 +116,7 @@ const AddPatientTable = props => {
                     </div>
                     :
                     <div className="row">
-                        <div className="col-4 offset-4">
+                        <div className="col-10 col-sm-6 col-lg-4 offset-1 offset-sm-3 offset-lg-4">
                             <a href="/createPatient" className="btn btn-lg btn-block text-white" style={{borderRadius: '1em', backgroundColor: '#0C0C52'}}>Add Patient Manually</a>
                         </div>
                     </div>

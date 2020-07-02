@@ -105,6 +105,9 @@ const ProfileInformation = () => {
                     setGuardianName(response.data.user.patientList[0].patientName)
                     setPatientId(response.data.user.patientList[0].patientId)
                 }
+                if(response.data.user.guardianList.length > 0 && response.data.user.patientList.length > 0){
+                    setUserRole('Guardian/Patient')
+                }
                 setIsLoading(false)
                 setDisable(false)
             } catch (error) {
@@ -201,6 +204,27 @@ const ProfileInformation = () => {
         setMessage(null)
     }
 
+    const removeMyselfAsPatient = async () => {
+        setIsLoading(true)
+        setDisable(true)
+        try {
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'removePatientMyself', {
+                id: auth.userId 
+            });
+            setIsLoading(false)
+            setDisable(false)
+            setTestBool(true)
+            setMessage(response.data.message)
+            console.log(response.data);
+        } catch (error) {
+            setIsLoading(false)
+            setDisable(false)
+            setTestBool(true)
+            setMessage(error.response.data.message)
+            console.log(error.response.data);
+        }
+    }
+
     return  <div className="container-fluid">
         {isLoading && <LoadingSpinner/>}
         {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
@@ -240,13 +264,22 @@ const ProfileInformation = () => {
                     }
                     {
                         userRole && patientName ?
-                        <p>Patient Name: {patientName}</p>
+                        <p>Guardian Name: {patientName}</p>
                         :
                         null
                     }
                     {
                         userRole && guardianName ?
-                        <p>Guardian Name: {guardianName}<span className="d-inline-block"><img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){cancelRequest(patientId)}}/></span></p>
+                        <p>Patient Name: {guardianName}
+                            <span className="d-inline-block">
+                                {guardianName && patientName
+                                ?
+                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){removeMyselfAsPatient()}}/>
+                                :
+                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){cancelRequest(patientId)}}/>
+                                }
+                            </span>
+                        </p>
                         :
                         null
                     }
