@@ -142,12 +142,17 @@ router.post('/login', (req, res, next) => {
   })(req, res, next)
 })
 
-router.post('/users/userList' , async (req , res) => {
-    let owner
-    if(req.user){
+router.get('/userListExcludingMyself/:id' , async (req , res) => {
+    let owner = req.params.id
+    /* if(req.user){
         owner = req.user._id
     } else {
-        owner = req.body.owner
+        owner = req.params.id
+    } */
+    if(owner === undefined){
+      return res.status(404).json({
+        message: 'You must logged in'
+      })
     }
     const users = await User.find({})
     if(!users){
@@ -349,14 +354,8 @@ router.get('/conformation/:token', (req, res) => {
   });
 })
 
-router.post('/users/me', async (req, res) => {
-  const {id} = req.body
-  let userId = id || req.user._id
-  if(req.user){
-    userId = req.user._id
-  } else {
-    userId = id
-  }
+router.get('/users/:id', async (req, res) => {
+  let userId = req.params.id
   try {
     const user = await  User.findOne({_id: userId}).exec()
     if(!user){
@@ -380,16 +379,11 @@ router.post('/users/me', async (req, res) => {
   }
 })
 
-router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res) => {
+router.patch('/users/profilePicture/:id' , upload.single('updatepp') , async(req,res) => {
   const buffer = Buffer.from(req.file.buffer, 'binary').toString('base64');
 
-  const {id} = req.body
-  let userId
-  if(req.user){
-    userId = req.user._id
-  } else {
-    userId = id
-  }
+  let userId = req.params.id
+  
   const user = await User.findOne({_id: userId}).exec()
   if(!user){
     return res.status(400).json({
@@ -407,20 +401,23 @@ router.post('/users/profilePicture' , upload.single('updatepp') , async(req,res)
   })
 })
 
-router.delete('/users/profilePicture' ,  async(req,res) => {
-  req.user.profilePicture = undefined
-  await req.user.save()
-  res.send({ message: 'successfully deleted'})
+router.delete('/users/profilePicture/:id' ,  async(req,res) => {
+  let userId = req.params.id
+  
+  const user = await User.findOne({_id: userId}).exec()
+  if(!user){
+    return res.status(400).json({
+      message: "User not found"
+    })
+  }
+  user.profilePicture = undefined
+  await user.save()
+  res.send({ message: 'Your profile picure has been successfully deleted'})
 })
 
-router.patch('/users/me',  async ( req , res) => {
-  const {id} = req.body
-  let userId
-  if(req.user){
-    userId = req.user._id
-  } else {
-    userId = id
-  }
+router.patch('/users/me/:id',  async ( req , res) => {
+  let userId = req.params.id
+  
   const updates = Object.keys(req.body)
   const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'phone']
   const isValidOperation = updates.every((update) => allowedupdates.includes(update))

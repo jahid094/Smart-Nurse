@@ -41,6 +41,16 @@ const routineSchema = new mongoose.Schema({
             required: true 
         }
     }],
+    statusDay: [{
+        statusTime: [{
+            done: {
+                type: Boolean
+            },
+            visible: {
+                type: Boolean
+            }
+        }]
+    }],
     notification: {
         type: String ,
         required: true,

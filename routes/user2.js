@@ -6,10 +6,27 @@ const jwt = require("jsonwebtoken");
 const async = require("async");
 const User = require("../models/User");
 const { sendRequestEmail } = require("../emails/account");
+const { use } = require("passport");
 
 router.post("/users/patientRegister", async (req, res) => {
-  const {firstname, lastname, gender, age,email, phone, height, weight} = req.body;
+  const {firstname, lastname, gender, age,email, phone, height, weight, guardianId} = req.body;
   let newUser;
+
+  const guardian = await User.findOne({
+    _id: guardianId
+  })
+
+  if(guardian.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You already have a guradian.'
+    })
+  }
+
+  if(guardian.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a patient of a user.'
+    })
+  }
 
   User.findOne({ email }).then((user) => {
     if (user) {
@@ -17,6 +34,7 @@ router.post("/users/patientRegister", async (req, res) => {
         message: "Email already exists"
       });
     } else {
+      
       newUser = new User({
         firstname,
         lastname,
@@ -25,7 +43,11 @@ router.post("/users/patientRegister", async (req, res) => {
         email,
         phone,
         height,
-        weight
+        weight,
+        guardianList: {
+          guardianId,
+          guardianName: guardian.firstname+' '+guardian.lastname
+        }
       });
 
       const Token = jwt.sign(
@@ -74,7 +96,15 @@ router.post("/conformation/request/:token", (req, res) => {
                 bcrypt.hash(password, salt, async (err, hash) => {
                   if (err) throw err;
                   user.password = hash;
+                  const guardian = await User.findOne({
+                    _id: user.guardianList[0].guardianId
+                  })
                   try {
+                    guardian.patientList = [{
+                      patientId: user._id,
+                      patientName: user.firstname+' '+user.lastname
+                    }]
+                    await guardian.save();
                     await user.save();
                     return res.status(200).json({
                       message: "Password added successfully to your account. You can now login into your account"

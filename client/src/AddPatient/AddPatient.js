@@ -6,6 +6,7 @@ import Footer from '../shared/component/Footer'
 import AddPatientTable from './AddPatientTable'
 import {AuthContext} from '../shared/context/auth-context'
 import LoadingSpinner from '../shared/component/LoadingSpinner'
+import ErrorModal from '../shared/component/ErrorModal'
 import './AddPatient.css'
 
 const AddPatient = () => {
@@ -15,15 +16,14 @@ const AddPatient = () => {
     const [filteredUserList, setFilteredUserList] = useState([]);
     const [isLoading, setIsLoading] = useState(false)
     const [disable, setDisable] = useState(false)
+    const [message, setMessage] = useState('')
 
     useEffect(() => {
         const getUserList = async () => { 
             setIsLoading(true)
             setDisable(true)
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/userList', {
-                    owner: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'userListExcludingMyself/'+ auth.userId);
                 setIsLoading(false)
                 setDisable(false)
                 setUserList(response.data.user)
@@ -51,6 +51,27 @@ const AddPatient = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
+    const addMyselfAsPatient = async () => {
+        setIsLoading(true)
+        setDisable(true)
+        try {
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'addPatientMyself/'+auth.userId);
+            setIsLoading(false)
+            setDisable(false)
+            setMessage(response.data.message)
+            console.log(response.data);
+        } catch (error) {
+            setIsLoading(false)
+            setDisable(false)
+            setMessage(error.response.data.message)
+            console.log(error.response.data);
+        }
+    }
+
+    const messageHandler = () => {
+        setMessage(null)
+    }
+
     return  <React.Fragment>
         <Helmet>
             <meta charSet="utf-8" />
@@ -67,8 +88,14 @@ const AddPatient = () => {
         <div className="container-fluid w-100 h-100">
             <div className="container">
                 {isLoading && <LoadingSpinner/>}
+                {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
+                <div className="row text-center mb-4">
+                    <div className="col-10 col-sm-6 col-lg-4 offset-1 offset-sm-3 offset-lg-4">
+                        <button className='btn btn-lg btn-block text-white' style={{borderRadius: '1em', backgroundColor: '#0C0C52'}} onClick={function() {addMyselfAsPatient()}}>Add Me As A Patient</button>
+                    </div>
+                </div>
                 <div className="row">
-                    <p className="h1 font-weight-normal">Search with the UserId and add your patient</p>
+                    <p className="h1 font-weight-normal ml-3">Search with the UserId and add your patient</p>
                 </div>
                 <div className="row mt-4">
                     <div className="col-md-4">

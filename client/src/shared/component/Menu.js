@@ -17,6 +17,7 @@ const Menu = () => {
     const history = useHistory()
     const [seconds, setSeconds] = useState(0);
     const [sign, setSign] = useState(ApiCalendar.sign)
+    const [notificationNumber, setNotificationNumber] = useState(0);
     useEffect(() => {
         console.log(seconds)
         if(seconds <= 2){
@@ -36,6 +37,40 @@ const Menu = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [seconds]);
+
+    useEffect(() => {
+        const getPatientRequestNotificationList = async () => {
+            if(auth.isLoggedIn){
+                // console.log('Notification try')
+                var length = 0
+                try {
+                    const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'users/requestList/'+auth.userId);
+                    if(response.data.requestExist){
+                        length = response.data.requestExist.length
+                        // console.log('Length:'+response.data.requestExist.length)
+                    } else {
+                        // console.log('Length:'+0)
+                    }
+                } catch (error) {
+                    // console.log('catch')
+                }
+                try {
+                    const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routineNotification/'+auth.userId);
+                    if(response.data.routine){
+                        length = length + response.data.routine.length
+                        // console.log('Routine Length'+response.data.routine.length)
+                        setNotificationNumber(length)
+                    } else {
+                        // console.log('Routine Length:'+0)
+                        setNotificationNumber(length)
+                    }
+                } catch (error) {
+                    // console.log('catch')
+                }
+            }
+        }
+        getPatientRequestNotificationList()
+    })
 
     const signUpdate = () => {
         setSign(ApiCalendar.sign)
@@ -133,7 +168,14 @@ const Menu = () => {
                         <Nav.Item className="mt-lg-n1">
                             <Nav.Link className="text-light" href="/notification">
                                 <img className="mr-2" src={NotificationIcon} style={{width: '35px', height: '35px'}} alt="Notification Icon"/>
-                                <span className="badge rounded-circle bg-light position-relative ml-n4 badge-notify">5</span>
+                                {
+                                    notificationNumber > 0 
+                                    ?
+                                    <span className="badge rounded-circle bg-light position-relative ml-n4 badge-notify">{notificationNumber}</span>
+                                    :
+                                    null
+                                }
+                                
                             </Nav.Link>
                         </Nav.Item>
                         <NavDropdown 

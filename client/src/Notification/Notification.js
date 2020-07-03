@@ -9,21 +9,19 @@ import {AuthContext} from '../shared/context/auth-context'
 const Notification = () => {
     const auth = useContext(AuthContext)
     const [notificationList, setNotificationList] = useState([])
+    // const [routineNotificationList, setRoutineNotificationList] = useState([])
     useEffect(() => {
         const getNotificationList = async () => { 
             try {
                 // console.log('try')
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/requestList', {
-                    owner: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'users/requestList/'+auth.userId);
                 setNotificationList(response.data.requestExist)
-                // console.log(response.data)
             } catch (error) {
                 console.log('catch')
-                console.log(error.response.data);
+                // console.log(error.response.data);
             }
-          }
-          getNotificationList()
+        }
+        getNotificationList()
     })
     return <React.Fragment>
         <Helmet>
@@ -40,7 +38,7 @@ const Notification = () => {
         </div>
         {
             notificationList ?
-                <NotificationAlert notificationList={notificationList}/>
+                <NotificationAlert notificationList={notificationList} /*routineNotificationList={routineNotificationList}*//>
             :
             <NotificationAlert/>
         }
