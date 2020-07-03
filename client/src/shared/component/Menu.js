@@ -44,9 +44,7 @@ const Menu = () => {
                 // console.log('Notification try')
                 var length = 0
                 try {
-                    const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/requestList', {
-                        owner: auth.userId
-                    });
+                    const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'users/requestList/'+auth.userId);
                     if(response.data.requestExist){
                         length = response.data.requestExist.length
                         // console.log('Length:'+response.data.requestExist.length)
@@ -57,9 +55,7 @@ const Menu = () => {
                     // console.log('catch')
                 }
                 try {
-                    const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routineNotification', {
-                        owner: auth.userId
-                    });
+                    const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routineNotification/'+auth.userId);
                     if(response.data.routine){
                         length = length + response.data.routine.length
                         // console.log('Routine Length'+response.data.routine.length)

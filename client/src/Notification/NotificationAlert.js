@@ -13,9 +13,7 @@ const NotificationAlert = props => {
         const getNotificationList = async () => { 
             try {
                 // console.log('try')
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routineNotification', {
-                    owner: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routineNotification/'+auth.userId);
                 // console.log(response.data.routine)
                 setRoutineNotificationList(response.data.routine)
             } catch (error) {
@@ -34,9 +32,8 @@ const NotificationAlert = props => {
         setIsLoading(true)
         setDisable(true)
         try {
-            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/acceptRequest', {
-                requester: requesterId,
-                owner: auth.userId
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/acceptRequest/'+auth.userId, {
+                requester: requesterId
             });
             setIsLoading(false)
             setDisable(false)

@@ -67,14 +67,9 @@ router.get('/routine' , async (req, res) => {
     }
 })
 
-router.post('/routines' , async (req, res) =>{
-    const {id} = req.body
-    let userId
-    if(req.user){
-        userId = req.user._id
-    } else {
-        userId = id
-    }
+router.get('/routines/:userId' , async (req, res) =>{
+    let userId = req.params.userId
+    
     try{
         const routine = await Routine.find({owner: userId})
         if (routine === undefined || routine.length == 0) {
@@ -88,8 +83,8 @@ router.post('/routines' , async (req, res) =>{
     }
 })
 
-router.get('/routine/:id' , async (req, res) =>{
-    const _id=req.params.id
+router.get('/routine/:routineId' , async (req, res) =>{
+    const _id=req.params.routineId
     try{
         const routine = await Routine.findOne({_id })
         if(!routine){
@@ -102,8 +97,8 @@ router.get('/routine/:id' , async (req, res) =>{
     }
 })
 
-router.patch('/routine/:id' , async ( req , res) => {
-    //const _id = req.params.id
+router.patch('/routine/:routineId' , async ( req , res) => {
+    //const _id = req.params.routineId
     const updates = Object.keys(req.body)
     const allowedupdates = ['routineItem', 'itemName' , 'unit' , 'startDate' , 'endDate' , 'timesPerDay' , 'beforeAfterMeal' , 'times' ,'notification' ,'notificationFor' ]
     const isValidOperation = updates.every((update) => allowedupdates.includes(update))
@@ -116,7 +111,7 @@ router.patch('/routine/:id' , async ( req , res) => {
 
     try{
         //const task = await Task.findOne({ _id: req.params.id , owner: req.user._id})
-        const routine = await Routine.findOne({ _id: req.params.id })
+        const routine = await Routine.findOne({ _id: req.params.routineId })
         if(!routine){
             return res.status(404).json({ 
                 message: 'Routine not found'
@@ -136,10 +131,9 @@ router.patch('/routine/:id' , async ( req , res) => {
 
 })
 
-router.delete('/routine/:id'  , async(req , res) =>{
+router.delete('/routine/:routineId'  , async(req , res) =>{
     try{
-        //const task = await Task.findOneAndDelete({_id: req.params.id , owner: req.user._id})
-        const routine = await Routine.findOneAndDelete({_id: req.params.id})
+        const routine = await Routine.findOneAndDelete({_id: req.params.routineId})
 
         if(!routine){
             return res.status(404).json({
@@ -157,13 +151,8 @@ router.delete('/routine/:id'  , async(req , res) =>{
     }
 })
 
-router.post('/routineNotification' , async (req, res) =>{
-    let owner;
-    if (req.user) {
-        owner = req.user._id;
-    } else {
-        owner = req.body.owner;
-    }
+router.get('/routineNotification/:userId' , async (req, res) =>{
+    let owner = req.params.userId;
 
     try {
         const routine = await Routine.find({owner})

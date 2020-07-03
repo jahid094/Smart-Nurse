@@ -38,9 +38,7 @@ const ProfileInformation = () => {
             setDisable(true)
             console.log('first')
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
-                    id: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'users/'+auth.userId);
                 // console.log(response.data)
                 setFirstName(response.data.user.firstname)
                 setLastName(response.data.user.lastname)
@@ -79,9 +77,7 @@ const ProfileInformation = () => {
             setIsLoading(true)
             setDisable(true)
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/me', {
-                    id: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'users/'+auth.userId);
                 console.log('second')
                 // console.log(response.data)
                 setFirstName(response.data.user.firstname)
@@ -127,7 +123,7 @@ const ProfileInformation = () => {
         setDisable(true)
         if(!currentPassword){
             try {
-                const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/me', {
+                const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/me/'+auth.userId, {
                     firstname: firstName,
                     lastname: lastName,
                     age,
@@ -152,7 +148,7 @@ const ProfileInformation = () => {
             setIsLoading(true)
             setDisable(true)
             try {
-                const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/me', {
+                const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/me/'+auth.userId, {
                     firstname: firstName,
                     lastname: lastName,
                     age,
@@ -183,8 +179,7 @@ const ProfileInformation = () => {
         setIsLoading(true)
         setDisable(true)
         try {
-            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/cancelRequest', {
-                owner: auth.userId,
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/cancelRequest/'+auth.userId, {
                 patientId
             });
             setIsLoading(false)
@@ -208,9 +203,7 @@ const ProfileInformation = () => {
         setIsLoading(true)
         setDisable(true)
         try {
-            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'removePatientMyself', {
-                id: auth.userId 
-            });
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'removePatientMyself/'+auth.userId);
             setIsLoading(false)
             setDisable(false)
             setTestBool(true)
@@ -240,7 +233,7 @@ const ProfileInformation = () => {
                                 formData.append("updatepp", e.target.files[0]);
                                 formData.append("id", auth.userId);
                                 try {
-                                    const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/profilePicture', formData, {
+                                    const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'users/profilePicture/'+auth.userId, formData, {
                                         headers: {
                                             'Content-Type': 'multipart/form-data'
                                         }

@@ -29,9 +29,7 @@ const MyRoutine = props => {
         });
         const getRoutine = async () => { 
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
-                    id: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routines/'+auth.userId);
                 setUserRoutine(response.data.routine)
                 console.log(response.data.routine)
             } catch (error) {
@@ -47,9 +45,7 @@ const MyRoutine = props => {
         });
         const getRoutine = async () => { 
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
-                    id: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routines/'+auth.userId);
                 setUserRoutine(response.data.routine)
             } catch (error) {
                 console.log(error.response.data);
@@ -67,9 +63,7 @@ const MyRoutine = props => {
         });
         const getRoutine = async () => { 
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'routines', {
-                    id: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'routines/'+auth.userId);
                 setUserRoutine(response.data.routine)
             } catch (error) {
                 console.log(error.response.data);

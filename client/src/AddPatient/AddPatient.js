@@ -23,9 +23,7 @@ const AddPatient = () => {
             setIsLoading(true)
             setDisable(true)
             try {
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/userList', {
-                    owner: auth.userId
-                });
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'userListExcludingMyself/'+ auth.userId);
                 setIsLoading(false)
                 setDisable(false)
                 setUserList(response.data.user)
@@ -57,9 +55,7 @@ const AddPatient = () => {
         setIsLoading(true)
         setDisable(true)
         try {
-            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'addPatientMyself', {
-                id: auth.userId 
-            });
+            const response = await axios.patch(process.env.REACT_APP_BACKEND_URL+'addPatientMyself/'+auth.userId);
             setIsLoading(false)
             setDisable(false)
             setMessage(response.data.message)

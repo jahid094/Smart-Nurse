@@ -4,26 +4,22 @@ const Guardianship = require("../models/Guardianship");
 const User = require("../models/User");
 
 //Send Request
-router.post("/users/sendRequest", async (req, res) => {
+router.post("/users/sendRequest/:id", async (req, res) => {
   let owner;
   let ownerName;
-  if (req.user) {
-    owner = req.user._id;
-    ownerName = req.user.firstname + " " + req.user.lastname;
-  } else {
-    owner = req.body.owner;
-    const ownerNameFind = await User.findOne({ _id: owner });
-    if(ownerNameFind.guardianList.length > 0){
-      return res.status(404).json({
-        message: 'You have already a guardian'
-      })
-    } if(ownerNameFind.patientList.length > 0){
-      return res.status(404).json({
-        message: 'You are already a patient of a user.'
-      }) 
-    } if (ownerNameFind) {
-      ownerName = ownerNameFind.firstname + " " + ownerNameFind.lastname;
-    }
+  
+  owner = req.params.id;
+  const ownerNameFind = await User.findOne({ _id: owner });
+  if(ownerNameFind.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You have already a guardian'
+    })
+  } if(ownerNameFind.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a patient of a user.'
+    })
+  } if (ownerNameFind) {
+    ownerName = ownerNameFind.firstname + " " + ownerNameFind.lastname;
   }
 
   const gurdian = new Guardianship({
@@ -103,13 +99,8 @@ router.post("/users/sendRequest", async (req, res) => {
 });
 
 //Accept Request
-router.patch("/users/acceptRequest", async (req, res) => {
-  let owner;
-  if (req.user) {
-    owner = req.user._id;
-  } else {
-    owner = req.body.owner;
-  }
+router.patch("/users/acceptRequest/:id", async (req, res) => {
+  let owner = req.params.id;
 
   const user = await User.findOne({
     _id: req.body.requester
@@ -142,18 +133,12 @@ router.patch("/users/acceptRequest", async (req, res) => {
 });
 
 //Delete Request
-router.delete("/requestDelete/:id", async (req, res) => {
-  /* let owner;
-  if (req.user) {
-    owner = req.user._id;
-  } else {
-    owner = req.body.owner;
-  } */
+router.delete("/requestDelete/:requestId", async (req, res) => {
   try {
     const user = await Guardianship.findOneAndDelete({
       // "recipients.id": owner,
       "recipients.status": false,
-      _id: req.params.id,
+      _id: req.params.requestId,
     });
     if (!user) {
       return res.status(404).json({
@@ -171,13 +156,9 @@ router.delete("/requestDelete/:id", async (req, res) => {
 });
 
 //Cancel Request
-router.post("/users/cancelRequest", async (req, res) => {
-  let owner;
-  if (req.user) {
-    owner = req.user._id;
-  } else {
-    owner = req.body.owner;
-  }
+router.patch("/users/cancelRequest/:id", async (req, res) => {
+  let owner = req.params.id;
+  
   try {
     const request = await Guardianship.findOneAndDelete({
       "recipients.id": req.body.patientId,
@@ -218,14 +199,9 @@ router.post("/users/cancelRequest", async (req, res) => {
 })
 
 //Request List
-router.post("/users/requestList", async (req, res) => {
-  let owner;
-  if (req.user) {
-    owner = req.user._id;
-  } else {
-    owner = req.body.owner;
-  }
-
+router.get("/users/requestList/:id", async (req, res) => {
+  let owner = req.params.id;
+  
   const requestExist = await Guardianship.find({
     "recipients.id": owner,
     "recipients.status": false
@@ -249,10 +225,9 @@ router.post("/users/requestList", async (req, res) => {
 });
 
 //Add Myself As Patient
-router.patch("/addPatientMyself", async (req, res) => {
-  let id = req.body.id
+router.patch("/addPatientMyself/:id", async (req, res) => {
   const user = await User.findOne({
-    _id: req.body.id
+    _id: req.params.id
   });
   if(user.guardianList.length > 0){
     return res.status(404).json({
@@ -275,10 +250,9 @@ router.patch("/addPatientMyself", async (req, res) => {
 });
 
 //Remove Myself As Patient
-router.patch("/removePatientMyself", async (req, res) => {
-  let id = req.body.id
+router.patch("/removePatientMyself/:id", async (req, res) => {
   const user = await User.findOne({
-    _id: req.body.id
+    _id: req.params.id
   });
   if(user.guardianList[0].guardianId.equals(req.body.id) && user.patientList[0].patientId.equals(req.body.id)){
     user.guardianList = []
@@ -295,9 +269,9 @@ router.patch("/removePatientMyself", async (req, res) => {
   }
 });
 
-router.post("/checkGuardianAndPatient", async (req, res) => {
+router.get("/checkGuardianAndPatient/:id", async (req, res) => {
   const user = await User.findOne({
-    _id: req.body.id
+    _id: req.params.id
   });
   if(user.guardianList.length > 0){
     return res.status(404).json({

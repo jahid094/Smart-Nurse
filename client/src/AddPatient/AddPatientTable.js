@@ -67,13 +67,12 @@ const AddPatientTable = props => {
             setDisable(true)
             try {
                 console.log(auth.userId)
-                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/sendRequest', {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'users/sendRequest/'+auth.userId, {
                     recipients: [
                         {
                             id : searchId
                         }
-                    ],
-                    owner: auth.userId 
+                    ]
                 });
                 setIsLoading(false)
                 setDisable(false)
@@ -96,9 +95,7 @@ const AddPatientTable = props => {
         console.log('click')
         try {
             console.log(auth.userId)
-            const response = await axios.post(process.env.REACT_APP_BACKEND_URL+'checkGuardianAndPatient', {
-                id: auth.userId 
-            });
+            const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'checkGuardianAndPatient/'+auth.userId);
             setIsLoading(false)
             setDisable(false)
             history.push('/createPatient')
