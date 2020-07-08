@@ -6,10 +6,12 @@ import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import Delete from '../shared/img/Delete.png'
 import {Cookies} from 'react-cookie';
+import {useHistory} from 'react-router-dom';
 
 const ProfileInformation = () => {
     const auth = useContext(AuthContext)
     const cookies = new Cookies()
+    const history = useHistory()
     const [imageFile, setImageFile] = useState(ProfilePic)
     const [profileimageFile, setProfileImageFile] = useState()
     const [userRole, setUserRole] = useState('')
@@ -30,6 +32,8 @@ const ProfileInformation = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [disable, setDisable] = useState(false)
     const [message, setMessage] = useState('')
+    const [deleteRelation, setDeleteRelation] = useState(false)
+    const [deleteRelationMyself, setDeleteRelationMyself] = useState(false)
     const [testBool, setTestBool] = useState(false)
 
     useEffect(() => {
@@ -93,19 +97,23 @@ const ProfileInformation = () => {
                     setProfileImageFile("data:image/png;base64,"+response.data.profilePicture)
                 }
                 if(response.data.user.guardianList.length > 0){
+                    auth.userRole = 'Patient'
                     setUserRole('Patient')
                     setPatientName(response.data.user.guardianList[0].guardianName)
                 }
                 if(response.data.user.patientList.length > 0){
+                    auth.userRole = 'Guardian'
                     setUserRole('Guardian')
                     setGuardianName(response.data.user.patientList[0].patientName)
                     setPatientId(response.data.user.patientList[0].patientId)
                 }
                 if(response.data.user.guardianList.length > 0 && response.data.user.patientList.length > 0){
+                    auth.userRole = 'Guardian/Patient'
                     setUserRole('Guardian/Patient')
                 }
                 setIsLoading(false)
                 setDisable(false)
+                cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });
             } catch (error) {
                 setIsLoading(false)
                 setDisable(false)
@@ -185,6 +193,8 @@ const ProfileInformation = () => {
             setIsLoading(false)
             setDisable(false)
             setTestBool(true)
+            auth.userRole = null
+            cookies.remove('userRole', {path: '/'})
             console.log(response.data)
             setMessage(response.data.message)
         } catch (error) {
@@ -199,6 +209,16 @@ const ProfileInformation = () => {
         setMessage(null)
     }
 
+    const deleteRelationHandler = () => {
+        setDeleteRelation(false)
+        cancelRequest(patientId)
+    }
+
+    const deleteRelationMyselfHandler = () => {
+        setDeleteRelationMyself(false)
+        removeMyselfAsPatient()
+    }
+
     const removeMyselfAsPatient = async () => {
         setIsLoading(true)
         setDisable(true)
@@ -209,6 +229,9 @@ const ProfileInformation = () => {
             setTestBool(true)
             setMessage(response.data.message)
             console.log(response.data);
+            auth.userRole = null
+            cookies.remove('userRole', {path: '/'})
+            history.push('/editProfile')
         } catch (error) {
             setIsLoading(false)
             setDisable(false)
@@ -221,6 +244,8 @@ const ProfileInformation = () => {
     return  <div className="container-fluid">
         {isLoading && <LoadingSpinner/>}
         {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
+        {deleteRelation && <ErrorModal message={'Are you sure you want to delete the patient guardian relationship? If you delete then all routine created by both of them has been deleted'} onClear={deleteRelationHandler.bind(this)}/>}
+        {deleteRelationMyself && <ErrorModal message={'Are you sure you want to delete the patient guardian relationship? If you delete then all routine created by both of them has been deleted'} onClear={deleteRelationMyselfHandler.bind(this)}/>}
         <div className="row">
             <div className="col-lg-4">
                 <img className="d-block mx-auto rounded-circle" style={{width: '250px', height: '250px'}} src={imageFile} alt="Profile"/>
@@ -267,9 +292,9 @@ const ProfileInformation = () => {
                             <span className="d-inline-block">
                                 {guardianName && patientName
                                 ?
-                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){removeMyselfAsPatient()}}/>
+                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){/* removeMyselfAsPatient() */ setDeleteRelationMyself(true)}}/>
                                 :
-                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){cancelRequest(patientId)}}/>
+                                <img className='mt-n1 ml-1' src={Delete} style={{width: '20px', height: '20px'}} alt='Delete' onClick={function(){/* cancelRequest(patientId) */ setDeleteRelation(true)}}/>
                                 }
                             </span>
                         </p>

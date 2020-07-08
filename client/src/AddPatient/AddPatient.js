@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios'
 import {Helmet} from "react-helmet";
+import {Cookies} from 'react-cookie';
 import Menu from '../shared/component/Menu'
 import Footer from '../shared/component/Footer'
 import AddPatientTable from './AddPatientTable'
@@ -11,6 +12,7 @@ import './AddPatient.css'
 
 const AddPatient = () => {
     const auth = useContext(AuthContext)
+    const cookies = new Cookies();
     const [search, setSearch] = useState("");
     const [userList, setUserList] = useState([])
     const [filteredUserList, setFilteredUserList] = useState([]);
@@ -60,6 +62,8 @@ const AddPatient = () => {
             setDisable(false)
             setMessage(response.data.message)
             console.log(response.data);
+            auth.userRole = 'Guardian/Patient'
+            cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });
         } catch (error) {
             setIsLoading(false)
             setDisable(false)

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Guardianship = require("../models/Guardianship");
 const User = require("../models/User");
+const Routine = require('../models/Routine');
 
 //Send Request
 router.post("/users/sendRequest/:id", async (req, res) => {
@@ -116,8 +117,8 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
     requester: req.body.requester
   });
   if (gurdian) {
-    user.patientList.push({patientId: owner, patientName: guardianUser.firstname+' '+guardianUser.lastname})
-    guardianUser.guardianList.push({guardianId: req.body.requester, guardianName: user.firstname+' '+user.lastname})
+    user.patientList.push({patientId: owner, patientName: guardianUser.firstname+' '+guardianUser.lastname, patientEmail: guardianUser.email})
+    guardianUser.guardianList.push({guardianId: req.body.requester, guardianName: user.firstname+' '+user.lastname, guardianEmail: user.email})
     gurdian.recipients[0].status = true;
     await user.save();
     await guardianUser.save();
@@ -160,11 +161,17 @@ router.patch("/users/cancelRequest/:id", async (req, res) => {
   let owner = req.params.id;
   
   try {
-    const request = await Guardianship.findOneAndDelete({
+    await Guardianship.findOneAndDelete({
       "recipients.id": req.body.patientId,
       "recipients.status": true,
       requester: owner
     });
+    const routine = await Routine.find({"owner.guardian.guardianId": owner, "owner.patient.patientId": req.body.patientId})
+    let routineId = []
+    routine.forEach(function(item) {
+      routineId.push(item.id)
+    })
+    await Routine.deleteMany({_id: routineId})
     await User.findByIdAndUpdate(
       owner, { $pull: { "patientList": { patientId: req.body.patientId } } }, { multi: true },
       function(err) {
@@ -183,11 +190,6 @@ router.patch("/users/cancelRequest/:id", async (req, res) => {
           }); 
         }
     });
-    /* if(!request){
-      return res.status(200).json({
-        message: 'No Request Found.'
-      });
-    } */
     return res.status(200).json({
       message: 'Request Deleted Successfully'
     });
@@ -239,8 +241,8 @@ router.patch("/addPatientMyself/:id", async (req, res) => {
       message: 'You are already a patient of a user.'
     })
   }
-  user.guardianList.push({guardianId: req.body.id, guardianName: user.firstname+' '+user.lastname})
-  user.patientList.push({patientId: req.body.id, patientName: user.firstname+' '+user.lastname})
+  user.guardianList.push({guardianId: req.params.id, guardianName: user.firstname+' '+user.lastname, guardianEmail: user.email})
+  user.patientList.push({patientId: req.params.id, patientName: user.firstname+' '+user.lastname, patientEmail: user.email})
   await user.save();
   
   return res.status(200).json({
@@ -254,9 +256,15 @@ router.patch("/removePatientMyself/:id", async (req, res) => {
   const user = await User.findOne({
     _id: req.params.id
   });
-  if(user.guardianList[0].guardianId.equals(req.body.id) && user.patientList[0].patientId.equals(req.body.id)){
+  if(user.guardianList[0].guardianId.equals(req.params.id) && user.patientList[0].patientId.equals(req.params.id)){
     user.guardianList = []
     user.patientList = []
+    const routine = await Routine.find({"owner.guardian.guardianId": req.params.id, "owner.patient.patientId": req.params.id})
+    let routineId = []
+    routine.forEach(function(item) {
+      routineId.push(item.id)
+    })
+    await Routine.deleteMany({_id: routineId})
     await user.save();
     return res.status(200).json({
       message: 'You have removed yourself as a patient',

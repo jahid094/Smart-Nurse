@@ -34,9 +34,16 @@ const App = () => {
             cookies.remove('token', {path: '/'})
             cookies.remove('isLoggedIn', {path: '/'})
             cookies.remove('firstName', {path: '/'})
+            cookies.remove('userRole', {path: '/'})
         }
       }
       verifyToken()
+    } else {
+      cookies.remove('userId', {path: '/'})
+      cookies.remove('token', {path: '/'})
+      cookies.remove('isLoggedIn', {path: '/'})
+      cookies.remove('firstName', {path: '/'})
+      cookies.remove('userRole', {path: '/'})
     }
   })
   return <Main/>;

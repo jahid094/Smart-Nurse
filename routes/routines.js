@@ -2,35 +2,88 @@ const express = require('express');
 const router = express.Router();;
 const moment = require('moment')
 const Routine = require('../models/Routine');
+const User = require('../models/User');
 
-router.post('/routine' , async (req, res) =>{
+router.post('/routine/:userId' , async (req, res) =>{
+    // let owner = req.params.userId
+    const ownerDetails = await User.findOne({ _id: req.params.userId });
+    // console.log(ownerDetails)
     let owner
-    if(req.user){
+    if(ownerDetails.guardianList.length === 0 && ownerDetails.patientList.length === 0){
+        return res.status(404).json({
+            message: 'You have to become a guardian of a user or yourself Or You have to become a patient of a user or yourself to create a routine.'
+        })
+    } else if(ownerDetails.guardianList.length > 0 && ownerDetails.patientList.length > 0) {
+        owner = [{
+            guardian: [{
+                guardianId: ownerDetails._id,
+                guardianName: ownerDetails.firstname + " " + ownerDetails.lastname,
+                guardianEmail: ownerDetails.email
+            }],
+            patient: [{
+                patientId: ownerDetails._id,
+                patientName: ownerDetails.firstname + " " + ownerDetails.lastname,
+                patientEmail: ownerDetails.email
+            }]
+        }]
+    } else if(ownerDetails.guardianList.length > 0) {
+        const guardianDetails = await User.findOne({ _id: ownerDetails.guardianList[0].guardianId });
+        owner = [{
+            guardian: [{
+                guardianId: guardianDetails._id,
+                guardianName: guardianDetails.firstname + " " + guardianDetails.lastname,
+                guardianEmail: guardianDetails.email
+            }],
+            patient: [{
+                patientId: ownerDetails._id,
+                patientName: ownerDetails.firstname + " " + ownerDetails.lastname,
+                patientEmail: ownerDetails.email
+            }]
+        }]
+    } else if(ownerDetails.patientList.length > 0) {
+        const patientDetails = await User.findOne({ _id: ownerDetails.patientList[0].patientId });
+        owner = [{
+            guardian: [{
+                guardianId: ownerDetails._id,
+                guardianName: ownerDetails.firstname + " " + ownerDetails.lastname,
+                guardianEmail: ownerDetails.email
+            }],
+            patient: [{
+                patientId: patientDetails._id,
+                patientName: patientDetails.firstname + " " + patientDetails.lastname,
+                patientEmail: patientDetails.email
+            }]
+        }]
+    }
+    /* console.log('Owner:')
+    console.log(owner[0].guardian[0])
+    console.log(owner[0].patient[0]) */
+    const startDate  = moment(req.body.startDate, "YYYY-MM-DD")
+    const endDate  = moment(req.body.endDate, "YYYY-MM-DD")
+    if(!moment(startDate).isSameOrBefore(endDate)){
+        return res.status(404).json({
+            message: 'Start Date should not be greater than End Date.'
+        })
+    }
+    /* if(req.user){
         owner = req.user._id
     } else {
         owner = req.body.owner
-    }
+    } */
     const statusDay = [];
     const statusTime = [];
-    const startDate  = moment(req.body.startDate, "YYYY-MM-DD")
-    const endDate  = moment(req.body.endDate, "YYYY-MM-DD")
     const dateDifference = endDate.diff(startDate, 'days') + 1
-    console.log(dateDifference)
-    console.log('TimesPerDay:'+req.body.timesPerDay)
     Array.from({ length: req.body.timesPerDay }, (v, k) => (
         statusTime.push({
             done: false,
             visible: true
         })
     ))
-    console.log(statusTime)
     Array.from({ length: dateDifference }, (v, k) => (
         statusDay.push({
             statusTime
         })
     ))
-    console.log(statusDay)
-    console.log(statusDay[0])
     /* return res.status(201).json({
         message: 'Successful'
     }) */
@@ -71,15 +124,34 @@ router.get('/routines/:userId' , async (req, res) =>{
     let userId = req.params.userId
     
     try{
-        const routine = await Routine.find({owner: userId})
+        const user = await User.findOne({
+            _id: req.params.userId
+        });
+        let routine
+        if(user.guardianList.length > 0 && user.patientList.length > 0){
+            routine = await Routine.find({"owner.guardian.guardianId": userId, "owner.patient.patientId": userId})
+        } else if(user.guardianList.length === 0 && user.patientList.length === 0){
+            return res.status(404).json({
+                message: "You are not guardian or patient of any user. So you don't have any routine."
+            })
+        } else if(user.guardianList.length > 0){
+            routine = await Routine.find({"owner.patient.patientId": userId})
+        } else if(user.patientList.length > 0){
+            routine = await Routine.find({"owner.guardian.guardianId": userId})
+        }
+        // const routine = await Routine.find({owner: {guardian: {guardianId: userId}}})
         if (routine === undefined || routine.length == 0) {
-            return res.status(404).json("Routine not found")
+            return res.status(404).json({
+                message: "Routine not found"
+            })
         }
         return res.status(200).json({
             routine
         })
     }catch(e){
-        res.status(500).json(e)
+        return res.status(404).json({
+            message: e
+        })
     }
 })
 
@@ -110,17 +182,74 @@ router.patch('/routine/:routineId' , async ( req , res) => {
     }
 
     try{
-        //const task = await Task.findOne({ _id: req.params.id , owner: req.user._id})
         const routine = await Routine.findOne({ _id: req.params.routineId })
+        // console.log(routine)
+        var today = new Date();
+        today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
         if(!routine){
             return res.status(404).json({ 
                 message: 'Routine not found'
             })
         }
-
+        let statusDay = [];
+        let statusTime = [];
+        if(req.body.startDate && req.body.endDate && req.body.timesPerDay){
+            console.log('if')
+            if(routine.timesPerDay == req.body.timesPerDay &&  moment(routine.endDate, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') + 1 ==  moment(req.body.endDate, "YYYY-MM-DD").diff( moment(req.body.startDate, "YYYY-MM-DD"), 'days') + 1){
+                console.log('if1')
+                updates.forEach((update) => routine[update] = req.body[update])
+                await routine.save()
+                return res.json({ 
+                    message: 'Routine updated successfully'
+                })
+            } else {
+                if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') == 0){
+                    console.log('if3')
+                } else if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') > 0){
+                    console.log('if4')
+                    // console.log('PreviousArray Length:'+routine.statusDay.length)
+                    let newArray = routine.statusDay.splice(0, moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days'));
+                    /* console.log('NewArray:')
+                    console.log(newArray)
+                    console.log('NewArray Length:'+newArray.length)
+                    console.log(routine.statusDay)
+                    console.log('PreviousArray Length:'+routine.statusDay.length) */
+                    Array.from({ length: req.body.timesPerDay }, (v, k) => (
+                        statusTime.push({
+                            done: false,
+                            visible: true
+                        })
+                    ))
+                    /* console.log('StatusTime:')
+                    console.log(statusTime)
+                    console.log('StatusTime Length:'+statusTime.length) */
+                    Array.from({ length: (moment(req.body.endDate, "YYYY-MM-DD").diff(moment(req.body.startDate, "YYYY-MM-DD"), 'days') + 1) - (moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days')) }, (v, k) => (
+                        statusDay.push({
+                            statusTime
+                        })
+                    ))
+                    /* console.log('StatusDay:')
+                    console.log(statusDay)
+                    console.log('StatusDay Length:'+statusDay.length) */
+                    statusDay = newArray.concat(statusDay);
+                    /* console.log('After Concat:')
+                    console.log('StatusDay:')
+                    console.log(statusDay)
+                    console.log('StatusDay Length:'+statusDay.length) */
+                    updates.forEach((update) => routine[update] = req.body[update])
+                    routine.statusDay = statusDay
+                    await routine.save()
+                    return res.json({ 
+                        message: 'Routine updated successfully'
+                    })
+                }
+                // console.log('Difference:'+moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days'))
+            }
+        }
+        console.log('if2')
         updates.forEach((update) => routine[update] = req.body[update])
         await routine.save()
-        res.json({ 
+        return res.json({ 
             message: 'Routine updated successfully'
         })
     }catch(error){
@@ -152,11 +281,32 @@ router.delete('/routine/:routineId'  , async(req , res) =>{
 })
 
 router.get('/routineNotification/:userId' , async (req, res) =>{
-    let owner = req.params.userId;
-
+    // let owner = req.params.userId;
+    let userId = req.params.userId
     try {
-        const routine = await Routine.find({owner})
-
+        const user = await User.findOne({
+            _id: req.params.userId
+        });
+        // console.log(user)
+        let routine
+        if(user.guardianList.length > 0 && user.patientList.length > 0){
+            // console.log('if')
+            routine = await Routine.find({"owner.guardian.guardianId": userId, "owner.patient.patientId": userId})
+        } else if(user.guardianList.length === 0 && user.patientList.length === 0){
+            // console.log('if1')
+            routine = []
+            /* return res.status(404).json({
+                message: "You are not guardian or patient of any user. So you don't have any routine."
+            }) */
+        } else if(user.guardianList.length > 0){
+            // console.log('if2')
+            routine = await Routine.find({"owner.patient.patientId": userId})
+        } else if(user.patientList.length > 0){
+            // console.log('if3')
+            routine = await Routine.find({"owner.guardian.guardianId": userId})
+        }
+        // const routine = await Routine.find({owner})
+        // console.log(routine)
         var today = new Date();
         today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
 

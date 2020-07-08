@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios'
+import {Cookies} from 'react-cookie';
 import Checkmark from '../shared/img/checkmark.png'
 import Cross from '../shared/img/Cross.png'
 import Alert from 'react-bootstrap/Alert'
@@ -9,6 +10,7 @@ import {AuthContext} from '../shared/context/auth-context'
 
 const NotificationAlert = props => {
     const [routineNotificationList, setRoutineNotificationList] = useState([])
+    const cookies = new Cookies();
     useEffect(() => {
         const getNotificationList = async () => { 
             try {
@@ -37,6 +39,8 @@ const NotificationAlert = props => {
             });
             setIsLoading(false)
             setDisable(false)
+            auth.userRole = 'Patient'
+            cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });
             setMessage(response.data.message)
             console.log(response.data.message)
         } catch (error) {

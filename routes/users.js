@@ -26,11 +26,17 @@ router.get('/getUser/:id' , async (req , res ) =>{
     try{
       const user = await User.findById(req.params.id)
       if(!user){
-          return res.status(404).send()
+          return res.status(404).json({
+            message: 'User not found'
+          })
       }
-      res.send(user)
+      res.status(200).json({
+        user
+      })
     }catch(e){
-        res.status(500).send()
+        res.status(404).json({
+          message: e
+        })
     }
 })
 

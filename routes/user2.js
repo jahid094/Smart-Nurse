@@ -46,7 +46,8 @@ router.post("/users/patientRegister", async (req, res) => {
         weight,
         guardianList: {
           guardianId,
-          guardianName: guardian.firstname+' '+guardian.lastname
+          guardianName: guardian.firstname+' '+guardian.lastname,
+          guardianEmail: guardian.email
         }
       });
 
@@ -102,7 +103,8 @@ router.post("/conformation/request/:token", (req, res) => {
                   try {
                     guardian.patientList = [{
                       patientId: user._id,
-                      patientName: user.firstname+' '+user.lastname
+                      patientName: user.firstname+' '+user.lastname,
+                      patientEmail: user.email
                     }]
                     await guardian.save();
                     await user.save();

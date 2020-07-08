@@ -79,11 +79,22 @@ const Menu = () => {
     useEffect(() => {
         const token = new Cookies().get('token')
         if(token !== undefined){
-            const verifyUser = () => { 
-              auth.userId = new Cookies().get('userId')
-              auth.token = token
-              auth.isLoggedIn = true
-              auth.firstName = new Cookies().get('firstName')
+            const verifyUser = async () => {
+                const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'getUser/'+auth.userId);
+                if(response.data.user.guardianList.length > 0){
+                    auth.userRole = 'Patient'
+                }
+                if(response.data.user.patientList.length > 0){
+                    auth.userRole = 'Guardian'
+                }
+                if(response.data.user.guardianList.length > 0 && response.data.user.patientList.length > 0){
+                    auth.userRole = 'Guardian/Patient'
+                }
+                auth.userId = new Cookies().get('userId')
+                auth.token = token
+                auth.isLoggedIn = true
+                auth.firstName = new Cookies().get('firstName')
+                cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });
           }
           verifyUser()
         }
@@ -100,10 +111,12 @@ const Menu = () => {
             auth.firstName = null
             auth.token = null
             auth.isLoggedIn = false
+            auth.userRole = null
             cookies.remove('userId', {path: '/'})
             cookies.remove('token', {path: '/'})
             cookies.remove('isLoggedIn', {path: '/'})
             cookies.remove('firstName', {path: '/'})
+            cookies.remove('userRole', {path: '/'})
             history.push('/')
             const logoutFromGoogle = () => {
                 if(sign){

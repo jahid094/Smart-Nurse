@@ -8,10 +8,5 @@ export const AuthContext = createContext({
     firstName: new Cookies().get('firstName') || null,
     authMessage: null,
     resetMessage: null,
-    login: () => {
-        
-    },
-    logout: () => {
-
-    }
+    userRole: new Cookies().get('userRole') || null,
 })

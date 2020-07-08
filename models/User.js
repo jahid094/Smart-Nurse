@@ -137,6 +137,9 @@ const UserSchema = new mongoose.Schema({
     },
     patientName: {
       type: String
+    },
+    patientEmail: {
+      type: String
     }
   }],
   guardianList: [{
@@ -145,6 +148,9 @@ const UserSchema = new mongoose.Schema({
         ref: 'User'
     },
     guardianName: {
+      type: String
+    },
+    guardianEmail: {
       type: String
     }
   }]

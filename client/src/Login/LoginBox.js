@@ -35,10 +35,20 @@ const LoginBox = () => {
             auth.token = response.data.Token
             auth.isLoggedIn = true
             auth.firstName = response.data.user.firstname
+            if(response.data.user.guardianList.length > 0){
+                auth.userRole = 'Patient'
+            }
+            if(response.data.user.patientList.length > 0){
+                auth.userRole = 'Guardian'
+            }
+            if(response.data.user.guardianList.length > 0 && response.data.user.patientList.length > 0){
+                auth.userRole = 'Guardian/Patient'
+            }
             cookies.set('userId', auth.userId, { path: '/', maxAge: 31536000 });
             cookies.set('token', auth.token, { path: '/', maxAge: 31536000 });
             cookies.set('isLoggedIn', auth.isLoggedIn, { path: '/', maxAge: 31536000 });
             cookies.set('firstName', auth.firstName, { path: '/', maxAge: 31536000 });
+            cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });
             history.push('/')
         } catch (error) {
             setIsLoading(false)

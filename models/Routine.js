@@ -61,11 +61,38 @@ const routineSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    owner: {
-        type: mongoose.Schema.Types.ObjectId ,
-        required: true,
-        ref: 'User'
-    }
+    owner: [{
+        guardian: [{
+            guardianId: {
+                type: mongoose.Schema.Types.ObjectId ,
+                required: true,
+                ref: 'User'
+            },
+            guardianName: {
+                type: String,
+                required: true
+            },
+            guardianEmail: {
+                type: String,
+                required: true
+            }
+        }],
+        patient: [{
+            patientId: {
+                type: mongoose.Schema.Types.ObjectId ,
+                required: true,
+                ref: 'User'
+            },
+            patientName: {
+                type: String,
+                required: true
+            },
+            patientEmail: {
+                type: String,
+                required: true
+            }
+        }]
+    }], 
 }, {
     timestamps: true
 })
