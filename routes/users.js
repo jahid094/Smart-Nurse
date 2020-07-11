@@ -7,7 +7,8 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken')
 const async = require('async');
 const User = require('../models/User');
-const { sendWelcomeEmail , sendCancelationEmail , sendResetEmail} =require('../emails/account')
+const { sendWelcomeEmail , sendCancelationEmail, sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
+const axios = require('axios');
 
 const multer = require('multer')
 const upload = multer({
@@ -340,7 +341,39 @@ User.find({varify: false }).then((user) =>{
     }
   })
 })
-  
+
+User.find({}).then((user) =>{
+  user.forEach((element) => {
+    var today = new Date();
+    today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+    today = moment(today, "YYYY/MM/DD");
+    var compareDateTime = moment(`${moment(today).format()} 23:59`, 'YYYY-MM-DD HH:mm').format()
+    console.log(element._id)
+    // console.log((moment(moment(compareDateTime).format('YYYY-MM-DD HH:mm'))).isSame(moment(moment(new Date()).format('YYYY-MM-DD HH:mm'))))
+    if((element.guardianList.length > 0 && element.patientList.length > 0) || (element.guardianList.length > 0)){
+      console.log('If Start')
+      console.log(element._id)
+      axios.get(process.env.BACKEND_URL+'routineNotification/'+element._id).then(function (response) {
+        console.log(element._id)
+        if(response.data.routine){
+          console.log('Length:'+response.data.routine.length)
+          if(response.data.routine.length > 3){
+            if((moment(moment(compareDateTime).format('YYYY-MM-DD HH:mm'))).isSame(moment(moment(new Date()).format('YYYY-MM-DD HH:mm')))){
+              console.log('Email Sent '+element.guardianList[0].guardianEmail)
+              sendRoutineMissedEmail(element.guardianList[0].guardianEmail , response.data.routine, element.guardianList[0].guardianName, element.patientList[0].patientName)
+            }
+          }
+        }
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      console.log('If End')
+    }
+  })
+})
+
 //Registration Verify
 router.get('/conformation/:token', (req, res) => {
   User.findOne({ 
