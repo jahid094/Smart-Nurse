@@ -58,9 +58,38 @@ const sendCancelationEmail =( email , name) => {
     })
 }
 
+const timeFormat = (timeString) => {
+    var time = timeString.split(':');
+    var hour = time[0] % 12 || 12;
+    var minute = time[1];
+    var ampm = (time[0] < 12 || time[0] === 24) ? "AM" : "PM";
+    return hour+':'+minute + ' '+ampm;
+}
+
+const sendRoutineMissedEmail =( email , routine, guardianName, patientName) => {
+    let emailBody = 'Hello, Mr./ Mrs. '+guardianName+',\nYour patient is not following the daily routine. He has missed these activities listed below:\n'
+    routine.sort(function (a, b) {
+        return a.notificationTime.time.localeCompare(b.notificationTime.time);
+    });
+    routine.forEach((element) => {
+        emailBody = emailBody + element.notificationArray.itemName + ' ' + timeFormat(element.notificationTime.time)+'\n'
+    })
+    emailBody = emailBody + 'Please contact with your patient as soon as possible.\nWith best regards,\nSmart Nurse Team'
+    sgMail.send({
+        to: email,
+        from: 'jahid.aust39@gmail.com',
+        subject: 'Your patient '+patientName+ ' has missed several daily routines in a row.',
+        text: emailBody
+    }).then(() => {
+    }).catch((error) => {
+        console.log(error)
+    })
+}
+
 module.exports = {
     sendWelcomeEmail ,
     sendCancelationEmail ,
     sendResetEmail ,
-    sendRequestEmail
+    sendRequestEmail,
+    sendRoutineMissedEmail
 }
