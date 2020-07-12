@@ -303,7 +303,7 @@ router.get('/routineNotification/:userId' , async (req, res) =>{
             routine = await Routine.find({"owner.patient.patientId": userId})
         } else if(user.patientList.length > 0){
             // console.log('if3')
-            routine = await Routine.find({"owner.guardian.guardianId": userId})
+            routine = await Routine.find({"owner.guardian.guardianId": userId, notificationFor: 'Guradian&Patient'})
         }
         // const routine = await Routine.find({owner})
         // console.log(routine)

@@ -111,6 +111,16 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
     _id: owner
   });
 
+  if(guardianUser.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You have already a guardian'
+    })
+  } else if(guardianUser.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a patient of a user.'
+    })
+  }
+
   const gurdian = await Guardianship.findOne({
     "recipients.id": owner,
     "recipients.status": false,

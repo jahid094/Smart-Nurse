@@ -1,6 +1,7 @@
 import React, {useState,useContext} from 'react';
 import axios from 'axios'
 import moment from 'moment'
+import Form from 'react-bootstrap/Form'
 import DatePicker from 'react-date-picker';
 import TimePicker from 'react-time-picker';
 import {AuthContext} from '../shared/context/auth-context'
@@ -36,10 +37,12 @@ const AddRoutine = props => {
         }
     ]);
     const [notificationState, setNotificationState] = useState('Before 5 mins')
-    const [userType, setUserType] = useState('Me')
+    // const [userType, setUserType] = useState('Me')
     const [routineFormLoading, setRoutineFormLoading] = useState(false)
     const [disable, setDisable] = useState(false)
     const [message, setMessage] = useState('')
+    const [guardianCheck, setGuardianCheck] = useState(false)
+    const [patientCheck, setPatientCheck] = useState(true)
 
     const submitHandler = async (event) => {
         event.preventDefault()
@@ -65,7 +68,7 @@ const AddRoutine = props => {
                                 beforeAfterMeal: mealState,
                                 times,
                                 notification: notificationState,
-                                notificationFor: userType
+                                notificationFor: 'Me'
                             });
                             setRoutineItem('Medicine')
                             setItemName('')
@@ -92,7 +95,7 @@ const AddRoutine = props => {
                                 }
                             ]);
                             setNotificationState('Before 5 mins')
-                            setUserType('Me')
+                            // setUserType('Me')
                             setRoutineFormLoading(false)
                             setDisable(false)
                             setMessage(response.data.message)
@@ -111,7 +114,7 @@ const AddRoutine = props => {
                                 eventEndTime.setSeconds(0)
                                 const event = {
                                     summary: `${itemName}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: Me
                                     `, 
                                     start: {
                                         dateTime: eventStartTime,
@@ -155,7 +158,7 @@ const AddRoutine = props => {
                                 beforeAfterMeal: mealState,
                                 times,
                                 notification: notificationState,
-                                notificationFor: userType
+                                notificationFor: 'Me'
                             });
                             setRoutineItem('Medicine')
                             setItemName('')
@@ -182,7 +185,7 @@ const AddRoutine = props => {
                                 }
                             ]);
                             setNotificationState('Before 5 mins')
-                            setUserType('Me')
+                            // setUserType('Me')
                             setRoutineFormLoading(false)
                             setDisable(false)
                             setMessage(response.data.message)
@@ -201,7 +204,7 @@ const AddRoutine = props => {
                                 eventEndTime.setSeconds(0)
                                 const event = {
                                     summary: `${itemName} ${unit}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: Me
                                     `, 
                                     start: {
                                         dateTime: eventStartTime,
@@ -258,7 +261,7 @@ const AddRoutine = props => {
                                     beforeAfterMeal: mealState,
                                     times,
                                     notification: notificationState,
-                                    notificationFor: userType
+                                    notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')
                                 });
                                 setRoutineItem('Medicine')
                                 setItemName('')
@@ -285,7 +288,7 @@ const AddRoutine = props => {
                                     }
                                 ]);
                                 setNotificationState('Before 5 mins')
-                                setUserType('Me')
+                                // setUserType('Me')
                                 setRoutineFormLoading(false)
                                 setDisable(false)
                                 setMessage(response.data.message)
@@ -304,7 +307,7 @@ const AddRoutine = props => {
                                     eventEndTime.setSeconds(0)
                                     const event = {
                                         summary: `${itemName}`,
-                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
                                         `, 
                                         start: {
                                             dateTime: eventStartTime,
@@ -351,7 +354,7 @@ const AddRoutine = props => {
                                     beforeAfterMeal: mealState,
                                     times,
                                     notification: notificationState,
-                                    notificationFor: userType
+                                    notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')
                                 });
                                 setRoutineItem('Medicine')
                                 setItemName('')
@@ -378,7 +381,7 @@ const AddRoutine = props => {
                                     }
                                 ]);
                                 setNotificationState('Before 5 mins')
-                                setUserType('Me')
+                                // setUserType('Me')
                                 setRoutineFormLoading(false)
                                 setDisable(false)
                                 setMessage(response.data.message)
@@ -397,7 +400,7 @@ const AddRoutine = props => {
                                     eventEndTime.setSeconds(0)
                                     const event = {
                                         summary: `${itemName} ${unit}`,
-                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
                                         `, 
                                         start: {
                                             dateTime: eventStartTime,
@@ -461,7 +464,7 @@ const AddRoutine = props => {
                                     beforeAfterMeal: mealState,
                                     times,
                                     notification: notificationState,
-                                    notificationFor: userType
+                                    notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')
                                 });
                                 setRoutineItem('Medicine')
                                 setItemName('')
@@ -488,7 +491,7 @@ const AddRoutine = props => {
                                     }
                                 ]);
                                 setNotificationState('Before 5 mins')
-                                setUserType('Me')
+                                // setUserType('Me')
                                 setRoutineFormLoading(false)
                                 setDisable(false)
                                 setMessage(response.data.message)
@@ -507,7 +510,7 @@ const AddRoutine = props => {
                                     eventEndTime.setSeconds(0)
                                     const event = {
                                         summary: `${itemName}`,
-                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
                                         `, 
                                         start: {
                                             dateTime: eventStartTime,
@@ -554,7 +557,7 @@ const AddRoutine = props => {
                                     beforeAfterMeal: mealState,
                                     times,
                                     notification: notificationState,
-                                    notificationFor: userType
+                                    notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')
                                 });
                                 setRoutineItem('Medicine')
                                 setItemName('')
@@ -581,7 +584,7 @@ const AddRoutine = props => {
                                     }
                                 ]);
                                 setNotificationState('Before 5 mins')
-                                setUserType('Me')
+                                // setUserType('Me')
                                 setRoutineFormLoading(false)
                                 setDisable(false)
                                 setMessage(response.data.message)
@@ -600,7 +603,7 @@ const AddRoutine = props => {
                                     eventEndTime.setSeconds(0)
                                     const event = {
                                         summary: `${itemName} ${unit}`,
-                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${userType}
+                                        description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${mealState}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
                                         `, 
                                         start: {
                                             dateTime: eventStartTime,
@@ -967,12 +970,43 @@ const AddRoutine = props => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="form-row my-4">
+                            <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}>
                                 <p className="font-weight-bold h4 pl-1" style={{color: '#857072'}}>Notification For</p>
                             </div>
-                            <div className="form-row my-4"> 
-                                <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
-                                <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>
+                            <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}> 
+                                <Form.Check
+                                    inline
+                                    label="Guardian"
+                                    type="checkbox"
+                                    id="guardian"
+                                    value="Guardian"
+                                    checked={guardianCheck ? "checked" : ""}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setGuardianCheck(true)
+                                        } else {
+                                            setGuardianCheck(false)
+                                        }
+                                    }}
+                                />
+                                <Form.Check
+                                    inline
+                                    label="Patient"
+                                    type="checkbox"
+                                    id="patient"
+                                    value="Patient"
+                                    required
+                                    checked={patientCheck ? "checked" : ""}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setPatientCheck(true)
+                                        } else {
+                                            setPatientCheck(false)
+                                        }
+                                    }}
+                                />
+                                {/* <input className="form-check-input" type="checkbox" name="userType" value='Guardian' id="guardian" checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="rform-check-label px-2 h5 mr-2" for="guardian">Guardian</label> */}
+                                {/* <input className="form-check-input" type="checkbox" name="userType" value='Patient' id="patient" checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""} required/><label className="radio-inline px-2 h5 mr-2" for="patient">Patient</label> */}
                             </div>
                             <div className="row mt-5">
 				                <div className="col-lg-4">
