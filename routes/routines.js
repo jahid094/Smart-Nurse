@@ -194,9 +194,7 @@ router.patch('/routine/:routineId' , async ( req , res) => {
         let statusDay = [];
         let statusTime = [];
         if(req.body.startDate && req.body.endDate && req.body.timesPerDay){
-            console.log('if')
             if(routine.timesPerDay == req.body.timesPerDay &&  moment(routine.endDate, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') + 1 ==  moment(req.body.endDate, "YYYY-MM-DD").diff( moment(req.body.startDate, "YYYY-MM-DD"), 'days') + 1){
-                console.log('if1')
                 updates.forEach((update) => routine[update] = req.body[update])
                 await routine.save()
                 return res.json({ 
@@ -204,9 +202,7 @@ router.patch('/routine/:routineId' , async ( req , res) => {
                 })
             } else {
                 if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') == 0){
-                    console.log('if3')
                 } else if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') > 0){
-                    console.log('if4')
                     // console.log('PreviousArray Length:'+routine.statusDay.length)
                     let newArray = routine.statusDay.splice(0, moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days'));
                     /* console.log('NewArray:')
@@ -239,7 +235,7 @@ router.patch('/routine/:routineId' , async ( req , res) => {
                     updates.forEach((update) => routine[update] = req.body[update])
                     routine.statusDay = statusDay
                     await routine.save()
-                    return res.json({ 
+                    return res.json({  
                         message: 'Routine updated successfully'
                     })
                 }

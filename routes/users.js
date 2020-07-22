@@ -348,48 +348,48 @@ User.find({}).then((user) =>{
     today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
     today = moment(today, "YYYY/MM/DD");
     var compareDateTime = moment(`${moment(today).format()} 23:59`, 'YYYY-MM-DD HH:mm').format()
-    console.log(element._id)
+    // console.log(element._id)
     // console.log((moment(moment(compareDateTime).format('YYYY-MM-DD HH:mm'))).isSame(moment(moment(new Date()).format('YYYY-MM-DD HH:mm'))))
     if(element.guardianList.length > 0 && element.patientList.length > 0){
-      console.log('If Start')
-      console.log(element._id)
+      // console.log('If Start')
+      // console.log(element._id)
       axios.get(process.env.BACKEND_URL+'routineNotification/'+element._id).then(function (response) {
-        console.log(element._id)
+        // console.log(element._id)
         if(response.data.routine){
-          console.log('Length:'+response.data.routine.length)
+          // console.log('Length:'+response.data.routine.length)
           if(response.data.routine.length > 3){
             if((moment(moment(compareDateTime).format('YYYY-MM-DD HH:mm'))).isSame(moment(moment(new Date()).format('YYYY-MM-DD HH:mm')))){
-              console.log('Email Sent '+element.guardianList[0].guardianEmail)
+              // console.log('Email Sent '+element.guardianList[0].guardianEmail)
               sendRoutineMissedEmail(element.guardianList[0].guardianEmail , response.data.routine, element.guardianList[0].guardianName, element.patientList[0].patientName)
             }
           }
         }
-        console.log(response.data);
+        // console.log(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       })
-      console.log('If End')
+      // console.log('If End')
     } else if(element.guardianList.length > 0){
-      console.log('If 2 Start')
-      console.log(element._id)
+      // console.log('If 2 Start')
+      // console.log(element._id)
       axios.get(process.env.BACKEND_URL+'routineNotification/'+element._id).then(function (response) {
-        console.log(element._id)
+        // console.log(element._id)
         if(response.data.routine){
-          console.log('Length:'+response.data.routine.length)
+          // console.log('Length:'+response.data.routine.length)
           if(response.data.routine.length > 3){
             if((moment(moment(compareDateTime).format('YYYY-MM-DD HH:mm'))).isSame(moment(moment(new Date()).format('YYYY-MM-DD HH:mm')))){
-              console.log('Email Sent '+element.guardianList[0].guardianEmail)
+              // console.log('Email Sent '+element.guardianList[0].guardianEmail)
               sendRoutineMissedEmail(element.guardianList[0].guardianEmail , response.data.routine, element.guardianList[0].guardianName, response.data.routine[0].notificationArray.owner[0].patient[0].patientName)
             }
           }
         }
-        console.log(response.data);
+        // console.log(response.data);
       }) 
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       })
-      console.log('If 2 End')
+      // console.log('If 2 End')
     }
   })
 })

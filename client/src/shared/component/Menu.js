@@ -78,6 +78,10 @@ const Menu = () => {
 
     useEffect(() => {
         const token = new Cookies().get('token')
+        if(ApiCalendar.sign){
+            console.log('Cookie Set')
+            cookies.set('googleSignIn', true, { path: '/', maxAge: 31536000 });
+        }
         if(token !== undefined){
             const verifyUser = async () => {
                 const response = await axios.get(process.env.REACT_APP_BACKEND_URL+'getUser/'+auth.userId);
@@ -121,6 +125,7 @@ const Menu = () => {
             const logoutFromGoogle = () => {
                 if(sign){
                     ApiCalendar.handleSignoutClick();
+                    cookies.set('googleSignIn', false, { path: '/', maxAge: 31536000 });
                 }
             }
             await logoutFromGoogle()

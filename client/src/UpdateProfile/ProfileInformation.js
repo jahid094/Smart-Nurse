@@ -111,6 +111,11 @@ const ProfileInformation = () => {
                     auth.userRole = 'Guardian/Patient'
                     setUserRole('Guardian/Patient')
                 }
+                if(response.data.user.guardianList.length === 0 && response.data.user.patientList.length === 0){
+                    setUserRole(null)
+                    setGuardianName(null)
+                    setPatientId(null)
+                }
                 setIsLoading(false)
                 setDisable(false)
                 cookies.set('userRole', auth.userRole, { path: '/', maxAge: 31536000 });

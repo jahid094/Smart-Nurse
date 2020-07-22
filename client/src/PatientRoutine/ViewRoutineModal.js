@@ -1,10 +1,13 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import DatePicker from 'react-date-picker'
 import {Modal, Button} from 'react-bootstrap'
+import Form from 'react-bootstrap/Form'
 import TimePicker from 'react-time-picker'
+import {AuthContext} from '../shared/context/auth-context'
 import './AddRoutine.css'
 
 const ViewRoutineModal = props => {
+    const auth = useContext(AuthContext)
     const [show, setShow] = useState(true)
     const [routineItem, setRoutineItem] = useState(props.rowInfo.routineItem)
     const [itemName, setItemName] = useState(props.rowInfo.itemName)
@@ -14,7 +17,9 @@ const ViewRoutineModal = props => {
     const [timesPerDay, setTimesPerDay] = useState(props.rowInfo.timesPerDay)
     const [beforeAfterMeal, setBeforeAfterMeal] = useState(props.rowInfo.beforeAfterMeal)
     const [notificationState, setNotificationState] = useState(props.rowInfo.notificationState)
-    const [userType, setUserType] = useState(props.rowInfo.userType)
+    // const [userType, setUserType] = useState(props.rowInfo.userType)
+    const [guardianCheck, setGuardianCheck] = useState(props.rowInfo.guardianCheck)
+    const [patientCheck, setPatientCheck] = useState(props.rowInfo.patientCheck)
 
     const handleClose = () => {
         setShow(false)
@@ -132,12 +137,45 @@ const ViewRoutineModal = props => {
                                     </div>
                                 </div>
                             </div>
-                                <div className="form-row my-4">
+                                <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}>
                                     <p className="font-weight-bold h4 pl-1" style={{color: '#857072'}}>Notification For</p>
                                 </div>
-                                <div className="form-row my-4"> 
-                                    <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
-                                    <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>
+                                <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}> 
+                                    <Form.Check
+                                        inline
+                                        label="Guardian"
+                                        type="checkbox"
+                                        id="guardian"
+                                        value="Guardian"
+                                        checked={guardianCheck ? "checked" : ""}
+                                        disabled
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setGuardianCheck(true)
+                                            } else {
+                                                setGuardianCheck(false)
+                                            }
+                                        }}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        label="Patient"
+                                        type="checkbox"
+                                        id="patient"
+                                        value="Patient"
+                                        required
+                                        checked={patientCheck ? "checked" : ""}
+                                        disabled
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setPatientCheck(true)
+                                            } else {
+                                                setPatientCheck(false)
+                                            }
+                                        }}
+                                    />
+                                    {/* <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
+                                    <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label> */}
                                 </div>
                             </form>
                         </div>

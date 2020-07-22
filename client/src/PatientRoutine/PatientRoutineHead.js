@@ -1,27 +1,38 @@
 import React, {useState, useEffect} from 'react';
 import './PatientRoutineHead.css'
+import {Cookies} from 'react-cookie';
 import ApiCalendar from './ApiCalendar'
 
 const PatientRoutineHead = () => {
     const [seconds, setSeconds] = useState(0);
     const [sign, setSign] = useState(ApiCalendar.sign)
+    const cookies = new Cookies()
     useEffect(() => {
         console.log(seconds)
-        if(seconds <= 2){
+        if(seconds <= 3){
             ApiCalendar.onLoad(() => {
                 ApiCalendar.listenSign(signUpdate());
             });
             if(seconds === 2){
                 const signStatus = async () => {
                     console.log(sign)
-                    if(!sign){
+                    // console.log(new Cookies().get('googleSignIn').localeCompare("false"))
+                    if(new Cookies().get('googleSignIn').localeCompare("false") === 0){
                         console.log('if')
                         console.log('Sign Status in if:'+ApiCalendar.sign)
                         await ApiCalendar.handleAuthClick();
+                        cookies.set('googleSignIn', ApiCalendar.sign, { path: '/', maxAge: 31536000 });
+                        console.log('Sign Status in if after:'+ApiCalendar.sign)
                     }
                 }
                 signStatus()
                 console.log('Sign Status outside if:'+ApiCalendar.sign)
+                cookies.set('googleSignIn', ApiCalendar.sign, { path: '/', maxAge: 31536000 });
+            }
+            if(seconds === 3){
+                if(ApiCalendar.sign){
+                    cookies.set('googleSignIn', true, { path: '/', maxAge: 31536000 });
+                }
             }
             const interval = setInterval(() => {
             setSeconds(seconds => seconds + 1);

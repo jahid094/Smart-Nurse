@@ -1,15 +1,18 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import axios from 'axios'
 import moment from 'moment'
 import DatePicker from 'react-date-picker';
+import Form from 'react-bootstrap/Form'
 import {Modal, Button} from 'react-bootstrap'
 import TimePicker from 'react-time-picker';
 import LoadingSpinner from '../shared/component/LoadingSpinner'
 import ErrorModal from '../shared/component/ErrorModal'
 import ApiCalendar from './ApiCalendar'
+import {AuthContext} from '../shared/context/auth-context'
 import './AddRoutine.css'
 
 const UpdateRoutineModal = props => {
+    const auth = useContext(AuthContext)
     const [show, setShow] = useState(true);
     const [routineItem, setRoutineItem] = useState(props.rowInfo.routineItem)
     const [itemName, setItemName] = useState(props.rowInfo.itemName)
@@ -36,10 +39,11 @@ const UpdateRoutineModal = props => {
         } 
     ]);
     const [notificationState, setNotificationState] = useState(props.rowInfo.notificationState)
-    const [userType, setUserType] = useState(props.rowInfo.userType)
     const [isLoading, setIsLoading] = useState(false)
     const [disable, setDisable] = useState(false)
     const [message, setMessage] = useState('')
+    const [guardianCheck, setGuardianCheck] = useState(props.rowInfo.guardianCheck)
+    const [patientCheck, setPatientCheck] = useState(props.rowInfo.patientCheck)
 
     const handleClose = () => {
         setShow(false)
@@ -110,117 +114,60 @@ const UpdateRoutineModal = props => {
                                 updateId.push(events[i].id)
                             }
                         }
-                        if(routineItem === 'Activity'){
-                            for (i = 0; i < timesPerDay; i++) {
-                                const eventStartTime = new Date(startingDate)
-                                let input = times[i].time
-                                fields = input.split(':');
-                                hour = fields[0];
-                                minute = fields[1];
-                                eventStartTime.setHours(hour)
-                                eventStartTime.setMinutes(minute)
-                                eventStartTime.setSeconds(0)
-                                const eventEndTime = new Date(endingDate)
-                                eventEndTime.setHours(hour)
-                                eventEndTime.setMinutes(minute)
-                                eventEndTime.setSeconds(0)
-                                const event = {
-                                    summary: `${itemName}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
-                                    `, 
-                                    start: {
-                                        dateTime: eventStartTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    end: {
-                                        dateTime: eventEndTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    reminders: {
-                                        useDefault: false,
-                                        overrides: [{
-                                            method: "popup",
-                                            minutes: notificationTime[1]
-                                          }
-                                        ]
-                                    },
-                                    colorId: 9
-                                }
-                                await ApiCalendar.updateEvent(event, updateId[i]).then((result) => {
-                                    setMessage('Your Event is updated successfully.')
-                                }).catch((error) => {
-                                    setMessage('Your Event is not updated successfully.')
-                                });
-                                const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
-                                    routineItem,
-                                    itemName,
-                                    unit,
-                                    startDate: startingDate,
-                                    endDate: endingDate,
-                                    timesPerDay: timesPerDay,
-                                    beforeAfterMeal,
-                                    times,
-                                    notification: notificationState,
-                                    notificationFor: userType 
-                                }); 
-                                setMessage(updateResponse.data.message)
+                        for (i = 0; i < timesPerDay; i++) {
+                            const eventStartTime = new Date(startingDate)
+                            let input = times[i].time
+                            fields = input.split(':');
+                            hour = fields[0];
+                            minute = fields[1];
+                            eventStartTime.setHours(hour)
+                            eventStartTime.setMinutes(minute)
+                            eventStartTime.setSeconds(0)
+                            const eventEndTime = new Date(endingDate)
+                            eventEndTime.setHours(hour)
+                            eventEndTime.setMinutes(minute)
+                            eventEndTime.setSeconds(0)
+                            const event = {
+                                summary: `${itemName}`,
+                                description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
+                                `, 
+                                start: {
+                                    dateTime: eventStartTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                end: {
+                                    dateTime: eventEndTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                reminders: {
+                                    useDefault: false,
+                                    overrides: [{
+                                        method: "popup",
+                                        minutes: notificationTime[1]
+                                      }
+                                    ]
+                                },
+                                colorId: 9
                             }
-                        } else {
-                            for (i = 0; i < timesPerDay; i++) {
-                                const eventStartTime = new Date(startingDate)
-                                let input = times[i].time
-                                fields = input.split(':');
-                                hour = fields[0];
-                                minute = fields[1];
-                                eventStartTime.setHours(hour)
-                                eventStartTime.setMinutes(minute)
-                                eventStartTime.setSeconds(0)
-                                const eventEndTime = new Date(endingDate)
-                                eventEndTime.setHours(hour)
-                                eventEndTime.setMinutes(minute)
-                                eventEndTime.setSeconds(0)
-                                const event = {
-                                    summary: `${itemName} ${unit}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
-                                    `, 
-                                    start: {
-                                        dateTime: moment(eventStartTime).format(),
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    end: {
-                                        dateTime: moment(eventEndTime).format(),
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    reminders: {
-                                        useDefault: false,
-                                        overrides: [{
-                                            method: "popup",
-                                            minutes: notificationTime[1]
-                                          }
-                                        ]
-                                    },
-                                    colorId: 9
-                                }
-                                await ApiCalendar.updateEvent(event, updateId[i]).then((result) => {
-                                    setMessage('Your Event is updated successfully.')
-                                }).catch((error) => {
-                                    setMessage('Your Event is not updated successfully.')
-                                });
-                                const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
-                                    routineItem,
-                                    itemName,
-                                    unit,
-                                    startDate: startingDate,
-                                    endDate: endingDate,
-                                    timesPerDay: timesPerDay,
-                                    beforeAfterMeal,
-                                    times,
-                                    notification: notificationState,
-                                    notificationFor: userType 
-                                }); 
-                                setMessage(updateResponse.data.message)
-                            }   
+                            await ApiCalendar.updateEvent(event, updateId[i]).then((result) => {
+                                setMessage('Your Event is updated successfully.')
+                            }).catch((error) => {
+                                setMessage('Your Event is not updated successfully.')
+                            });
                         }
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit: routineItem === 'Activity' ? null : unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')
+                        }); 
+                        setMessage(updateResponse.data.message)
                     } else {
                         let i
                         let eventMinTime = []
@@ -266,115 +213,59 @@ const UpdateRoutineModal = props => {
                         for (i = 0; i < deleteId.length; i++) {
                             ApiCalendar.deleteEvent(deleteId[i]).then(({result}) => {});
                         }
-                        if(routineItem === 'Activity'){
-                            for (i = 0; i < timesPerDay; i++) {
-                                const eventStartTime = new Date(startingDate)
-                                let input = times[i].time
-                                fields = input.split(':');
-                                hour = fields[0];
-                                minute = fields[1];
-                                eventStartTime.setHours(hour)
-                                eventStartTime.setMinutes(minute)
-                                eventStartTime.setSeconds(0)
-                                const eventEndTime = new Date(endingDate)
-                                eventEndTime.setHours(hour)
-                                eventEndTime.setMinutes(minute)
-                                eventEndTime.setSeconds(0)
-                                const event = {
-                                    summary: `${itemName}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
-                                    `, 
-                                    start: {
-                                        dateTime: eventStartTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    end: {
-                                        dateTime: eventEndTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    reminders: {
-                                        useDefault: false,
-                                        overrides: [{
-                                            method: "popup",
-                                            minutes: notificationTime[1]
-                                          }
-                                        ]
-                                    },
-                                    colorId: 9
-                                }
-                                await ApiCalendar.createEvent(event).then((result) => {
-                                }).catch((error) => {
-                                    setMessage('Your Event is not updated successfully.')
-                                });
-                                const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
-                                    routineItem,
-                                    itemName,
-                                    unit,
-                                    startDate: startingDate,
-                                    endDate: endingDate,
-                                    timesPerDay: timesPerDay,
-                                    beforeAfterMeal,
-                                    times,
-                                    notification: notificationState,
-                                    notificationFor: userType 
-                                }); 
-                                setMessage(updateResponse.data.message)
+                        for (i = 0; i < timesPerDay; i++) {
+                            const eventStartTime = new Date(startingDate)
+                            let input = times[i].time
+                            fields = input.split(':');
+                            hour = fields[0];
+                            minute = fields[1];
+                            eventStartTime.setHours(hour)
+                            eventStartTime.setMinutes(minute)
+                            eventStartTime.setSeconds(0)
+                            const eventEndTime = new Date(endingDate)
+                            eventEndTime.setHours(hour)
+                            eventEndTime.setMinutes(minute)
+                            eventEndTime.setSeconds(0)
+                            const event = {
+                                summary: `${itemName} ${unit}`,
+                                description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${(guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient')}
+                                `, 
+                                start: {
+                                    dateTime: eventStartTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                end: {
+                                    dateTime: eventEndTime,
+                                    timeZone: 'Asia/Dhaka'
+                                },
+                                reminders: {
+                                    useDefault: false,
+                                    overrides: [{
+                                        method: "popup",
+                                        minutes: notificationTime[1]
+                                      }
+                                    ]
+                                },
+                                colorId: 9
                             }
-                        } else {
-                            for (i = 0; i < timesPerDay; i++) {
-                                const eventStartTime = new Date(startingDate)
-                                let input = times[i].time
-                                fields = input.split(':');
-                                hour = fields[0];
-                                minute = fields[1];
-                                eventStartTime.setHours(hour)
-                                eventStartTime.setMinutes(minute)
-                                eventStartTime.setSeconds(0)
-                                const eventEndTime = new Date(endingDate)
-                                eventEndTime.setHours(hour)
-                                eventEndTime.setMinutes(minute)
-                                eventEndTime.setSeconds(0)
-                                const event = {
-                                    summary: `${itemName} ${unit}`,
-                                    description: `Routine Item: ${routineItem}\nItem Name: ${itemName}\nTimes Per Day: ${timesPerDay}\n${beforeAfterMeal}\nNotification For: ${userType}
-                                    `, 
-                                    start: {
-                                        dateTime: eventStartTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    end: {
-                                        dateTime: eventEndTime,
-                                        timeZone: 'Asia/Dhaka'
-                                    },
-                                    reminders: {
-                                        useDefault: false,
-                                        overrides: [{
-                                            method: "popup",
-                                            minutes: notificationTime[1]
-                                          }
-                                        ]
-                                    },
-                                    colorId: 9
-                                }
-                                await ApiCalendar.createEvent(event).then((result) => {
-                                }).catch((error) => {
-                                    setMessage('Your Event is not updated successfully.')
-                                });
-                                const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
-                                    routineItem,
-                                    itemName,
-                                    unit,
-                                    startDate: startingDate,
-                                    endDate: endingDate,
-                                    timesPerDay: timesPerDay,
-                                    beforeAfterMeal,
-                                    times,
-                                    notification: notificationState,
-                                    notificationFor: userType 
-                                }); 
-                                setMessage(updateResponse.data.message)
-                            }
+                            await ApiCalendar.createEvent(event).then((result) => {
+                            }).catch((error) => {
+                                setMessage('Your Event is not updated successfully.')
+                            });
                         }
+                        const updateResponse = await axios.patch(process.env.REACT_APP_BACKEND_URL+'routine/'+props.rowInfo.id, {
+                            routineItem,
+                            itemName,
+                            unit: routineItem === 'Activity' ? null : unit,
+                            startDate: startingDate,
+                            endDate: endingDate,
+                            timesPerDay: timesPerDay,
+                            beforeAfterMeal,
+                            times,
+                            notification: notificationState,
+                            notificationFor: (guardianCheck && patientCheck ? 'Guradian&Patient' : 'Patient') 
+                        }); 
+                        setMessage(updateResponse.data.message)
                     }
                     setIsLoading(false)
                     setDisable(false)
@@ -423,8 +314,6 @@ const UpdateRoutineModal = props => {
         <Modal.Header style={{backgroundColor: '#0C0C52'}}>
             <Modal.Title style={{color: 'white'}}>Update Routine</Modal.Title>
         </Modal.Header>
-        {/* {time3 && console.log(time3)} */}
-        {/* {!time3 && console.log('time3')} */}
         <Modal.Body>
             {message && <ErrorModal message={message} onClear={messageHandler.bind(this)}/>}
             <div className="container-fluid bg-white">
@@ -501,12 +390,6 @@ const UpdateRoutineModal = props => {
                                                     onChange={(inputTime) => 
                                                         handleTimeChange(inputTime, k)
                                                     }    
-                                                    /* onChange={(inputTime) => {
-                                                        eval('setTime'+(k+1))(inputTime)
-                                                    }} */
-                                                    // value={eval('time'+(k+1))} 
-                                                    // value={props.rowInfo.times[k].time || timeList[k].time}
-                                                    // value={timeValueHandler(k)}
                                                     value={timeList[k].time}
                                                 />
                                             </div>
@@ -524,12 +407,43 @@ const UpdateRoutineModal = props => {
                                     </div>
                                 </div>
                             </div>
-                                <div className="form-row my-4">
+                                <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}>
                                     <p className="font-weight-bold h4 pl-1" style={{color: '#857072'}}>Notification For</p>
                                 </div>
-                                <div className="form-row my-4"> 
-                                    <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
-                                    <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label>
+                                <div className={"form-row my-4 "+(auth.userRole === 'Guardian/Patient' ? 'd-none' : '')}>
+                                    <Form.Check
+                                        inline
+                                        label="Guardian"
+                                        type="checkbox"
+                                        id="guardian"
+                                        value="Guardian"
+                                        checked={guardianCheck ? "checked" : ""}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setGuardianCheck(true)
+                                            } else {
+                                                setGuardianCheck(false)
+                                            }
+                                        }}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        label="Patient"
+                                        type="checkbox"
+                                        id="patient"
+                                        value="Patient"
+                                        required
+                                        checked={patientCheck ? "checked" : ""}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setPatientCheck(true)
+                                            } else {
+                                                setPatientCheck(false)
+                                            }
+                                        }}
+                                    />
+                                    {/* <input type="radio" name="userType" value='Me' checked={userType === 'Me'} onChange={(e) => setUserType('Me')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Me</label>
+                                    <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline px-2 h5 mr-2 mt-n2">Guardian</label> */}
                                 </div>
                                 <div className="row mt-5">
                                     <div className="col-lg-4">

@@ -351,7 +351,8 @@ const MyRoutine = props => {
             console.log(timeList)
             let unit = row.unit
             let notificationState = row.notification
-            let userType = row.notificationFor
+            let guardianCheck = (row.notificationFor === 'Guradian&Patient' ? true : false)
+            let patientCheck = true
             if(row.times[timesPerDay-1]){
                 console.log("if")
                 const setRowInfoFunction = async () => {
@@ -371,7 +372,8 @@ const MyRoutine = props => {
                         time5, */
                         unit,
                         notificationState,
-                        userType
+                        guardianCheck,
+                        patientCheck
                     })
                 }
                 setRowInfoFunction()
