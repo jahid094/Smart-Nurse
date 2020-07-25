@@ -15,7 +15,7 @@ const RegisterBox = props => {
     const [phone, setPhone] = useState('')
     const [height, setHeight] = useState('')
     const [weight, setWeight] = useState('')
-    const [userType, setUserType] = useState('Patient')
+    const [userType, setUserType] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [success, setSuccess] = useState()
     const [error, setError] = useState()
@@ -52,7 +52,7 @@ const RegisterBox = props => {
             setPhone('')
             setHeight('')
             setWeight('')
-            setUserType('Patient')
+            setUserType('')
         } catch (error) {
             const map = error.response.data.message.errors
             const result = Object.values(map)
@@ -113,10 +113,10 @@ const RegisterBox = props => {
                         <input type="text" className="form-control text-left" placeholder="Weight" name="weight" value={weight} required onChange={(e) => setWeight(e.target.value)} disabled = {(disable)? "disabled" : ""}/>
                     </div>
                 </div>            
-                <div className="form-row justify-content-center">
+                {/* <div className="form-row justify-content-center">
                     <input type="radio" name="userType" value='Patient' checked={userType === 'Patient'} onChange={(e) => setUserType('Patient')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline radio_button">Patient</label>
                     <input type="radio" name="userType" value='Guardian' checked={userType === 'Guardian'} onChange={(e) => setUserType('Guardian')} disabled = {(disable)? "disabled" : ""}/><label className="radio-inline radio_button">Guardian</label>
-                </div>
+                </div> */}
                 <div className="row">
                     <div className="col-6 offset-3">
                     <button type="submit" className="btn-block btn text-white mt-3 p-2 justify-content-center" style={{borderRadius: '1em', backgroundColor: '#0C0C52', fontSize: '20px'}} disabled = {(disable)? "disabled" : ""}>SIGN UP</button>

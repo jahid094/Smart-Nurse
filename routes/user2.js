@@ -55,7 +55,7 @@ router.post("/users/patientRegister", async (req, res) => {
         { firstname, lastname, email },
         process.env.JWT_SECRET
       );
-      newUser.userType = "patient";
+      newUser.userType = "Patient";
       newUser.conformationToken = Token;
       newUser.conformationExpires = Date.now() + 3600000;
 
@@ -106,6 +106,7 @@ router.post("/conformation/request/:token", (req, res) => {
                       patientName: user.firstname+' '+user.lastname,
                       patientEmail: user.email
                     }]
+                    guardian.userType = 'Guardian'
                     await guardian.save();
                     await user.save();
                     return res.status(200).json({

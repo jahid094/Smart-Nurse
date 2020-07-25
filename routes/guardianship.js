@@ -128,7 +128,9 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
   });
   if (gurdian) {
     user.patientList.push({patientId: owner, patientName: guardianUser.firstname+' '+guardianUser.lastname, patientEmail: guardianUser.email})
+    user.userType = 'Guardian'
     guardianUser.guardianList.push({guardianId: req.body.requester, guardianName: user.firstname+' '+user.lastname, guardianEmail: user.email})
+    guardianUser.userType = 'Patient'
     gurdian.recipients[0].status = true;
     await user.save();
     await guardianUser.save();
@@ -191,6 +193,16 @@ router.patch("/users/cancelRequest/:id", async (req, res) => {
           }); 
         }
     });
+    const user = await User.findOne({
+      _id: owner
+    });
+    user.userType = ''
+    await user.save();
+    const patient = await User.findOne({
+      _id: req.body.patientId
+    });
+    patient.userType = ''
+    await patient.save();
     await User.findByIdAndUpdate(
       req.body.patientId, { $pull: { "guardianList": { guardianId: owner } } },{ "multi": true },
       function(err) {
@@ -253,6 +265,7 @@ router.patch("/addPatientMyself/:id", async (req, res) => {
   }
   user.guardianList.push({guardianId: req.params.id, guardianName: user.firstname+' '+user.lastname, guardianEmail: user.email})
   user.patientList.push({patientId: req.params.id, patientName: user.firstname+' '+user.lastname, patientEmail: user.email})
+  user.userType = 'Guardian/Patient'
   await user.save();
   
   return res.status(200).json({
@@ -269,6 +282,7 @@ router.patch("/removePatientMyself/:id", async (req, res) => {
   if(user.guardianList[0].guardianId.equals(req.params.id) && user.patientList[0].patientId.equals(req.params.id)){
     user.guardianList = []
     user.patientList = []
+    user.userType = ''
     const routine = await Routine.find({"owner.guardian.guardianId": req.params.id, "owner.patient.patientId": req.params.id})
     let routineId = []
     routine.forEach(function(item) {
