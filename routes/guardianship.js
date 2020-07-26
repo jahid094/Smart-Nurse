@@ -11,13 +11,18 @@ router.post("/users/sendRequest/:id", async (req, res) => {
   
   owner = req.params.id;
   const ownerNameFind = await User.findOne({ _id: owner });
+  if(ownerNameFind.guardianList.length > 0 && ownerNameFind.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already Your Patient'
+    })
+  }
   if(ownerNameFind.guardianList.length > 0){
     return res.status(404).json({
-      message: 'You have already a guardian'
+      message: 'You are already a Patient. Remove that relationship'
     })
   } if(ownerNameFind.patientList.length > 0){
     return res.status(404).json({
-      message: 'You are already a patient of a user.'
+      message: 'You are already a Guardian. Remove that relationship'
     })
   } if (ownerNameFind) {
     ownerName = ownerNameFind.firstname + " " + ownerNameFind.lastname;
@@ -38,6 +43,10 @@ router.post("/users/sendRequest/:id", async (req, res) => {
   const previouspatientCheck = await Guardianship.findOne({
     "recipients.id": req.body.recipients[0].id,
     "recipients.status": true
+  });
+
+  const previousGuardianCheck = await User.findOne({
+    _id: req.body.recipients[0].id
   });
 
   const guardianExist = await Guardianship.findOne({
@@ -63,19 +72,31 @@ router.post("/users/sendRequest/:id", async (req, res) => {
 
   try {
     if (patientExist) {
-      return res.status(200).json({
+      return res.status(404).json({
         message: "You are already guardian of that user."
       });
     } else if (previouspatientCheck) {
-      return res.status(200).json({
+      return res.status(404).json({
         message: "This user has a guardian. So You can't send request to become his guardian."
       });
-    } else if (guardianExist) {
-      return res.status(200).json({
+    } else if(previousGuardianCheck.guardianList.length > 0 && previousGuardianCheck.patientList.length > 0){
+      return res.status(404).json({
+        message: "This user has already Patient.So You can't send request to become his guardian."
+      })
+    } else if(previousGuardianCheck.guardianList.length > 0){
+      return res.status(404).json({
+        message: 'This user has already Guardian'
+      })
+    } else if(previousGuardianCheck.patientList.length > 0){
+      return res.status(404).json({
+        message: "This user has already Patient.So You can't send request to become his guardian."
+      })
+    }else if (guardianExist) {
+      return res.status(404).json({
         message: "You are already patient of that user."
       });
     } else if (myStatusCheck) {
-      return res.status(200).json({
+      return res.status(404).json({
         message: "You are already patient of a user. So You can't send request to anyone to become his guardian."
       });
     } else if (requestExist) {
@@ -111,13 +132,17 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
     _id: owner
   });
 
-  if(guardianUser.guardianList.length > 0){
+  if(guardianUser.guardianList.length > 0 && guardianUser.patientList.length > 0){
     return res.status(404).json({
-      message: 'You have already a guardian'
+      message: 'You are already Your Patient.'
+    })
+  } else if(guardianUser.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a Patient. Remove that relationship'
     })
   } else if(guardianUser.patientList.length > 0){
     return res.status(404).json({
-      message: 'You are already a patient of a user.'
+      message: 'You are already a Guardian. Remove that relationship'
     })
   }
 
