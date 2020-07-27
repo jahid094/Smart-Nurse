@@ -278,14 +278,19 @@ router.patch("/addPatientMyself/:id", async (req, res) => {
   const user = await User.findOne({
     _id: req.params.id
   });
-  if(user.guardianList.length > 0){
+  if(user.guardianList.length > 0 && user.patientList.length > 0){
     return res.status(404).json({
-      message: 'You already have a guradian.'
+      message: 'You are already Your Patient'
+    })
+  }
+  else if(user.guardianList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a Patient. Remove that relationship'
     })
   }
   if(user.patientList.length > 0){
     return res.status(404).json({
-      message: 'You are already a patient of a user.'
+      message: 'You are already a Guardian. Remove that relationship'
     })
   }
   user.guardianList.push({guardianId: req.params.id, guardianName: user.firstname+' '+user.lastname, guardianEmail: user.email})
