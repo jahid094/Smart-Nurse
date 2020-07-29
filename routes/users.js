@@ -7,6 +7,8 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken')
 const async = require('async');
 const User = require('../models/User');
+const Routine = require('../models/Routine');
+const Guardianship = require("../models/Guardianship");
 const { sendWelcomeEmail , sendCancelationEmail, sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
 const axios = require('axios');
 
@@ -486,6 +488,47 @@ router.patch('/users/me/:id',  async ( req , res) => {
   {
     User.findOne({_id: userId}).then((user) =>{
       updates.forEach((update) => user[update] = req.body[update])
+      let routine
+      if(user.guardianList.length > 0 && user.patientList.length > 0){
+          routine = Routine.find({"owner.guardian.guardianId": userId, "owner.patient.patientId": userId}).then((routine) => {
+            routine.forEach((item) => {
+              item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname
+              item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
+              item.save()
+            })
+          })
+          user.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
+          user.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
+      } else if(user.guardianList.length === 0 && user.patientList.length === 0){
+        Guardianship.find({requester: userId}).then((requester) => {
+          requester.forEach((item) => {
+            item.requesterName = req.body.firstname+' '+req.body.lastname
+            item.save()
+          })
+        });
+      } else if(user.guardianList.length > 0){
+        User.findOne({_id: user.guardianList[0].guardianId}).then((guardian) =>{
+          guardian.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
+          guardian.save()
+        })
+        routine = Routine.find({"owner.patient.patientId": userId}).then((routine) => {
+          routine.forEach((item) => {
+            item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
+            item.save()
+          })
+        })
+      } else if(user.patientList.length > 0){
+        User.findOne({_id: user.patientList[0].patientId}).then((patient) =>{
+          patient.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
+          patient.save()
+        })
+        routine = Routine.find({"owner.guardian.guardianId": userId}).then((routine) => {
+          routine.forEach((item) => {
+            item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname
+            item.save()
+          })
+        })
+      }
       user.save().then(() => {
         return res.status(200).json({
           message: 'Successfully updated'
@@ -522,6 +565,47 @@ router.patch('/users/me/:id',  async ( req , res) => {
                 try{
                     updates.forEach((update) => user[update] = req.body[update])
                     user.password = hash;
+                    let routine
+                    if(user.guardianList.length > 0 && user.patientList.length > 0){
+                        routine = Routine.find({"owner.guardian.guardianId": userId, "owner.patient.patientId": userId}).then((routine) => {
+                          routine.forEach((item) => {
+                            item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname
+                            item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
+                            item.save()
+                          })
+                        })
+                        user.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
+                        user.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
+                    } else if(user.guardianList.length === 0 && user.patientList.length === 0){
+                      Guardianship.find({requester: userId}).then((requester) => {
+                        requester.forEach((item) => {
+                          item.requesterName = req.body.firstname+' '+req.body.lastname
+                          item.save()
+                        })
+                      });
+                    } else if(user.guardianList.length > 0){
+                      User.findOne({_id: user.guardianList[0].guardianId}).then((guardian) =>{
+                        guardian.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
+                        guardian.save()
+                      })
+                      routine = Routine.find({"owner.patient.patientId": userId}).then((routine) => {
+                        routine.forEach((item) => {
+                          item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
+                          item.save()
+                        })
+                      })
+                    } else if(user.patientList.length > 0){
+                      User.findOne({_id: user.patientList[0].patientId}).then((patient) =>{
+                        patient.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
+                        patient.save()
+                      })
+                      routine = Routine.find({"owner.guardian.guardianId": userId}).then((routine) => {
+                        routine.forEach((item) => {
+                          item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname
+                          item.save()
+                        })
+                      })
+                    }
                     await user.save()
                     return res.status(200).json({
                       message: 'Profile updated successfully.'
