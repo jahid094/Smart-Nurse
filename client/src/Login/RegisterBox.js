@@ -55,10 +55,19 @@ const RegisterBox = props => {
             setUserType('')
         } catch (error) {
             const map = error.response.data.message.errors
-            const result = Object.values(map)
-            setIsLoading(false)
-            setDisable(false)
-            setError(result[0].message || 'Something went wrong, please try again.')
+            console.log(error.response.data)
+            if(map){
+                const result = Object.values(map)
+                setIsLoading(false)
+                setDisable(false)
+                console.log(result[0].message)
+                setError(result[0].message || 'Something went wrong, please try again.')
+            } else {
+                setIsLoading(false)
+                setDisable(false)
+                console.log(error.response.data.message)
+                setError(error.response.data.message || 'Something went wrong, please try again.')
+            }
         }
     }
 

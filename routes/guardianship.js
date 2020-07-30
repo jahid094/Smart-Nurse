@@ -15,16 +15,16 @@ router.post("/users/sendRequest/:id", async (req, res) => {
     return res.status(404).json({
       message: 'You are already Your Patient'
     })
-  }
-  if(ownerNameFind.guardianList.length > 0){
+  } else if(ownerNameFind.guardianList.length > 0){
     return res.status(404).json({
       message: 'You are already a Patient. Remove that relationship'
     })
-  } if(ownerNameFind.patientList.length > 0){
+  } else if(ownerNameFind.patientList.length > 0){
     return res.status(404).json({
       message: 'You are already a Guardian. Remove that relationship'
     })
-  } if (ownerNameFind) {
+  } 
+  if (ownerNameFind) {
     ownerName = ownerNameFind.firstname + " " + ownerNameFind.lastname;
   }
 
@@ -143,6 +143,20 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
   } else if(guardianUser.patientList.length > 0){
     return res.status(404).json({
       message: 'You are already a Guardian. Remove that relationship'
+    })
+  }
+
+  if(user.guardianList.length > 0 && user.patientList.length > 0){
+    return res.status(404).json({
+      message: user.firstname+' '+user.lastname+' is already Patient of '+(user.gender === 'Male' ? 'himself' : 'herself')
+    })
+  } else if(user.guardianList.length > 0){
+    return res.status(404).json({
+      message: user.firstname+' '+user.lastname+' is already Patient of Someone. Please tell '+ user.firstname+' '+user.lastname+' to remove that relationship.'
+    })
+  } else if(user.patientList.length > 0){
+    return res.status(404).json({
+      message: user.firstname+' '+user.lastname+' is already Guardian of Someone. Please tell '+ user.firstname+' '+user.lastname+' to remove that relationship.'
     })
   }
 
@@ -335,13 +349,17 @@ router.get("/checkGuardianAndPatient/:id", async (req, res) => {
   const user = await User.findOne({
     _id: req.params.id
   });
-  if(user.guardianList.length > 0){
+  if(user.guardianList.length > 0 && user.patientList.length > 0){
     return res.status(404).json({
-      message: 'You have already a guardian'
+      message: 'You are already Your Patient'
     })
-  } if(user.patientList.length > 0){
+  } else if(user.guardianList.length > 0){
     return res.status(404).json({
-      message: 'You are already a patient of a user.'
+      message: 'You are already a Patient. Remove that relationship'
+    })
+  } else if(user.patientList.length > 0){
+    return res.status(404).json({
+      message: 'You are already a Guardian. Remove that relationship'
     })
   } else {
     return res.status(200).json({

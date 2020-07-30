@@ -9,9 +9,8 @@ const async = require('async');
 const User = require('../models/User');
 const Routine = require('../models/Routine');
 const Guardianship = require("../models/Guardianship");
-const { sendWelcomeEmail , sendCancelationEmail, sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
+const { sendWelcomeEmail , sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
 const axios = require('axios');
-
 const multer = require('multer')
 const upload = multer({
   limits: {
@@ -53,6 +52,12 @@ router.post('/register', (req, res) => {
       message: 'Passwords do not match'
     }) 
   }
+  
+  if(password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/) === null){
+    return res.status(400).json({
+      message: 'Password must have at least one uppercase, one lower case and one special character'
+    })
+  }
 
   User.findOne({ email: email }).then(user => {
     if (user) {
@@ -63,8 +68,8 @@ router.post('/register', (req, res) => {
       newUser = new User({firstname, lastname, gender, age, email, password, phone, height, weight, userType})
 
       const Token = jwt.sign({ firstname , lastname , email } , process.env.JWT_SECRET)
-      newUser.conformationToken = Token
-      newUser.conformationExpires = Date.now() + 3600000
+      newUser.confirmationToken = Token
+      newUser.confirmationExpires = Date.now() + 3600000
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, async (err, hash) => {
@@ -96,7 +101,6 @@ router.post('/login', (req, res, next) => {
   passport.authenticate('local' ,(err, user, info) => {
     const {email, password} = req.body
     if (err) { 
-      // return next(err);
       return res.status(400).json({
         message: err
       })
@@ -106,13 +110,13 @@ router.post('/login', (req, res, next) => {
         message: 'Invalid credentials, could not log you in'
       })
     }
-    if(user.varify !== true){
+    if(user.verify !== true){
       return res.status(400).json({
         message: 'Please verify your email to login.'
       })
     }
     let isValidPassword = false
-    if(user.varify === true){
+    if(user.verify === true){
       isValidPassword =  bcrypt.compare(password, user.password).then(() => {
         isValidPassword = true
       }).catch((error) => {
@@ -129,13 +133,8 @@ router.post('/login', (req, res, next) => {
 
           }) 
         }
-        // console.log(user._id)
-        // userId  = user._id
         const Token = jwt.sign({ firstname: user.firstname , lastname:user.lastname , email:user.email } , process.env.JWT_SECRET)
         user.cookieToken = Token
-        //const user = User.findOne({email: req.body.email})
-        //userId  = user._id
-        //console.log(user._id)
         user.save()
         return res.status(200).json({
           user,
@@ -271,6 +270,11 @@ router.post('/reset/:token', function(req, res) {
           })
         }
         if(password === confirm) {
+          if(password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/) === null){
+            return res.status(400).json({
+              message: 'Password must have at least one uppercase, one lower case and one special character'
+            })
+          }
           bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, async (err, hash) => {
               if (err) throw err;
@@ -333,9 +337,9 @@ router.get('/reset/:token', function(req, res) {
   });
 })
 
-User.find({varify: false }).then((user) =>{
+User.find({verify: false }).then((user) =>{
   user.forEach((element) => {
-    var expire = moment(new Date()).isSameOrBefore(element.conformationExpires)
+    var expire = moment(new Date()).isSameOrBefore(element.confirmationExpires)
     if(!expire){
       User.deleteOne(element).then((user) =>{}).catch((e) =>{
         console.log(e)
@@ -399,15 +403,15 @@ User.find({}).then((user) =>{
 //Registration Verify
 router.get('/conformation/:token', (req, res) => {
   User.findOne({ 
-    conformationToken: req.params.token, 
-    conformationExpires: { $gt: Date.now() } 
+    confirmationToken: req.params.token, 
+    confirmationExpires: { $gt: Date.now() } 
   }, (err, user) => {
     if (!user) {
       return res.status(400).json({
         message: 'This link has been expired , Please register again !'
       })
     }
-    user.varify=true
+    user.verify=true
     user.save()
     return res.status(200).json({
       message: 'You are verified , Now you can login!'
@@ -497,6 +501,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
               item.save()
             })
           })
+          Guardianship.find({requester: userId}).then((requester) => {
+            requester.forEach((item) => {
+              item.requesterName = req.body.firstname+' '+req.body.lastname
+              item.save()
+            })
+          });
           user.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
           user.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
       } else if(user.guardianList.length === 0 && user.patientList.length === 0){
@@ -511,6 +521,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
           guardian.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
           guardian.save()
         })
+        Guardianship.find({requester: userId}).then((requester) => {
+          requester.forEach((item) => {
+            item.requesterName = req.body.firstname+' '+req.body.lastname
+            item.save()
+          })
+        });
         routine = Routine.find({"owner.patient.patientId": userId}).then((routine) => {
           routine.forEach((item) => {
             item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
@@ -522,6 +538,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
           patient.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
           patient.save()
         })
+        Guardianship.find({requester: userId}).then((requester) => {
+          requester.forEach((item) => {
+            item.requesterName = req.body.firstname+' '+req.body.lastname
+            item.save()
+          })
+        });
         routine = Routine.find({"owner.guardian.guardianId": userId}).then((routine) => {
           routine.forEach((item) => {
             item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname
@@ -556,6 +578,11 @@ router.patch('/users/me/:id',  async ( req , res) => {
         } 
         if (data) {
           if(newPassword === confirmPassword) {
+            if(newPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/) === null){
+              return res.status(400).json({
+                message: 'Password must have at least one uppercase, one lower case and one special character'
+              })
+            }
             bcrypt.genSalt(10, (err, salt) => {
               bcrypt.hash(newPassword, salt, async (err, hash) => {
                 if (err){
@@ -574,6 +601,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
                             item.save()
                           })
                         })
+                        Guardianship.find({requester: userId}).then((requester) => {
+                          requester.forEach((item) => {
+                            item.requesterName = req.body.firstname+' '+req.body.lastname
+                            item.save()
+                          })
+                        });
                         user.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
                         user.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
                     } else if(user.guardianList.length === 0 && user.patientList.length === 0){
@@ -588,6 +621,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
                         guardian.patientList[0].patientName = req.body.firstname+' '+req.body.lastname
                         guardian.save()
                       })
+                      Guardianship.find({requester: userId}).then((requester) => {
+                        requester.forEach((item) => {
+                          item.requesterName = req.body.firstname+' '+req.body.lastname
+                          item.save()
+                        })
+                      });
                       routine = Routine.find({"owner.patient.patientId": userId}).then((routine) => {
                         routine.forEach((item) => {
                           item.owner[0].patient[0].patientName = req.body.firstname+' '+req.body.lastname
@@ -599,6 +638,12 @@ router.patch('/users/me/:id',  async ( req , res) => {
                         patient.guardianList[0].guardianName = req.body.firstname+' '+req.body.lastname
                         patient.save()
                       })
+                      Guardianship.find({requester: userId}).then((requester) => {
+                        requester.forEach((item) => {
+                          item.requesterName = req.body.firstname+' '+req.body.lastname
+                          item.save()
+                        })
+                      });
                       routine = Routine.find({"owner.guardian.guardianId": userId}).then((routine) => {
                         routine.forEach((item) => {
                           item.owner[0].guardian[0].guardianName = req.body.firstname+' '+req.body.lastname

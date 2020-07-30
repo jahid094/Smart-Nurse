@@ -25,11 +25,7 @@ const UserSchema = new mongoose.Schema({
   gender: {
     type: String,
     required: true,
-    validate(value){
-      if(!validator.isAlphanumeric(value)){
-        throw new Error('Gender should not be Alphanumeric')
-      }
-    }
+    enum: {values: ['Male', 'Female'], message: 'Gender must be Male or Female.'}
   },
   age: {
     type: String,
@@ -55,17 +51,17 @@ const UserSchema = new mongoose.Schema({
           throw new Error('Email is invalid')
         }
       }
-    },
+  },
   password: {
     type: String,
     trim: true,
-    minlength: 6,
+    minlength: 8,
     validate(value){
         if(value.toLowerCase().includes('password')){
           throw new Error('Password can not contain "password"')
         }
       }
-    },
+  },
   phone: {
     type: String,
     trim: true,
@@ -73,6 +69,8 @@ const UserSchema = new mongoose.Schema({
     validate(value){
       if(!validator.isNumeric(value)){
         throw new Error('Please enter valid number')
+      } else if(value.length !== 11){
+        throw new Error('Phone number must be 11 digit.')
       }
    }
   },
@@ -103,23 +101,18 @@ const UserSchema = new mongoose.Schema({
   userType: {
     type: String
   },
-
-  varify: {
+  verify: {
     type: Boolean,
     default: false 
   },
-  conformationToken: {
+  confirmationToken: {
     type: String
   },
-  conformationExpires: {
+  confirmationExpires: {
     type: Date
   },
   cookieToken: {
     type: String
-  },
-  date: {
-    type: Date,
-    default: Date.now
   },
   resetPasswordToken: {
     type: String
@@ -159,14 +152,14 @@ const UserSchema = new mongoose.Schema({
 UserSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
-  delete userObject.conformationToken
-  delete userObject.conformationExpires
+  delete userObject.confirmationToken
+  delete userObject.confirmationExpires
   delete userObject.resetPasswordExpires
   delete userObject.resetPasswordToken
   delete userObject.cookieToken
   delete userObject.profilePicture
   delete userObject.date
-  delete userObject.varify
+  delete userObject.verify
   delete userObject.password
   delete userObject.__v
   return userObject

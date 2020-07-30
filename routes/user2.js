@@ -56,8 +56,8 @@ router.post("/users/patientRegister", async (req, res) => {
         process.env.JWT_SECRET
       );
       newUser.userType = "Patient";
-      newUser.conformationToken = Token;
-      newUser.conformationExpires = Date.now() + 3600000;
+      newUser.confirmationToken = Token;
+      newUser.confirmationExpires = Date.now() + 3600000;
 
       try {
         newUser.save();
@@ -82,8 +82,8 @@ router.post("/conformation/request/:token", (req, res) => {
     [
       function (done) {
         User.findOne({
-            conformationToken: req.params.token,
-            conformationExpires: { $gt: Date.now() }
+            confirmationToken: req.params.token,
+            confirmationExpires: { $gt: Date.now() }
           },
           (err, user) => {
             if (!user) {
@@ -91,23 +91,33 @@ router.post("/conformation/request/:token", (req, res) => {
                 message: "Password set token for your account is invalid or has expired."
               });
             }
-            user.varify = true;
+            user.verify = true;
             if (password === confirm) {
               bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(password, salt, async (err, hash) => {
                   if (err) throw err;
+                  if(password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$/) === null){
+                    return res.status(400).json({
+                      message: 'Password must have at least one uppercase, one lower case and one special character'
+                    })
+                  }
                   user.password = hash;
                   const guardian = await User.findOne({
                     _id: user.guardianList[0].guardianId
                   })
                   try {
-                    guardian.patientList = [{
-                      patientId: user._id,
-                      patientName: user.firstname+' '+user.lastname,
-                      patientEmail: user.email
-                    }]
-                    guardian.userType = 'Guardian'
-                    await guardian.save();
+                    if((!guardian.guardianList.length > 0 && !guardian.patientList.length > 0) && (!guardian.guardianList.length > 0) && (!guardian.patientList.length > 0)){
+                      guardian.patientList = [{
+                        patientId: user._id,
+                        patientName: user.firstname+' '+user.lastname,
+                        patientEmail: user.email
+                      }]
+                      guardian.userType = 'Guardian'
+                      await guardian.save();
+                    } else {
+                      user.guardianList = []
+                      user.userType = ''
+                    }
                     await user.save();
                     return res.status(200).json({
                       message: "Password added successfully to your account. You can now login into your account"
@@ -134,8 +144,8 @@ router.post("/conformation/request/:token", (req, res) => {
 
 router.get('/conformation/request/:token', function(req, res) {
   User.findOne({ 
-    conformationToken: req.params.token, 
-    conformationExpires: { $gt: Date.now() } 
+    confirmationToken: req.params.token, 
+    confirmationExpires: { $gt: Date.now() } 
   }, (err, user) => {
     if (!user) {
       return res.status(400).json({
