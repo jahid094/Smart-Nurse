@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-/* const sendWelcomeEmail = ( email , Token) => {
+const sendWelcomeEmail = ( email , Token) => {
     sgMail.send({
         to: email ,
         from: 'jahid.aust39@gmail.com' ,
@@ -14,7 +14,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
     }).catch((error) => {
         console.log(error)
     })
-} */
+}
 
 // Manually Pateint Account Creation Email
 const sendRequestEmail = ( email , Token) => {
@@ -91,7 +91,7 @@ const sendRoutineMissedEmail =( email , routine, guardianName, patientName) => {
 }
 
 module.exports = {
-    // sendWelcomeEmail ,
+    sendWelcomeEmail ,
     // sendCancelationEmail ,
     sendResetEmail ,
     sendRequestEmail,
