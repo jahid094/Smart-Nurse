@@ -8,6 +8,7 @@ const User = require("../models/User");
 const { sendRequestEmail } = require("../emails/account");
 const { use } = require("passport");
 
+// Create Patient Manually
 router.post("/users/patientRegister", async (req, res) => {
   const {firstname, lastname, gender, age,email, phone, height, weight, guardianId} = req.body;
   let newUser;
@@ -76,6 +77,7 @@ router.post("/users/patientRegister", async (req, res) => {
   });
 });
 
+// Patient Id verification
 router.post("/conformation/request/:token", (req, res) => {
   const { password, confirm } = req.body;
   async.waterfall(
@@ -142,6 +144,7 @@ router.post("/conformation/request/:token", (req, res) => {
   );
 });
 
+// Patient Account creation token verification
 router.get('/conformation/request/:token', function(req, res) {
   User.findOne({ 
     confirmationToken: req.params.token, 

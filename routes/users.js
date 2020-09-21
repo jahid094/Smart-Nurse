@@ -9,7 +9,7 @@ const async = require('async');
 const User = require('../models/User');
 const Routine = require('../models/Routine');
 const Guardianship = require("../models/Guardianship");
-const { sendWelcomeEmail , sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
+const { sendRoutineMissedEmail , sendResetEmail} =require('../emails/account')
 const axios = require('axios');
 const multer = require('multer')
 const upload = multer({
@@ -24,7 +24,7 @@ const upload = multer({
   }
 })
 
-router.get('/getUser/:id' , async (req , res ) =>{
+/* router.get('/getUser/:id' , async (req , res ) =>{
     try{
       const user = await User.findById(req.params.id)
       if(!user){
@@ -40,7 +40,7 @@ router.get('/getUser/:id' , async (req , res ) =>{
           message: e
         })
     }
-})
+}) */
 
 // Registration 
 router.post('/register', (req, res) => {
@@ -150,6 +150,7 @@ router.post('/login', (req, res, next) => {
   })(req, res, next)
 })
 
+// User List Excluding Myself
 router.get('/userListExcludingMyself/:id' , async (req , res) => {
     let owner = req.params.id
     /* if(req.user){
@@ -203,7 +204,7 @@ router.post('/logout', (req, res) => {
   })
 });
 
-//Verify Cookie
+// Verify Cookie
 router.post('/verifyCookie', (req, res) => {
   const {token} = req.body
   User.findOne({cookieToken: token}).then((user) =>{
@@ -222,6 +223,7 @@ router.post('/verifyCookie', (req, res) => {
   })
 });
 
+// Forgot Password
 router.post('/forgot', function(req, res, next) {
   const {email} = req.body
   async.waterfall([
@@ -254,6 +256,7 @@ router.post('/forgot', function(req, res, next) {
   });
 });
 
+// New Password Set
 router.post('/reset/:token', function(req, res) {
   const {password, confirm} = req.body
   async.waterfall([
@@ -321,6 +324,7 @@ router.post('/reset/:token', function(req, res) {
   });
 });
 
+// Forgot Password Token Verify
 router.get('/reset/:token', function(req, res) {
   User.findOne({ 
     resetPasswordToken: req.params.token, 
@@ -337,6 +341,7 @@ router.get('/reset/:token', function(req, res) {
   });
 })
 
+// Remove User Automatically If User is not verified within 1 hour
 User.find({verify: false }).then((user) =>{
   user.forEach((element) => {
     var expire = moment(new Date()).isSameOrBefore(element.confirmationExpires)
@@ -348,6 +353,7 @@ User.find({verify: false }).then((user) =>{
   })
 })
 
+// Send Email to Guardian automatically if patient missed 3 routines in a day
 User.find({}).then((user) =>{
   user.forEach((element) => {
     var today = new Date();
@@ -419,6 +425,7 @@ router.get('/conformation/:token', (req, res) => {
   });
 })
 
+// Get Full Profile details of a user
 router.get('/users/:id', async (req, res) => {
   let userId = req.params.id
   try {
@@ -444,6 +451,7 @@ router.get('/users/:id', async (req, res) => {
   }
 })
 
+// Profile Picture Update
 router.patch('/users/profilePicture/:id' , upload.single('updatepp') , async(req,res) => {
   const buffer = Buffer.from(req.file.buffer, 'binary').toString('base64');
 
@@ -466,6 +474,7 @@ router.patch('/users/profilePicture/:id' , upload.single('updatepp') , async(req
   })
 })
 
+// Profile Picture Delete
 router.delete('/users/profilePicture/:id' ,  async(req,res) => {
   let userId = req.params.id
   
@@ -480,6 +489,7 @@ router.delete('/users/profilePicture/:id' ,  async(req,res) => {
   res.send({ message: 'Your profile picure has been successfully deleted'})
 })
 
+// Profile Update
 router.patch('/users/me/:id',  async ( req , res) => {
   let userId = req.params.id
   

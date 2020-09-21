@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-const sendWelcomeEmail = ( email , Token) => {
+/* const sendWelcomeEmail = ( email , Token) => {
     sgMail.send({
         to: email ,
         from: 'jahid.aust39@gmail.com' ,
@@ -14,8 +14,9 @@ const sendWelcomeEmail = ( email , Token) => {
     }).catch((error) => {
         console.log(error)
     })
-}
+} */
 
+// Manually Pateint Account Creation Email
 const sendRequestEmail = ( email , Token) => {
     sgMail.send({
         to: email,
@@ -31,6 +32,7 @@ const sendRequestEmail = ( email , Token) => {
     })
 }
 
+// Password Reset Confirmation Email
 const sendResetEmail = ( email , token) => {
     sgMail.send({
         to: email ,
@@ -46,7 +48,7 @@ const sendResetEmail = ( email , token) => {
     })
 }
 
-const sendCancelationEmail =( email , name) => {
+/* const sendCancelationEmail =( email , name) => {
     sgMail.send({
         to: email,
         from: 'jahid.aust39@gmail.com',
@@ -56,8 +58,9 @@ const sendCancelationEmail =( email , name) => {
     }).catch((error) => {
         console.log(error)
     })
-}
+} */
 
+// Time Format Function
 const timeFormat = (timeString) => {
     var time = timeString.split(':');
     var hour = time[0] % 12 || 12;
@@ -66,6 +69,7 @@ const timeFormat = (timeString) => {
     return hour+':'+minute + ' '+ampm;
 }
 
+// Routine Missed Email
 const sendRoutineMissedEmail =( email , routine, guardianName, patientName) => {
     let emailBody = 'Hello, Mr./ Mrs. '+guardianName+',\nYour patient is not following the daily routine. He has missed these activities listed below:\n'
     routine.sort(function (a, b) {
@@ -87,8 +91,8 @@ const sendRoutineMissedEmail =( email , routine, guardianName, patientName) => {
 }
 
 module.exports = {
-    sendWelcomeEmail ,
-    sendCancelationEmail ,
+    // sendWelcomeEmail ,
+    // sendCancelationEmail ,
     sendResetEmail ,
     sendRequestEmail,
     sendRoutineMissedEmail

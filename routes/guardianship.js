@@ -184,7 +184,7 @@ router.patch("/users/acceptRequest/:id", async (req, res) => {
   });
 });
 
-//Delete Request
+//Delete Request 
 router.delete("/requestDelete/:requestId", async (req, res) => {
   try {
     const user = await Guardianship.findOneAndDelete({
@@ -345,7 +345,8 @@ router.patch("/removePatientMyself/:id", async (req, res) => {
   }
 });
 
-router.get("/checkGuardianAndPatient/:id", async (req, res) => {
+// User Status Check
+/* router.get("/checkGuardianAndPatient/:id", async (req, res) => {
   const user = await User.findOne({
     _id: req.params.id
   });
@@ -366,6 +367,6 @@ router.get("/checkGuardianAndPatient/:id", async (req, res) => {
       message: 'You are not guardian of any user & You are not patient of any user.'
     })
   }
-});
+}); */
 
 module.exports = router;

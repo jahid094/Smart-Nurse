@@ -4,6 +4,7 @@ const moment = require('moment')
 const Routine = require('../models/Routine');
 const User = require('../models/User');
 
+// Routine Create
 router.post('/routine/:userId' , async (req, res) =>{
     // let owner = req.params.userId
     const ownerDetails = await User.findOne({ _id: req.params.userId });
@@ -60,6 +61,14 @@ router.post('/routine/:userId' , async (req, res) =>{
     console.log(owner[0].patient[0]) */
     const startDate  = moment(req.body.startDate, "YYYY-MM-DD")
     const endDate  = moment(req.body.endDate, "YYYY-MM-DD")
+    var today = new Date();
+    today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+    today = moment(today, "YYYY/MM/DD")
+    if(moment(startDate).isBefore(today) && moment(endDate).isBefore(today)){
+        return resstatus(404).json({
+            message: 'Routine cannot create successfully because you have selected previous date'
+        })
+    }
     if(!moment(startDate).isSameOrBefore(endDate)){
         return res.status(404).json({
             message: 'Start Date should not be greater than End Date.'
@@ -105,7 +114,7 @@ router.post('/routine/:userId' , async (req, res) =>{
     }
 })
 
-router.get('/routine' , async (req, res) => {
+/* router.get('/routine' , async (req, res) => {
     const routine = await Routine.find({})
 
     try{
@@ -118,8 +127,9 @@ router.get('/routine' , async (req, res) => {
     }catch(e){
         res.status(500).send(e)
     }
-})
+}) */
 
+// Routine List of User
 router.get('/routines/:userId' , async (req, res) =>{
     let userId = req.params.userId
     
@@ -155,6 +165,7 @@ router.get('/routines/:userId' , async (req, res) =>{
     }
 })
 
+// Routine Details
 router.get('/routine/:routineId' , async (req, res) =>{
     const _id=req.params.routineId
     try{
@@ -169,6 +180,7 @@ router.get('/routine/:routineId' , async (req, res) =>{
     }
 })
 
+// Routine Update
 router.patch('/routine/:routineId' , async ( req , res) => {
     //const _id = req.params.routineId
     const updates = Object.keys(req.body)
@@ -185,7 +197,9 @@ router.patch('/routine/:routineId' , async ( req , res) => {
         const routine = await Routine.findOne({ _id: req.params.routineId })
         // console.log(routine)
         var today = new Date();
+        // var time = moment(new Date()).format("HH:mm")
         today = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+        today = moment(today, "YYYY/MM/DD")
         if(!routine){
             return res.status(404).json({ 
                 message: 'Routine not found'
@@ -193,23 +207,60 @@ router.patch('/routine/:routineId' , async ( req , res) => {
         }
         let statusDay = [];
         let statusTime = [];
-        if(req.body.startDate && req.body.endDate && req.body.timesPerDay){
-            if(routine.timesPerDay == req.body.timesPerDay &&  moment(routine.endDate, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') + 1 ==  moment(req.body.endDate, "YYYY-MM-DD").diff( moment(req.body.startDate, "YYYY-MM-DD"), 'days') + 1){
+        const startDate  = moment(req.body.startDate, "YYYY-MM-DD")
+        const endDate  = moment(req.body.endDate, "YYYY-MM-DD")
+        if(moment(startDate).isBefore(today) && moment(endDate).isBefore(today)){
+            console.log('ifmoment0')
+            return res.json({
+                message: 'Routine cannot updated successfully because you have selected previous date'
+            })
+        }
+        if(startDate && endDate && req.body.timesPerDay){
+            if(routine.timesPerDay == req.body.timesPerDay &&  moment(routine.endDate, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') + 1 ==  moment(endDate, "YYYY-MM-DD").diff( moment(startDate, "YYYY-MM-DD"), 'days') + 1){
+                for(var i = 0; i < routine.times.length; i++){
+                    console.log(routine.times[i].time)
+                    console.log(req.body.times[i].time)
+                    console.log(moment(today).isBefore(startDate))
+                    console.log(moment(today).isBefore(endDate))
+                    if(moment(today).isBefore(startDate) && moment(today).isBefore(endDate) || moment(today).isSame(startDate)){
+                        console.log('ifmoment1')
+                        if(routine.times[i].time != req.body.times[i].time){
+                            routine.statusDay.forEach((item) => {
+                                // console.log(item.statusTime[i])
+                                item.statusTime[i].done = false
+                                item.statusTime[i].visible = true
+                            })
+                        }
+                    }
+                    if(moment(today).isSame(endDate)){
+                        console.log('ifmoment2')
+                        if(routine.times[i].time != req.body.times[i].time){
+                            console.log(routine.statusDay[routine.statusDay.length - 1])
+                            routine.statusDay[routine.statusDay.length - 1].statusTime[i].done = false
+                            routine.statusDay[routine.statusDay.length - 1].statusTime[i].visible = true
+                        }
+                    }
+                    
+                }
                 updates.forEach((update) => routine[update] = req.body[update])
                 await routine.save()
-                return res.json({ 
+                return res.json({
                     message: 'Routine updated successfully'
                 })
             } else {
-                if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') == 0){
-                } else if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') > 0){
-                    // console.log('PreviousArray Length:'+routine.statusDay.length)
+                    console.log('if:')
+                    console.log(routine.statusDay)
+                    console.log('PreviousArray Length:'+routine.statusDay.length)
+                    /* for(var i = 0; i < req.body.timesPerDay; i++){
+                        console.log(routine.times[i].time)
+                        console.log(req.body.times[i].time)
+                        var time1 = moment(req.body.times[i].time).format("HH:mm")
+                        console.log(moment(time1).isSameOrAfter(time))
+                    } */
                     let newArray = routine.statusDay.splice(0, moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days'));
-                    /* console.log('NewArray:')
+                    console.log('NewArray:')
                     console.log(newArray)
                     console.log('NewArray Length:'+newArray.length)
-                    console.log(routine.statusDay)
-                    console.log('PreviousArray Length:'+routine.statusDay.length) */
                     Array.from({ length: req.body.timesPerDay }, (v, k) => (
                         statusTime.push({
                             done: false,
@@ -228,17 +279,26 @@ router.patch('/routine/:routineId' , async ( req , res) => {
                     console.log(statusDay)
                     console.log('StatusDay Length:'+statusDay.length) */
                     statusDay = newArray.concat(statusDay);
-                    /* console.log('After Concat:')
+                    console.log('After Concat:')
                     console.log('StatusDay:')
-                    console.log(statusDay)
-                    console.log('StatusDay Length:'+statusDay.length) */
-                    updates.forEach((update) => routine[update] = req.body[update])
-                    routine.statusDay = statusDay
-                    await routine.save()
+                    // console.log(statusDay)
+                    statusDay.forEach((item) => {
+                        console.log(item)
+                    })
+                    console.log('StatusDay Length:'+statusDay.length)
+                /* if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') == 0){
+                } else */ /* if(moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days') > 0){ */
+                    // console.log('PreviousArray Length:'+routine.statusDay.length)
+                    
+                    // updates.forEach((update) => routine[update] = req.body[update])
+                    // routine.statusDay = statusDay
+                    // await routine.save()
                     return res.json({  
                         message: 'Routine updated successfully'
                     })
-                }
+                /* } else{
+                    console.log('else')
+                } */
                 // console.log('Difference:'+moment(today, "YYYY-MM-DD").diff(moment(routine.startDate, "YYYY-MM-DD"), 'days'))
             }
         }
@@ -256,6 +316,7 @@ router.patch('/routine/:routineId' , async ( req , res) => {
 
 })
 
+// Routine Delete
 router.delete('/routine/:routineId'  , async(req , res) =>{
     try{
         const routine = await Routine.findOneAndDelete({_id: req.params.routineId})
@@ -276,6 +337,7 @@ router.delete('/routine/:routineId'  , async(req , res) =>{
     }
 })
 
+// Routine Notification Count Of a User
 router.get('/routineNotification/:userId' , async (req, res) =>{
     // let owner = req.params.userId;
     let userId = req.params.userId
@@ -372,6 +434,7 @@ router.get('/routineNotification/:userId' , async (req, res) =>{
     }
 })
 
+// Accept Routine Notification
 router.patch('/acceptRoutine' , async ( req , res) => {
     var timeIndex
     const routine = await Routine.findOne({ _id: req.body.id })
@@ -413,6 +476,7 @@ router.patch('/acceptRoutine' , async ( req , res) => {
     })
 })
 
+// Cancel Routine Notification
 router.patch('/cancelRoutine' , async ( req , res) => {
     var timeIndex
     const routine = await Routine.findOne({ _id: req.body.id })

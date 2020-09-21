@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Schema of Guardianship Table
 var GuardianshipSchema = new mongoose.Schema({
     requester: {
         type: mongoose.Schema.ObjectId,
