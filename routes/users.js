@@ -496,6 +496,7 @@ router.patch('/users/me/:id',  async ( req , res) => {
   const updates = Object.keys(req.body)
   const allowedupdates = ['firstname', 'lastname' , 'age' , 'weight' , 'height' , 'phone']
   const isValidOperation = updates.every((update) => allowedupdates.includes(update))
+  
   const {password, newPassword, confirmPassword} = req.body
 
   if(!password && !newPassword && !confirmPassword)

@@ -1,8 +1,9 @@
 const sgMail = require('@sendgrid/mail')
+var nodemailer = require('nodemailer');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-/* const sendWelcomeEmail = ( email , Token) => {
-    sgMail.send({
+const sendWelcomeEmail = ( email , Token) => {
+    /* sgMail.send({
         to: email ,
         from: 'jahid.aust39@gmail.com' ,
         subject: 'Confirm Your mail !' ,
@@ -13,39 +14,105 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
     }).then(() => {
     }).catch((error) => {
         console.log(error)
-    })
-} */
+    }) */
+    var smtpTransport = nodemailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'codebreakers8094@gmail.com',
+          pass: 'CodeBreakers8094'
+        }
+      });
+      var mailOptions = {
+        to: email ,
+        from: 'codebreakers8094@gmail.com',
+        subject: 'Confirm Your mail',
+        text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
+        'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+        process.env.FRONTEND_URL+'confirmation/' + Token + '\n\n' +
+        'If you did not request this, please ignore this email and your password will remain unchanged.\n'  
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+        console.log('mail sent');
+        console.log(err);
+      });
+}
 
 // Manually Pateint Account Creation Email
 const sendRequestEmail = ( email , Token) => {
-    sgMail.send({
-        to: email,
-        from: 'jahid.aust39@gmail.com',
+    // sgMail.send({
+    //     to: email,
+    //     from: 'jahid.aust39@gmail.com',
+    //     subject: 'Confirm Your Account!',
+    //     text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
+    //     'Please click on the following link and give passwords to create your account \n\n' +
+    //     process.env.FRONTEND_URL+'setPasswordForNewPatient/' + Token + '\n\n' +
+    //     'If you did not request this, please ignore this email and your password will remain unchanged.\n'  
+    // }).then(() => {
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
+
+
+    var smtpTransport = nodemailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'codebreakers8094@gmail.com',
+          pass: 'CodeBreakers8094'
+        }
+      });
+      var mailOptions = {
+        to: email ,
+        from: 'codebreakers8094@gmail.com',
         subject: 'Confirm Your Account!',
         text: 'You are receiving this because you (or someone else) have requested to create account.\n\n' +
         'Please click on the following link and give passwords to create your account \n\n' +
         process.env.FRONTEND_URL+'setPasswordForNewPatient/' + Token + '\n\n' +
         'If you did not request this, please ignore this email and your password will remain unchanged.\n'  
-    }).then(() => {
-    }).catch((error) => {
-        console.log(error)
-    })
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+        console.log('mail sent');
+        console.log(err);
+      });
+
+
 }
 
 // Password Reset Confirmation Email
 const sendResetEmail = ( email , token) => {
-    sgMail.send({
+    // sgMail.send({
+    //     to: email ,
+    //     from: 'jahid.aust39@gmail.com',
+    //     subject: 'Password Reset For Smart Nurse!',
+    //     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+    //       'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+    //       process.env.FRONTEND_URL+'resetPassword/' + token + '\n\n' +
+    //       'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+    // }).then(() => {
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
+
+
+    var smtpTransport = nodemailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'codebreakers8094@gmail.com',
+          pass: 'CodeBreakers8094'
+        }
+      });
+      var mailOptions = {
         to: email ,
-        from: 'jahid.aust39@gmail.com',
+        from: 'codebreakers8094@gmail.com',
         subject: 'Password Reset For Smart Nurse!',
         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          process.env.FRONTEND_URL+'resetPassword/' + token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-    }).then(() => {
-    }).catch((error) => {
-        console.log(error)
-    })
+        'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+        process.env.FRONTEND_URL+'resetPassword/' + token + '\n\n' +
+        'If you did not request this, please ignore this email and your password will remain unchanged.\n'  
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+        console.log('mail sent');
+        console.log(err);
+      });
 }
 
 /* const sendCancelationEmail =( email , name) => {
@@ -79,19 +146,41 @@ const sendRoutineMissedEmail =( email , routine, guardianName, patientName) => {
         emailBody = emailBody + element.notificationArray.itemName + ' ' + timeFormat(element.notificationTime.time)+'\n'
     })
     emailBody = emailBody + 'Please contact with your patient as soon as possible.\nWith best regards,\nSmart Nurse Team'
-    sgMail.send({
-        to: email,
-        from: 'jahid.aust39@gmail.com',
+    // sgMail.send({
+    //     to: email,
+    //     from: 'jahid.aust39@gmail.com',
+    //     subject: 'Your patient '+patientName+ ' has missed several daily routines in a row.',
+    //     text: emailBody
+    // }).then(() => {
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
+
+
+
+
+
+    var smtpTransport = nodemailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'codebreakers8094@gmail.com',
+          pass: 'CodeBreakers8094'
+        }
+      });
+      var mailOptions = {
+        to: email ,
+        from: 'codebreakers8094@gmail.com',
         subject: 'Your patient '+patientName+ ' has missed several daily routines in a row.',
-        text: emailBody
-    }).then(() => {
-    }).catch((error) => {
-        console.log(error)
-    })
+        text: emailBody 
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+        console.log('mail sent');
+        console.log(err);
+      });
 }
 
 module.exports = {
-    // sendWelcomeEmail ,
+    sendWelcomeEmail ,
     // sendCancelationEmail ,
     sendResetEmail ,
     sendRequestEmail,
